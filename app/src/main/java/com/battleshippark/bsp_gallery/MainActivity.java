@@ -1,18 +1,15 @@
 package com.battleshippark.bsp_gallery;
 
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+
+@EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -33,5 +30,13 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@AfterViews
+	protected void onViewCreated() {
+		Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+//		myToolbar.setTitle("Gallery");
+//		myToolbar.setTitleTextColor(0xffffff);
+		setSupportActionBar(myToolbar);
 	}
 }
