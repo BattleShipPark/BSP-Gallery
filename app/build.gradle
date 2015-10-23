@@ -18,6 +18,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor' // due to butterknife + lombok
+    }
 }
 
 dependencies {
@@ -26,6 +33,11 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.0.1'
 
     compile 'com.jakewharton:butterknife:7.0.1'
+
+//    provided group: 'org.projectlombok', name: 'lombok', version:'1.14.8'
+    compile 'org.projectlombok:lombok:1.16.6'
+
+    compile 'io.reactivex:rxjava:1.0.10'
 
     androidTestCompile 'com.android.support.test:runner:0.4'
     // Set this dependency to use JUnit 4 rules
