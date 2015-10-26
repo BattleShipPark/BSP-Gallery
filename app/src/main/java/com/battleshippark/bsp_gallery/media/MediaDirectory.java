@@ -8,6 +8,8 @@ import lombok.Data;
  */
 @Data
 public class MediaDirectory {
+    public static final int ALL_DIR_ID = 0;
+
     private int id;
     private long coverImageId;
     private String coverThumbPath;

@@ -24,6 +24,8 @@ import lombok.Cleanup;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
@@ -42,22 +44,13 @@ public class MediaController {
         this.mainModel = mainModel;
 
         writeToCacheSubject.subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<Void>() {
-                    @Override
-                    public void onCompleted() {
-                    }
+                .subscribe(
+                        aVoid -> {
+                            String json = toJson();
+                            writeToCache(json);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onNext(Void v) {
-                        String json = toJson();
-                        writeToCache(json);
-                    }
-                });
+                        },
+                        Throwable::printStackTrace);
     }
 
     /**
@@ -66,26 +59,28 @@ public class MediaController {
      */
     public void refreshDirListAsync() {
         Observable.create((Observable.OnSubscribe<List<MediaDirectory>>) subscriber -> {
-            List<MediaDirectory> dir;
+            List<MediaDirectory> dirs = null;
+            MediaDirectory allDir;
 
             try {
-                dir = getFromCache(context);
-                subscriber.onNext(dir);
+                dirs = getFromCache(context);
+                subscriber.onNext(dirs);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            dir = getMediaDirectoryList(context);
-            subscriber.onNext(dir);
+            allDir = dirs.get(0);
 
-            dir = addMediaFileCount(context, dir);
-            subscriber.onNext(dir);
+            dirs = getDirsWithAllAndNext(allDir, subscriber, () -> getMediaDirectoryList(context));
 
-            dir = addMediaFileId(context, dir);
-            subscriber.onNext(dir);
+            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, (_dirs) -> addMediaFileCount(context, _dirs));
 
-            dir = addMediaThumbPath(context, dir);
-            subscriber.onNext(dir);
+            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, (_dirs) -> addMediaFileId(context, _dirs));
+
+            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, (_dirs) -> addMediaThumbPath(context, _dirs));
+
+            dirs = addAllDirectory(dirs);
+            subscriber.onNext(dirs);
 
             subscriber.onCompleted();
         }).subscribeOn(Schedulers.io())
@@ -96,33 +91,36 @@ public class MediaController {
                         () -> writeToCacheSubject.onNext(null));
     }
 
-    private List<MediaDirectory> getFromCache(Context context) throws IOException {
-        File cacheDirFile = context.getExternalCacheDir();
-        File inputFile = new File(cacheDirFile, CACHE_FILENAME);
+    /*
+     * func을 수행해서 디렉토리 목록을 구하고, 거기에 전체 디렉토리를 붙여서 발행한다.
+     * 반환할 때는 전체 디렉토리없이 한다
+     */
+    private List<MediaDirectory> getDirsWithAllAndNext(MediaDirectory allDir,
+                                                       Subscriber<? super List<MediaDirectory>> subscriber,
+                                                       Func0<List<MediaDirectory>> func) {
+        List<MediaDirectory> dirs = func.call();
+        List<MediaDirectory> result = new ArrayList<>();
 
-        @Cleanup FileReader reader = new FileReader(inputFile);
+        result.clear();
+        result.add(allDir);
+        result.addAll(dirs);
+        subscriber.onNext(result);
 
-        try {
-            Type type = new TypeToken<List<MediaDirectory>>() {
-            }.getType();
-            return new Gson().fromJson(reader, type);
-        } catch (JsonParseException e) {
-            throw new IOException(e);
-        } finally {
-            Log.d("", "MediaController.getFromCache()");
-        }
+        return dirs;
     }
 
-    private void writeToCache(String json) {
-        File cacheDirFile = context.getCacheDir();
-        File outputFile = new File(cacheDirFile, CACHE_FILENAME);
+    private List<MediaDirectory> getDirsWithAllAndNext(MediaDirectory allDir, List<MediaDirectory> dirs,
+                                                       Subscriber<? super List<MediaDirectory>> subscriber,
+                                                       Func1<List<MediaDirectory>, List<MediaDirectory>> func) {
+        dirs = func.call(dirs);
+        List<MediaDirectory> result = new ArrayList<>();
 
-        try {
-            @Cleanup FileWriter writer = new FileWriter(outputFile);
-            writer.write(json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        result.clear();
+        result.add(allDir);
+        result.addAll(dirs);
+        subscriber.onNext(result);
+
+        return dirs;
     }
 
     /**
@@ -220,11 +218,71 @@ public class MediaController {
             }
         }
 
-
         return result;
+    }
+
+    List<MediaDirectory> addAllDirectory(List<MediaDirectory> directories) {
+        MediaDirectory allDir = new MediaDirectory();
+
+        allDir.setId(MediaDirectory.ALL_DIR_ID);
+
+        allDir.setName("All");
+
+        int count = Observable.from(directories)
+                .map(MediaDirectory::getCount)
+                .reduce((_sum, _count) -> _sum + _count)
+                .toBlocking()
+                .last();
+        allDir.setCount(count);
+
+        MediaDirectory dir = Observable.from(directories)
+                .reduce((_dir1, _dir2) -> {
+                    if (_dir1.getCoverImageId() >= _dir2.getCoverImageId())
+                        return _dir1;
+                    else
+                        return _dir2;
+                })
+                .toBlocking()
+                .last();
+        allDir.setCoverImageId(dir.getCoverImageId());
+        allDir.setCoverThumbPath(dir.getCoverThumbPath());
+
+        directories.add(0, allDir);
+        return directories;
     }
 
     private String toJson() {
         return new Gson().toJson(mainModel.getMediaDirectoryList());
+    }
+
+    private List<MediaDirectory> getFromCache(Context context) throws IOException {
+        File cacheDirFile = context.getCacheDir();
+        File inputFile = new File(cacheDirFile, CACHE_FILENAME);
+
+        @Cleanup FileReader reader = new FileReader(inputFile);
+
+        try {
+            Type type = new TypeToken<List<MediaDirectory>>() {
+            }.getType();
+            return new Gson().fromJson(reader, type);
+        } catch (JsonParseException e) {
+            throw new IOException(e);
+        } finally {
+            Log.d("DEBUG", "MediaController.getFromCache()");
+        }
+    }
+
+    private void writeToCache(String json) {
+        File cacheDirFile = context.getCacheDir();
+        File outputFile = new File(cacheDirFile, CACHE_FILENAME);
+
+        try {
+            @Cleanup FileWriter writer = new FileWriter(outputFile);
+            writer.write(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            Log.d("DEBUG", "MediaController.writeToCache()");
+        }
     }
 }
