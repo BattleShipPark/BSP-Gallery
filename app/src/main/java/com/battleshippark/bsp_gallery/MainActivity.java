@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     /* */
     private MainAdapter adapter;
+    private MainItemDecoration decoration;
     private MainModel mainModel;
     private Bus eventBus;
 
@@ -87,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void OnMediaDirectoryListUpdated(Events.OnMediaDirectoryListUpdated event) {
-        Log.i("", "event");
         adapter.refresh();
     }
 
@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         mainModel = new MainModel(eventBus);
 
         adapter = new MainAdapter(this, mainModel);
+        decoration = new MainItemDecoration(mainModel);
 
         mediaController = new MediaController(this, mainModel);
     }
@@ -110,5 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
         listview.setAdapter(adapter);
         listview.setLayoutManager(new LinearLayoutManager(this));
+        listview.addItemDecoration(decoration);
     }
 }

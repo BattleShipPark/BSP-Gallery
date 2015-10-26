@@ -32,7 +32,7 @@ public class MainViewHolder extends RecyclerView.ViewHolder {
     public void setModel(MediaDirectory mediaDirectory) {
         if (mediaDirectory.getCoverThumbPath() != null)
             coverImageView.setImageBitmap(BitmapFactory.decodeFile(mediaDirectory.getCoverThumbPath()));
-        
+
         nameTextView.setText(mediaDirectory.getName());
         countTextView.setText(String.valueOf(mediaDirectory.getCount()));
     }
