@@ -8,7 +8,15 @@ import android.util.Log;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.MainModel;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,45 +25,24 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 /**
  */
 public class MediaController {
+    private static final String CACHE_FILENAME = "dirCache";
     private final Context context;
     private final MainModel mainModel;
+
+    private Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
 
     public MediaController(Context context, MainModel mainModel) {
         this.context = context;
         this.mainModel = mainModel;
-    }
 
-    /**
-     * 디렉토리 목록을 갱신한다. 한 번에 전부 가져올 수 없고, 쿼리를 여러번 던져야 해서
-     * 쿼리를 던질때마다 MainModel을 갱신한다
-     */
-    public void refreshDirListAsync() {
-        Observable.create(new Observable.OnSubscribe<List<MediaDirectory>>() {
-            @Override
-            public void call(Subscriber<? super List<MediaDirectory>> subscriber) {
-                List<MediaDirectory> dir;
-
-                dir = getMediaDirectoryList(context);
-                subscriber.onNext(dir);
-
-                dir = addMediaFileCount(context, dir);
-                subscriber.onNext(dir);
-
-                dir = addMediaFileId(context, dir);
-                subscriber.onNext(dir);
-
-                dir = addMediaThumbPath(context, dir);
-                subscriber.onNext(dir);
-
-                subscriber.onCompleted();
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<MediaDirectory>>() {
+        writeToCacheSubject.subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -66,10 +53,76 @@ public class MediaController {
                     }
 
                     @Override
-                    public void onNext(List<MediaDirectory> mediaDirectories) {
-                        mainModel.setMediaDirectoryList(mediaDirectories);
+                    public void onNext(Void v) {
+                        String json = toJson();
+                        writeToCache(json);
                     }
                 });
+    }
+
+    /**
+     * 디렉토리 목록을 갱신한다. 한 번에 전부 가져올 수 없고, 쿼리를 여러번 던져야 해서
+     * 쿼리를 던질때마다 MainModel을 갱신한다
+     */
+    public void refreshDirListAsync() {
+        Observable.create((Observable.OnSubscribe<List<MediaDirectory>>) subscriber -> {
+            List<MediaDirectory> dir;
+
+            try {
+                dir = getFromCache(context);
+                subscriber.onNext(dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            dir = getMediaDirectoryList(context);
+            subscriber.onNext(dir);
+
+            dir = addMediaFileCount(context, dir);
+            subscriber.onNext(dir);
+
+            dir = addMediaFileId(context, dir);
+            subscriber.onNext(dir);
+
+            dir = addMediaThumbPath(context, dir);
+            subscriber.onNext(dir);
+
+            subscriber.onCompleted();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        mainModel::setMediaDirectoryList,
+                        Throwable::printStackTrace,
+                        () -> writeToCacheSubject.onNext(null));
+    }
+
+    private List<MediaDirectory> getFromCache(Context context) throws IOException {
+        File cacheDirFile = context.getExternalCacheDir();
+        File inputFile = new File(cacheDirFile, CACHE_FILENAME);
+
+        @Cleanup FileReader reader = new FileReader(inputFile);
+
+        try {
+            Type type = new TypeToken<List<MediaDirectory>>() {
+            }.getType();
+            return new Gson().fromJson(reader, type);
+        } catch (JsonParseException e) {
+            throw new IOException(e);
+        } finally {
+            Log.d("", "MediaController.getFromCache()");
+        }
+    }
+
+    private void writeToCache(String json) {
+        File cacheDirFile = context.getCacheDir();
+        File outputFile = new File(cacheDirFile, CACHE_FILENAME);
+
+        try {
+            @Cleanup FileWriter writer = new FileWriter(outputFile);
+            writer.write(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -77,7 +130,7 @@ public class MediaController {
      *
      * @return ID와 이름만 유효하다
      */
-    static List<MediaDirectory> getMediaDirectoryList(Context context) {
+    List<MediaDirectory> getMediaDirectoryList(Context context) {
         String[] columns = new String[]{
                 MediaStore.Images.ImageColumns.BUCKET_ID,
                 MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
@@ -102,7 +155,7 @@ public class MediaController {
     /**
      * 디렉토리에 파일 갯수를 추가한다
      */
-    static List<MediaDirectory> addMediaFileCount(Context context, List<MediaDirectory> dirs) {
+    List<MediaDirectory> addMediaFileCount(Context context, List<MediaDirectory> dirs) {
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] countClauses = new String[]{"count(*) AS count"};
 
@@ -128,7 +181,7 @@ public class MediaController {
     /**
      * 디렉토리에 가장 최근 파일의 ID를 추가한다
      */
-    static List<MediaDirectory> addMediaFileId(Context context, List<MediaDirectory> dirs) {
+    List<MediaDirectory> addMediaFileId(Context context, List<MediaDirectory> dirs) {
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projectionClauses = new String[]{MediaStore.Images.Media._ID};
         String orderClause = MediaStore.Images.Media._ID + " desc";
@@ -153,7 +206,7 @@ public class MediaController {
     /**
      * 디렉토리에 가장 최근 파일의 손톱 이미지 경로를 추가한다
      */
-    static List<MediaDirectory> addMediaThumbPath(Context context, List<MediaDirectory> dirs) {
+    List<MediaDirectory> addMediaThumbPath(Context context, List<MediaDirectory> dirs) {
         String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
 
         List<MediaDirectory> result = new ArrayList<>();
@@ -169,5 +222,9 @@ public class MediaController {
 
 
         return result;
+    }
+
+    private String toJson() {
+        return new Gson().toJson(mainModel.getMediaDirectoryList());
     }
 }
