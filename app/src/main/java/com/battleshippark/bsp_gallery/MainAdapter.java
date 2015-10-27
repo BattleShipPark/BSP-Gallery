@@ -44,7 +44,9 @@ public class MainAdapter extends RecyclerView.Adapter {
     }
 
     public void refresh() {
-        mediaDirectoryModelList = Collections.unmodifiableList(mainModel.getMediaDirectoryModelList());
-        notifyDataSetChanged();
+        if (mainModel.getMediaDirectoryModelList() != null) {
+            mediaDirectoryModelList = Collections.unmodifiableList(mainModel.getMediaDirectoryModelList());
+            notifyDataSetChanged();
+        }
     }
 }

@@ -3,4 +3,8 @@
 
 	<string name="hello_world">Hello world!</string>
 	<string name="action_settings">Settings</string>
+
+	<string name="media_mode_all">ALL</string>
+	<string name="media_mode_image">IMAGE</string>
+	<string name="media_mode_video">VIDEO</string>
 </resources>

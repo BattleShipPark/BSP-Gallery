@@ -10,10 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.media.MediaController;
+import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import com.squareup.otto.ThreadEnforcer;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         eventBus.post(Events.OnActivityCreated.EVENT);
 
-        mediaController.refreshDirListAsync();
+//        mediaController.refreshDirListAsync();
     }
 
     @Override
@@ -100,8 +103,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void OnMediaModeUpdated(Events.OnMediaModeUpdated event) {
-        Log.d("", "OnMediaModeUpdated()");
+        Log.d("", getClass().getSimpleName() + ".OnMediaModeUpdated()");
+
+        TextView tv = (TextView) toolbar.findViewById(R.id.media);
+        switch (mainModel.getMediaMode()) {
+            case ALL:
+                tv.setText(R.string.media_mode_all);
+                break;
+            case IMAGE:
+                tv.setText(R.string.media_mode_image);
+                break;
+            case VIDEO:
+                tv.setText(R.string.media_mode_video);
+                break;
+        }
         adapter.refresh();
+    }
+
+    @Subscribe
+    public void OnSharedPreferenceRead(Events.OnSharedPreferenceRead event) {
+        Log.d("", "OnSharedPreferenceRead()");
+        mainModel.setMediaMode(event.getModel().getMediaMode());
+        mediaController.refreshDirListAsync();
     }
 
     private void initData() {
@@ -114,12 +137,11 @@ public class MainActivity extends AppCompatActivity {
         decoration = new MainItemDecoration(mainModel);
 
         mediaController = new MediaController(this, mainModel);
+
+        new SharedPreferenceController(this, mainModel);
     }
 
     private void initUI() {
-//        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        //		myToolbar.setTitle("Gallery");
-        //		myToolbar.setTitleTextColor(0xffffff);
         setSupportActionBar(toolbar);
         toolbar.findViewById(R.id.media).setOnClickListener(this::showMediaPopup);
 

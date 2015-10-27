@@ -30,7 +30,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:text="All"
+            android:text="@string/media_mode_all"
             android:textSize="18sp" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/media"
             android:layout_toRightOf="@id/image"
-            android:text="name"
+            android:text="@string/app_name"
             android:textSize="22sp" />
 
     </RelativeLayout>

@@ -162,9 +162,13 @@ public class MediaController {
         return new Gson().toJson(mainModel.getMediaDirectoryModelList());
     }
 
+    private String getCacheFileName() {
+        return CACHE_FILENAME + mainModel.getMediaMode();
+    }
+
     private List<MediaDirectoryModel> getFromCache(Context context) throws IOException {
         File cacheDirFile = context.getCacheDir();
-        File inputFile = new File(cacheDirFile, CACHE_FILENAME);
+        File inputFile = new File(cacheDirFile, getCacheFileName());
 
         @Cleanup FileReader reader = new FileReader(inputFile);
 
@@ -181,7 +185,7 @@ public class MediaController {
 
     private void writeToCache(String json) {
         File cacheDirFile = context.getCacheDir();
-        File outputFile = new File(cacheDirFile, CACHE_FILENAME);
+        File outputFile = new File(cacheDirFile, getCacheFileName());
 
         try {
             @Cleanup FileWriter writer = new FileWriter(outputFile);

@@ -22,12 +22,12 @@ public class MainModel {
 
     @Subscribe
     public void OnActivityCreated(Events.OnActivityCreated event) {
-        eventBus.register(this);
+//        eventBus.register(this);
     }
 
     @Subscribe
     public void OnActivityDestroyed(Events.OnActivityDestroyed event) {
-        eventBus.unregister(this);
+//        eventBus.unregister(this);
     }
 
     public void setMediaDirectoryModelList(List<MediaDirectoryModel> modelList) {

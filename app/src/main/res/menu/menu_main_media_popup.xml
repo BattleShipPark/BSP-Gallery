@@ -5,13 +5,13 @@
     <item
         android:id="@+id/action_media_all"
         android:orderInCategory="101"
-        android:title="All" />
+        android:title="@string/media_mode_all" />
     <item
         android:id="@+id/action_media_image"
         android:orderInCategory="101"
-        android:title="Image" />
+        android:title="@string/media_mode_image" />
     <item
         android:id="@+id/action_media_video"
         android:orderInCategory="101"
-        android:title="Video" />
+        android:title="@string/media_mode_video" />
 </menu>
