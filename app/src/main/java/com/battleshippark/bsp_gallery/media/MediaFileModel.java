@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  */
 @Data
-public class MediaFile {
+public class MediaFileModel {
     private Uri pathUri;
     private String pathName;
 }

@@ -2,11 +2,6 @@ package com.battleshippark.bsp_gallery.test;
 
 import android.content.Context;
 
-import com.battleshippark.bsp_gallery.media.MediaController;
-import com.battleshippark.bsp_gallery.media.MediaDirectory;
-
-import java.util.List;
-
 
 /**
  */
