@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery;
+package com.battleshippark.bsp_gallery.activity.folders;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,12 +8,12 @@ import android.view.View;
 
 /**
  */
-public class MainItemDecoration extends RecyclerView.ItemDecoration {
-    private final MainModel mainModel;
+public class FoldersItemDecoration extends RecyclerView.ItemDecoration {
+    private final FoldersModel foldersModel;
     private Paint paint;
 
-    public MainItemDecoration(MainModel mainModel) {
-        this.mainModel = mainModel;
+    public FoldersItemDecoration(FoldersModel foldersModel) {
+        this.foldersModel = foldersModel;
 
         paint = new Paint();
         paint.setColor(Color.rgb(0x80, 0x80, 0x80));

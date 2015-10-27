@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.battleshippark.bsp_gallery.MainModel;
+import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
@@ -32,14 +32,14 @@ import rx.subjects.Subject;
 public class MediaController {
     private static final String CACHE_FILENAME = "dirCache";
     private final Context context;
-    private final MainModel mainModel;
+    private final FoldersModel foldersModel;
     private MediaDirectoryController directoryController;
 
     private Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
 
-    public MediaController(Context context, MainModel mainModel) {
+    public MediaController(Context context, FoldersModel foldersModel) {
         this.context = context;
-        this.mainModel = mainModel;
+        this.foldersModel = foldersModel;
 
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
@@ -56,7 +56,7 @@ public class MediaController {
      * 쿼리를 던질때마다 MainModel을 갱신한다
      */
     public void refreshDirListAsync() {
-        directoryController = MediaDirectoryController.create(context, mainModel.getMediaMode());
+        directoryController = MediaDirectoryController.create(context, foldersModel.getMediaMode());
 
         Observable.create((Observable.OnSubscribe<List<MediaDirectoryModel>>) subscriber -> {
             List<MediaDirectoryModel> dirs = null;
@@ -87,7 +87,7 @@ public class MediaController {
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        mainModel::setMediaDirectoryModelList,
+                        foldersModel::setMediaDirectoryModelList,
                         Throwable::printStackTrace,
                         () -> writeToCacheSubject.onNext(null));
     }
@@ -159,11 +159,11 @@ public class MediaController {
 
 
     private String toJson() {
-        return new Gson().toJson(mainModel.getMediaDirectoryModelList());
+        return new Gson().toJson(foldersModel.getMediaDirectoryModelList());
     }
 
     private String getCacheFileName() {
-        return CACHE_FILENAME + mainModel.getMediaMode();
+        return CACHE_FILENAME + foldersModel.getMediaMode();
     }
 
     private List<MediaDirectoryModel> getFromCache(Context context) throws IOException {

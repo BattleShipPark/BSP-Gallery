@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery;
+package com.battleshippark.bsp_gallery.activity.folders;
 
 import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaDirectoryModel;
 
 import butterknife.Bind;
@@ -14,7 +15,7 @@ import butterknife.ButterKnife;
 
 /**
  */
-public class MainViewHolder extends RecyclerView.ViewHolder {
+public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.image)
     ImageView coverImageView;
 
@@ -27,7 +28,7 @@ public class MainViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.count)
     TextView countTextView;
 
-    public MainViewHolder(View view) {
+    public FoldersItemViewHolder(View view) {
         super(view);
 
         ButterKnife.bind(this, view);

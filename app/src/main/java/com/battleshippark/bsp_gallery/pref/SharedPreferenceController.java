@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.Events;
-import com.battleshippark.bsp_gallery.MainModel;
+import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
@@ -21,16 +21,16 @@ import rx.schedulers.Schedulers;
 public class SharedPreferenceController {
     private static final String NAME = "sp";
     private final Context context;
-    private final MainModel mainModel;
+    private final FoldersModel foldersModel;
     private final SharedPreferenceModel model;
     private final Map<String, Action1<String>> readingProcessMap = new HashMap<>();
     private final Map<String, Action1<String>> writingProcessMap = new HashMap<>();
 
-    public SharedPreferenceController(Context context, MainModel mainModel) {
+    public SharedPreferenceController(Context context, FoldersModel foldersModel) {
         this.context = context;
-        this.mainModel = mainModel;
+        this.foldersModel = foldersModel;
 
-        mainModel.getEventBus().register(this);
+        foldersModel.getEventBus().register(this);
 
         model = new SharedPreferenceModel();
 
@@ -53,7 +53,7 @@ public class SharedPreferenceController {
 
     @Subscribe
     public void OnActivityDestroyed(Events.OnActivityDestroyed event) {
-        mainModel.getEventBus().unregister(this);
+        foldersModel.getEventBus().unregister(this);
     }
 
     @Subscribe
@@ -66,17 +66,17 @@ public class SharedPreferenceController {
 
     private void sendEvent() {
         BspApplication.getHandler().post(
-                () -> mainModel.getEventBus().post(new Events.OnSharedPreferenceRead(model))
+                () -> foldersModel.getEventBus().post(new Events.OnSharedPreferenceRead(model))
         );
     }
 
     private void readMediaMode(String key) {
         SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        model.setMediaMode(MainModel.MEDIA_MODE.valueOf(p.getString(key, MainModel.MEDIA_MODE.ALL.name())));
+        model.setMediaMode(FoldersModel.MEDIA_MODE.valueOf(p.getString(key, FoldersModel.MEDIA_MODE.ALL.name())));
     }
 
     private void writeMediaMode(String key) {
         SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        p.edit().putString(key, mainModel.getMediaMode().name()).apply();
+        p.edit().putString(key, foldersModel.getMediaMode().name()).apply();
     }
 }

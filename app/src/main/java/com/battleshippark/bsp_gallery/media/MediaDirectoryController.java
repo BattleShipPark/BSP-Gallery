@@ -1,17 +1,10 @@
 package com.battleshippark.bsp_gallery.media;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
 
-import com.battleshippark.bsp_gallery.CursorUtils;
-import com.battleshippark.bsp_gallery.MainModel;
+import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import lombok.Cleanup;
 
 /**
  */
@@ -22,7 +15,7 @@ public abstract class MediaDirectoryController {
         this.context = context;
     }
 
-    public static MediaDirectoryController create(Context context, MainModel.MEDIA_MODE mediaMode) {
+    public static MediaDirectoryController create(Context context, FoldersModel.MEDIA_MODE mediaMode) {
         switch (mediaMode) {
             case ALL:
                 return new MediaAllDirectoryController(context);

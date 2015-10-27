@@ -1,5 +1,6 @@
-package com.battleshippark.bsp_gallery;
+package com.battleshippark.bsp_gallery.activity.folders;
 
+import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.media.MediaDirectoryModel;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -11,12 +12,12 @@ import lombok.Data;
 /**
  */
 @Data
-public class MainModel {
+public class FoldersModel {
     private final Bus eventBus;
     private List<MediaDirectoryModel> mediaDirectoryModelList;
     private MEDIA_MODE mediaMode = MEDIA_MODE.ALL;
 
-    public MainModel(Bus eventBus) {
+    public FoldersModel(Bus eventBus) {
         this.eventBus = eventBus;
     }
 
