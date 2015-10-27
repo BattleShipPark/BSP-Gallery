@@ -30,10 +30,16 @@ public class MainModel {
         eventBus.unregister(this);
     }
 
-    public void setMediaDirectoryModelList(List<MediaDirectoryModel> arg) {
-        mediaDirectoryModelList = arg;
+    public void setMediaDirectoryModelList(List<MediaDirectoryModel> modelList) {
+        mediaDirectoryModelList = modelList;
 
         eventBus.post(Events.OnMediaDirectoryListUpdated.EVENT);
+    }
+
+    public void setMediaMode(MEDIA_MODE mode) {
+        mediaMode = mode;
+
+        eventBus.post(Events.OnMediaModeUpdated.EVENT);
     }
 
     public enum MEDIA_MODE {

@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
 
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.squareup.otto.Bus;
@@ -20,6 +22,10 @@ public class MainActivity extends AppCompatActivity {
     /* */
 
     /* View */
+
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
     @Bind(R.id.listview)
     RecyclerView listview;
 
@@ -78,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -88,6 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void OnMediaDirectoryListUpdated(Events.OnMediaDirectoryListUpdated event) {
+        Log.d("", "OnMediaDirectoryListUpdated()");
+        adapter.refresh();
+    }
+
+    @Subscribe
+    public void OnMediaModeUpdated(Events.OnMediaModeUpdated event) {
+        Log.d("", "OnMediaModeUpdated()");
         adapter.refresh();
     }
 
@@ -104,13 +117,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+//        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         //		myToolbar.setTitle("Gallery");
         //		myToolbar.setTitleTextColor(0xffffff);
-        setSupportActionBar(myToolbar);
+        setSupportActionBar(toolbar);
+        toolbar.findViewById(R.id.media).setOnClickListener(this::showMediaPopup);
 
         listview.setAdapter(adapter);
         listview.setLayoutManager(new LinearLayoutManager(this));
         listview.addItemDecoration(decoration);
+    }
+
+    private void showMediaPopup(View anchor) {
+        PopupMenu popupMenu = new PopupMenu(this, anchor);
+        popupMenu.inflate(R.menu.menu_main_media_popup);
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_media_all:
+                    mainModel.setMediaMode(MainModel.MEDIA_MODE.ALL);
+                    break;
+                case R.id.action_media_image:
+                    mainModel.setMediaMode(MainModel.MEDIA_MODE.IMAGE);
+                    break;
+                case R.id.action_media_video:
+                    mainModel.setMediaMode(MainModel.MEDIA_MODE.VIDEO);
+                    break;
+            }
+
+            mediaController.refreshDirListAsync();
+            return true;
+        });
+        popupMenu.show();
     }
 }

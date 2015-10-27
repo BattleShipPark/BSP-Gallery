@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_media_all"
+        android:orderInCategory="101"
+        android:title="All" />
+    <item
+        android:id="@+id/action_media_image"
+        android:orderInCategory="101"
+        android:title="Image" />
+    <item
+        android:id="@+id/action_media_video"
+        android:orderInCategory="101"
+        android:title="Video" />
+</menu>

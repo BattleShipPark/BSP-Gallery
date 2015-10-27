@@ -33,15 +33,13 @@ public class MediaController {
     private static final String CACHE_FILENAME = "dirCache";
     private final Context context;
     private final MainModel mainModel;
-    private final MediaDirectoryController directoryController;
+    private MediaDirectoryController directoryController;
 
     private Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
 
     public MediaController(Context context, MainModel mainModel) {
         this.context = context;
         this.mainModel = mainModel;
-
-        directoryController = MediaDirectoryController.create(context, mainModel.getMediaMode());
 
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
@@ -58,6 +56,8 @@ public class MediaController {
      * 쿼리를 던질때마다 MainModel을 갱신한다
      */
     public void refreshDirListAsync() {
+        directoryController = MediaDirectoryController.create(context, mainModel.getMediaMode());
+
         Observable.create((Observable.OnSubscribe<List<MediaDirectoryModel>>) subscriber -> {
             List<MediaDirectoryModel> dirs = null;
             MediaDirectoryModel allDir = null;

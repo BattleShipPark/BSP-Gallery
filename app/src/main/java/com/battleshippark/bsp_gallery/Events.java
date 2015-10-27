@@ -26,4 +26,12 @@ public class Events {
     public enum OnMediaDirectoryListUpdated {
         EVENT
     }
+
+    /**
+     * 툴바에서 미디어 모드를 변경해서 모델을 갱신했다.
+     * 이 이벤트를 받은 후에 화면을 갱신해야 한다
+     */
+    public enum OnMediaModeUpdated {
+        EVENT
+    }
 }
