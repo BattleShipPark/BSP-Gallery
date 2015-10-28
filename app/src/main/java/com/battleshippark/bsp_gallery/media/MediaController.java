@@ -44,7 +44,7 @@ public class MediaController {
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
     public void refreshDirListAsync(FoldersModel model) {
-        MediaDirectoryController directoryController = MediaDirectoryController.create(context, model.getMediaMode());
+        MediaFolderController directoryController = MediaFolderController.create(context, model.getMediaMode());
 
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
@@ -56,9 +56,9 @@ public class MediaController {
                         },
                         Throwable::printStackTrace);
 
-        Observable.create((Observable.OnSubscribe<List<MediaDirectoryModel>>) subscriber -> {
-            List<MediaDirectoryModel> dirs = null;
-            MediaDirectoryModel allDir = null;
+        Observable.create((Observable.OnSubscribe<List<MediaFolderModel>>) subscriber -> {
+            List<MediaFolderModel> dirs = null;
+            MediaFolderModel allDir = null;
 
             try {
                 dirs = getFromCache(context, model);
@@ -85,7 +85,7 @@ public class MediaController {
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        model::setMediaDirectoryModelList,
+                        model::setMediaFolderModelList,
                         Throwable::printStackTrace,
                         () -> writeToCacheSubject.onNext(null));
     }
@@ -118,11 +118,11 @@ public class MediaController {
      * func을 수행해서 디렉토리 목록을 구하고, 거기에 전체 디렉토리를 붙여서 발행한다.
      * 반환할 때는 전체 디렉토리없이 한다
      */
-    private List<MediaDirectoryModel> getDirsWithAllAndNext(@Nullable MediaDirectoryModel allDir,
-                                                            Subscriber<? super List<MediaDirectoryModel>> subscriber,
-                                                            Func0<List<MediaDirectoryModel>> func) {
-        List<MediaDirectoryModel> dirs = func.call();
-        List<MediaDirectoryModel> result = new ArrayList<>();
+    private List<MediaFolderModel> getDirsWithAllAndNext(@Nullable MediaFolderModel allDir,
+                                                            Subscriber<? super List<MediaFolderModel>> subscriber,
+                                                            Func0<List<MediaFolderModel>> func) {
+        List<MediaFolderModel> dirs = func.call();
+        List<MediaFolderModel> result = new ArrayList<>();
 
         result.clear();
         if (allDir != null)
@@ -133,11 +133,11 @@ public class MediaController {
         return dirs;
     }
 
-    private List<MediaDirectoryModel> getDirsWithAllAndNext(@Nullable MediaDirectoryModel allDir, List<MediaDirectoryModel> dirs,
-                                                            Subscriber<? super List<MediaDirectoryModel>> subscriber,
-                                                            Func1<List<MediaDirectoryModel>, List<MediaDirectoryModel>> func) {
+    private List<MediaFolderModel> getDirsWithAllAndNext(@Nullable MediaFolderModel allDir, List<MediaFolderModel> dirs,
+                                                            Subscriber<? super List<MediaFolderModel>> subscriber,
+                                                            Func1<List<MediaFolderModel>, List<MediaFolderModel>> func) {
         dirs = func.call(dirs);
-        List<MediaDirectoryModel> result = new ArrayList<>();
+        List<MediaFolderModel> result = new ArrayList<>();
 
         result.clear();
         if (allDir != null)
@@ -148,21 +148,21 @@ public class MediaController {
         return dirs;
     }
 
-    List<MediaDirectoryModel> addAllDirectory(List<MediaDirectoryModel> directories) {
-        MediaDirectoryModel allDir = new MediaDirectoryModel();
+    List<MediaFolderModel> addAllDirectory(List<MediaFolderModel> directories) {
+        MediaFolderModel allDir = new MediaFolderModel();
 
-        allDir.setId(MediaDirectoryModel.ALL_DIR_ID);
+        allDir.setId(MediaFolderModel.ALL_DIR_ID);
 
         allDir.setName("All");
 
         int count = Observable.from(directories)
-                .map(MediaDirectoryModel::getCount)
+                .map(MediaFolderModel::getCount)
                 .reduce((_sum, _count) -> _sum + _count)
                 .toBlocking()
                 .last();
         allDir.setCount(count);
 
-        MediaDirectoryModel dir = Observable.from(directories)
+        MediaFolderModel dir = Observable.from(directories)
                 .reduce((_dir1, _dir2) -> {
                     if (_dir1.getCoverMediaId() >= _dir2.getCoverMediaId())
                         return _dir1;
@@ -181,21 +181,21 @@ public class MediaController {
 
 
     private String toJson(FoldersModel model) {
-        return new Gson().toJson(model.getMediaDirectoryModelList());
+        return new Gson().toJson(model.getMediaFolderModelList());
     }
 
     private String getCacheFileName(FoldersModel model) {
         return CACHE_FILENAME + model.getMediaMode();
     }
 
-    private List<MediaDirectoryModel> getFromCache(Context context, FoldersModel model) throws IOException {
+    private List<MediaFolderModel> getFromCache(Context context, FoldersModel model) throws IOException {
         File cacheDirFile = context.getCacheDir();
         File inputFile = new File(cacheDirFile, getCacheFileName(model));
 
         @Cleanup FileReader reader = new FileReader(inputFile);
 
         try {
-            Type type = new TypeToken<List<MediaDirectoryModel>>() {
+            Type type = new TypeToken<List<MediaFolderModel>>() {
             }.getType();
             return new Gson().fromJson(reader, type);
         } catch (JsonParseException e) {

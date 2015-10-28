@@ -16,7 +16,7 @@ import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 import com.battleshippark.bsp_gallery.media.MediaController;
-import com.battleshippark.bsp_gallery.media.MediaDirectoryModel;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -102,9 +102,9 @@ public class FilesActivity extends AppCompatActivity {
         adapter.refresh();
     }
 
-    public static Intent createIntent(Context context, FoldersModel foldersModel, MediaDirectoryModel mediaDirectoryModel) {
+    public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
         Intent i = new Intent(context, FilesActivity.class);
-        i.putExtra(Consts.KEY_DIR_ID, mediaDirectoryModel.getId());
+        i.putExtra(Consts.KEY_DIR_ID, mediaFolderModel.getId());
         i.putExtra(Consts.KEY_MEDIA_MODE, foldersModel.getMediaMode().name());
 
         return i;

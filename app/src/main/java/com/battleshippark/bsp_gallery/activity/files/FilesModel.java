@@ -1,7 +1,6 @@
 package com.battleshippark.bsp_gallery.activity.files;
 
 import com.battleshippark.bsp_gallery.Events;
-import com.battleshippark.bsp_gallery.media.MediaDirectoryModel;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Bus;

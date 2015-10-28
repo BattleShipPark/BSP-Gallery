@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.media.MediaDirectoryModel;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,18 +17,18 @@ import java.util.List;
 public class FoldersAdapter extends RecyclerView.Adapter {
     private final Context context;
     private final FoldersModel foldersModel;
-    private List<MediaDirectoryModel> mediaDirectoryModelList;
+    private List<MediaFolderModel> mediaFolderModelList;
 
     public FoldersAdapter(Context context, FoldersModel foldersModel) {
         this.context = context;
         this.foldersModel = foldersModel;
 
-        mediaDirectoryModelList = new ArrayList<>();
+        mediaFolderModelList = new ArrayList<>();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = View.inflate(context, R.layout.listitem_main, null);
+        View view = View.inflate(context, R.layout.listitem_folders, null);
         RecyclerView.ViewHolder vh = new FoldersItemViewHolder(context, view, foldersModel);
         return vh;
     }
@@ -36,17 +36,17 @@ public class FoldersAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         FoldersItemViewHolder vh = (FoldersItemViewHolder) holder;
-        vh.setModel(mediaDirectoryModelList.get(position));
+        vh.setModel(mediaFolderModelList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mediaDirectoryModelList.size();
+        return mediaFolderModelList.size();
     }
 
     public void refresh() {
-        if (foldersModel.getMediaDirectoryModelList() != null) {
-            mediaDirectoryModelList = Collections.unmodifiableList(foldersModel.getMediaDirectoryModelList());
+        if (foldersModel.getMediaFolderModelList() != null) {
+            mediaFolderModelList = Collections.unmodifiableList(foldersModel.getMediaFolderModelList());
             notifyDataSetChanged();
         }
     }

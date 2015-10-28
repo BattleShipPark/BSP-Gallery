@@ -6,9 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersItemViewHolder;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
-import com.battleshippark.bsp_gallery.media.MediaDirectoryModel;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 
 import java.util.ArrayList;

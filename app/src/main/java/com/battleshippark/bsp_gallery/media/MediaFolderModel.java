@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  */
 @Data
-public class MediaDirectoryModel {
+public class MediaFolderModel {
     public static final int ALL_DIR_ID = 0;
 
     private int id;
@@ -17,8 +17,8 @@ public class MediaDirectoryModel {
     private int count;
     private int coverMediaType; /* MediaStore.File.FileColumns.MEDIA_TYPE_? */
 
-    public static MediaDirectoryModel of(Cursor c) {
-        MediaDirectoryModel result = new MediaDirectoryModel();
+    public static MediaFolderModel of(Cursor c) {
+        MediaFolderModel result = new MediaFolderModel();
 
 //        CursorUtils.getString(c, MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME)
 //                MediaStore.Images.ImageColumns.BUCKET_ID,
@@ -33,8 +33,8 @@ public class MediaDirectoryModel {
         return null;
     }
 
-    public MediaDirectoryModel copy() {
-        MediaDirectoryModel result = new MediaDirectoryModel();
+    public MediaFolderModel copy() {
+        MediaFolderModel result = new MediaFolderModel();
         result.setId(id);
         result.setCoverMediaId(coverMediaId);
         result.setCoverThumbPath(coverThumbPath);
