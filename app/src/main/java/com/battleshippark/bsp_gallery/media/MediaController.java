@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.battleshippark.bsp_gallery.activity.files.FilesModel;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -32,38 +33,35 @@ import rx.subjects.Subject;
 public class MediaController {
     private static final String CACHE_FILENAME = "dirCache";
     private final Context context;
-    private final FoldersModel foldersModel;
-    private MediaDirectoryController directoryController;
 
-    private Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
-
-    public MediaController(Context context, FoldersModel foldersModel) {
+    public MediaController(Context context) {
         this.context = context;
-        this.foldersModel = foldersModel;
-
-        writeToCacheSubject.subscribeOn(Schedulers.io())
-                .subscribe(
-                        aVoid -> {
-                            String json = toJson();
-                            writeToCache(json);
-
-                        },
-                        Throwable::printStackTrace);
     }
 
     /**
      * 디렉토리 목록을 갱신한다. 한 번에 전부 가져올 수 없고, 쿼리를 여러번 던져야 해서
-     * 쿼리를 던질때마다 MainModel을 갱신한다
+     * 쿼리를 던질때마다 FoldersModel을 갱신한다.
+     * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
-    public void refreshDirListAsync() {
-        directoryController = MediaDirectoryController.create(context, foldersModel.getMediaMode());
+    public void refreshDirListAsync(FoldersModel model) {
+        MediaDirectoryController directoryController = MediaDirectoryController.create(context, model.getMediaMode());
+
+        Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
+        writeToCacheSubject.subscribeOn(Schedulers.io())
+                .subscribe(
+                        aVoid -> {
+                            String json = toJson(model);
+                            writeToCache(json, model);
+
+                        },
+                        Throwable::printStackTrace);
 
         Observable.create((Observable.OnSubscribe<List<MediaDirectoryModel>>) subscriber -> {
             List<MediaDirectoryModel> dirs = null;
             MediaDirectoryModel allDir = null;
 
             try {
-                dirs = getFromCache(context);
+                dirs = getFromCache(context, model);
                 subscriber.onNext(dirs);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -87,9 +85,33 @@ public class MediaController {
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        foldersModel::setMediaDirectoryModelList,
+                        model::setMediaDirectoryModelList,
                         Throwable::printStackTrace,
                         () -> writeToCacheSubject.onNext(null));
+    }
+
+    /**
+     * 파일 목록을 갱신해서 FilesModel을 갱신한다
+     */
+    public void refreshFileListAsync(FilesModel model) {
+        MediaFileController fileController = MediaFileController.create(context, model.getDirId(), model.getMediaMode());
+
+        Observable.create((Observable.OnSubscribe<List<MediaFileModel>>) subscriber -> {
+            List<MediaFileModel> files;
+
+            files = fileController.getMediaFileList();
+            subscriber.onNext(files);
+
+            files = fileController.addMediaThumbPath(files);
+            subscriber.onNext(files);
+
+            subscriber.onCompleted();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        model::setMediaFileModelList,
+                        Throwable::printStackTrace
+                );
     }
 
     /*
@@ -158,17 +180,17 @@ public class MediaController {
     }
 
 
-    private String toJson() {
-        return new Gson().toJson(foldersModel.getMediaDirectoryModelList());
+    private String toJson(FoldersModel model) {
+        return new Gson().toJson(model.getMediaDirectoryModelList());
     }
 
-    private String getCacheFileName() {
-        return CACHE_FILENAME + foldersModel.getMediaMode();
+    private String getCacheFileName(FoldersModel model) {
+        return CACHE_FILENAME + model.getMediaMode();
     }
 
-    private List<MediaDirectoryModel> getFromCache(Context context) throws IOException {
+    private List<MediaDirectoryModel> getFromCache(Context context, FoldersModel model) throws IOException {
         File cacheDirFile = context.getCacheDir();
-        File inputFile = new File(cacheDirFile, getCacheFileName());
+        File inputFile = new File(cacheDirFile, getCacheFileName(model));
 
         @Cleanup FileReader reader = new FileReader(inputFile);
 
@@ -183,9 +205,9 @@ public class MediaController {
         }
     }
 
-    private void writeToCache(String json) {
+    private void writeToCache(String json, FoldersModel model) {
         File cacheDirFile = context.getCacheDir();
-        File outputFile = new File(cacheDirFile, getCacheFileName());
+        File outputFile = new File(cacheDirFile, getCacheFileName(model));
 
         try {
             @Cleanup FileWriter writer = new FileWriter(outputFile);

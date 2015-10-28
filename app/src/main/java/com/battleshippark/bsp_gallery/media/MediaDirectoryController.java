@@ -15,7 +15,7 @@ public abstract class MediaDirectoryController {
         this.context = context;
     }
 
-    public static MediaDirectoryController create(Context context, FoldersModel.MEDIA_MODE mediaMode) {
+    public static MediaDirectoryController create(Context context, MediaMode mediaMode) {
         switch (mediaMode) {
             case ALL:
                 return new MediaAllDirectoryController(context);

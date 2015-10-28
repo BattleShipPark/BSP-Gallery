@@ -29,7 +29,7 @@ public class FoldersAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(context, R.layout.listitem_main, null);
-        RecyclerView.ViewHolder vh = new FoldersItemViewHolder(view);
+        RecyclerView.ViewHolder vh = new FoldersItemViewHolder(context, view, foldersModel);
         return vh;
     }
 

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaController;
+import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -39,22 +40,20 @@ public class FoldersActivity extends AppCompatActivity {
     /* */
     private FoldersAdapter adapter;
     private FoldersItemDecoration decoration;
-    private FoldersModel foldersModel;
+    private FoldersModel model;
     private Bus eventBus;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_folders);
         ButterKnife.bind(this);
 
         initData();
         initUI();
 
         eventBus.post(Events.OnActivityCreated.EVENT);
-
-//        mediaController.refreshDirListAsync();
     }
 
     @Override
@@ -107,7 +106,7 @@ public class FoldersActivity extends AppCompatActivity {
         Log.d("", getClass().getSimpleName() + ".OnMediaModeUpdated()");
 
         TextView tv = (TextView) toolbar.findViewById(R.id.media);
-        switch (foldersModel.getMediaMode()) {
+        switch (model.getMediaMode()) {
             case ALL:
                 tv.setText(R.string.media_mode_all);
                 break;
@@ -124,22 +123,22 @@ public class FoldersActivity extends AppCompatActivity {
     @Subscribe
     public void OnSharedPreferenceRead(Events.OnSharedPreferenceRead event) {
         Log.d("", "OnSharedPreferenceRead()");
-        foldersModel.setMediaMode(event.getModel().getMediaMode());
-        mediaController.refreshDirListAsync();
+        model.setMediaMode(event.getModel().getMediaMode());
+        mediaController.refreshDirListAsync(model);
     }
 
     private void initData() {
         eventBus = new Bus();
         eventBus.register(this);
 
-        foldersModel = new FoldersModel(eventBus);
+        model = new FoldersModel(eventBus);
 
-        adapter = new FoldersAdapter(this, foldersModel);
-        decoration = new FoldersItemDecoration(foldersModel);
+        adapter = new FoldersAdapter(this, model);
+        decoration = new FoldersItemDecoration(model);
 
-        mediaController = new MediaController(this, foldersModel);
+        mediaController = new MediaController(this);
 
-        new SharedPreferenceController(this, foldersModel);
+        new SharedPreferenceController(this, model);
     }
 
     private void initUI() {
@@ -157,17 +156,17 @@ public class FoldersActivity extends AppCompatActivity {
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.action_media_all:
-                    foldersModel.setMediaMode(FoldersModel.MEDIA_MODE.ALL);
+                    model.setMediaMode(MediaMode.ALL);
                     break;
                 case R.id.action_media_image:
-                    foldersModel.setMediaMode(FoldersModel.MEDIA_MODE.IMAGE);
+                    model.setMediaMode(MediaMode.IMAGE);
                     break;
                 case R.id.action_media_video:
-                    foldersModel.setMediaMode(FoldersModel.MEDIA_MODE.VIDEO);
+                    model.setMediaMode(MediaMode.VIDEO);
                     break;
             }
 
-            mediaController.refreshDirListAsync();
+            mediaController.refreshDirListAsync(model);
             return true;
         });
         popupMenu.show();

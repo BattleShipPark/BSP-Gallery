@@ -7,6 +7,7 @@ import android.util.Log;
 import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
+import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
@@ -72,7 +73,7 @@ public class SharedPreferenceController {
 
     private void readMediaMode(String key) {
         SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        model.setMediaMode(FoldersModel.MEDIA_MODE.valueOf(p.getString(key, FoldersModel.MEDIA_MODE.ALL.name())));
+        model.setMediaMode(MediaMode.valueOf(p.getString(key, MediaMode.ALL.name())));
     }
 
     private void writeMediaMode(String key) {
