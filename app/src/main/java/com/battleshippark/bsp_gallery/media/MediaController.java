@@ -96,7 +96,7 @@ public class MediaController {
      * 파일 목록을 갱신해서 FilesModel을 갱신한다
      */
     public void refreshFileListAsync(FilesModel model) {
-        MediaFileController fileController = MediaFileController.create(context, model.getDirId(), model.getMediaMode());
+        MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaMode());
 
         Observable.create((Observable.OnSubscribe<List<MediaFileModel>>) subscriber -> {
             List<MediaFileModel> files;

@@ -15,7 +15,8 @@ import lombok.Data;
 @Data
 public class FilesModel {
     private Bus eventBus;
-    private int dirId;
+    private int folderId;
+    private String folderName;
     private List<MediaFileModel> mediaFileModelList;
     private MediaMode mediaMode;
 

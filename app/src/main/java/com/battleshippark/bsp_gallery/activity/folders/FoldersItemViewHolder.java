@@ -11,6 +11,9 @@ import android.widget.TextView;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivity;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -49,19 +52,21 @@ public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
         context.startActivity(FilesActivity.createIntent(context, foldersModel, model));
     }
 
-    public void setModel(MediaFolderModel mediaFolderModel) {
-        this.model = mediaFolderModel;
+    public void setModel(MediaFolderModel model) {
+        this.model = model;
 
-        if (mediaFolderModel.getCoverThumbPath() != null) {
-            coverImageView.setImageBitmap(BitmapFactory.decodeFile(mediaFolderModel.getCoverThumbPath()));
-            if (mediaFolderModel.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+        if (model.getCoverThumbPath() != null) {
+//            coverImageView.setImageBitmap(BitmapFactory.decodeFile(model.getCoverThumbPath()));
+            Picasso.with(context).load(new File(model.getCoverThumbPath())).error(R.drawable.ic_launcher).into(coverImageView);
+
+            if (model.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                 playImageView.setVisibility(View.VISIBLE);
             } else {
                 playImageView.setVisibility(View.GONE);
             }
         }
 
-        nameTextView.setText(mediaFolderModel.getName());
-        countTextView.setText(String.valueOf(mediaFolderModel.getCount()));
+        nameTextView.setText(model.getName());
+        countTextView.setText(String.valueOf(model.getCount()));
     }
 }

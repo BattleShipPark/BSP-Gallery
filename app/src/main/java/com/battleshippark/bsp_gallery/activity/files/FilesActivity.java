@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.Consts;
 import com.battleshippark.bsp_gallery.Events;
@@ -20,6 +21,8 @@ import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import org.w3c.dom.Text;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -104,7 +107,8 @@ public class FilesActivity extends AppCompatActivity {
 
     public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
         Intent i = new Intent(context, FilesActivity.class);
-        i.putExtra(Consts.KEY_DIR_ID, mediaFolderModel.getId());
+        i.putExtra(Consts.KEY_FOLDER_ID, mediaFolderModel.getId());
+        i.putExtra(Consts.KEY_FOLDER_NAME, mediaFolderModel.getName());
         i.putExtra(Consts.KEY_MEDIA_MODE, foldersModel.getMediaMode().name());
 
         return i;
@@ -131,7 +135,9 @@ public class FilesActivity extends AppCompatActivity {
     private FilesModel parseBundle(Bundle bundle) {
         FilesModel model = new FilesModel();
 
-        model.setDirId(bundle.getInt(Consts.KEY_DIR_ID, 0));
+        model.setFolderId(bundle.getInt(Consts.KEY_FOLDER_ID, 0));
+
+        model.setFolderName(bundle.getString(Consts.KEY_FOLDER_NAME));
 
         String mode = bundle.getString(Consts.KEY_MEDIA_MODE);
         model.setMediaMode(MediaMode.valueOf(mode));
@@ -142,7 +148,9 @@ public class FilesActivity extends AppCompatActivity {
     private FilesModel parseIntent() {
         FilesModel model = new FilesModel();
 
-        model.setDirId(getIntent().getIntExtra(Consts.KEY_DIR_ID, 0));
+        model.setFolderId(getIntent().getIntExtra(Consts.KEY_FOLDER_ID, 0));
+
+        model.setFolderName(getIntent().getStringExtra(Consts.KEY_FOLDER_NAME));
 
         String mode = getIntent().getStringExtra(Consts.KEY_MEDIA_MODE);
         model.setMediaMode(MediaMode.valueOf(mode));
@@ -157,5 +165,7 @@ public class FilesActivity extends AppCompatActivity {
         listview.setAdapter(adapter);
         listview.setLayoutManager(new GridLayoutManager(this, 3));
 //        listview.addItemDecoration(decoration);
+
+        ((TextView)toolbar.findViewById(R.id.title)).setText(model.getFolderName());
     }
 }
