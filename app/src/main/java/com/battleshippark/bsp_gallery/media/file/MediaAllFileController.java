@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
+import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Cleanup;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  */
@@ -78,6 +82,64 @@ public class MediaAllFileController extends MediaFileController {
         }
 
         return result;
+    }
+
+    @Override
+    public void getMediaFileList(Subscriber<? super List<MediaFileModel>> subscriber) {
+        String[] columns = new String[]{
+                MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DISPLAY_NAME,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.DATA
+        };
+
+        String selectionClause;
+        if (dirId == MediaFolderModel.ALL_DIR_ID) {
+            selectionClause = String.format("%s = ? OR %s = ?",
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE
+            );
+        } else {
+            selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
+                    MediaStore.Images.ImageColumns.BUCKET_ID,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE
+            );
+        }
+
+
+        String[] selectionArgs;
+        if (dirId == MediaFolderModel.ALL_DIR_ID) {
+            selectionArgs = new String[]{
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
+            };
+        } else {
+            selectionArgs = new String[]{
+                    String.valueOf(dirId),
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
+            };
+        }
+
+        @Cleanup
+        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, null);
+        if (c != null && c.moveToFirst()) {
+            Observable.create((Observable.OnSubscribe<MediaFileModel>) _subscriber -> {
+                do {
+                    MediaFileModel model = new MediaFileModel();
+                    model.setId(CursorUtils.getInt(c, columns[0]));
+                    model.setName(CursorUtils.getString(c, columns[1]));
+                    model.setMediaType(CursorUtils.getInt(c, columns[2]));
+                    model.setPathName(CursorUtils.getString(c, columns[3]));
+
+                    _subscriber.onNext(model);
+                } while (c.moveToNext());
+
+                _subscriber.onCompleted();
+            }).buffer(100)
+                    .subscribe(subscriber::onNext);
+        }
     }
 
     @Override

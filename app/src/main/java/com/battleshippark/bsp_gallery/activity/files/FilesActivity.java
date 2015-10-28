@@ -22,8 +22,6 @@ import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
-import org.w3c.dom.Text;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -101,8 +99,13 @@ public class FilesActivity extends AppCompatActivity {
 
     @Subscribe
     public void OnMediaFileListUpdated(Events.OnMediaFileListUpdated event) {
-        Log.d("", "OnMediaFileListUpdated()");
-        adapter.refresh();
+        Log.d("DEBUG", "OnMediaFileListUpdated()");
+
+        GridLayoutManager layoutManager = (GridLayoutManager) listview.getLayoutManager();
+
+        if (layoutManager.findFirstVisibleItemPosition() == RecyclerView.NO_POSITION ||
+                (layoutManager.findFirstVisibleItemPosition() <= adapter.getItemCount() && adapter.getItemCount() <= layoutManager.findLastVisibleItemPosition()))
+            adapter.refresh();
     }
 
     public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
@@ -166,6 +169,6 @@ public class FilesActivity extends AppCompatActivity {
         listview.setLayoutManager(new GridLayoutManager(this, 3));
 //        listview.addItemDecoration(decoration);
 
-        ((TextView)toolbar.findViewById(R.id.title)).setText(model.getFolderName());
+        ((TextView) toolbar.findViewById(R.id.title)).setText(model.getFolderName());
     }
 }

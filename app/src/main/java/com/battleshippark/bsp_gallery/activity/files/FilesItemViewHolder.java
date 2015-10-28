@@ -1,12 +1,10 @@
 package com.battleshippark.bsp_gallery.activity.files;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
@@ -36,9 +34,11 @@ public class FilesItemViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setModel(MediaFileModel model) {
-        if (model.getThumbPath() != null) {
-//            imageView.setImageBitmap(BitmapFactory.decodeFile(model.getThumbPath()));
-            Picasso.with(context).load(new File(model.getThumbPath())).error(R.drawable.ic_launcher).into(imageView);
+        if (model.getThumbPath() == null) {
+            Picasso.with(context).load(R.drawable.error_100).into(imageView);
+            playImageView.setVisibility(View.GONE);
+        } else {
+            Picasso.with(context).load(new File(model.getThumbPath())).error(R.drawable.error_100).into(imageView);
 
             if (model.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                 playImageView.setVisibility(View.VISIBLE);

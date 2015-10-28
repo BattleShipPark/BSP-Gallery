@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Cleanup;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  */
@@ -54,6 +56,44 @@ public class MediaImageFileController extends MediaFileController {
         }
 
         return result;
+    }
+
+    @Override
+    public void getMediaFileList(Subscriber<? super List<MediaFileModel>> subscriber) {
+        String[] columns = new String[]{
+                MediaStore.Images.ImageColumns._ID,
+                MediaStore.Images.ImageColumns.DISPLAY_NAME,
+                MediaStore.Images.ImageColumns.DATA
+        };
+
+        String selectionClause = null;
+        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+            selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
+        }
+
+        String[] selectionArgs = null;
+        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+            selectionArgs = new String[]{String.valueOf(dirId),};
+        }
+
+        @Cleanup
+        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, null);
+        if (c != null && c.moveToFirst()) {
+            Observable.create((Observable.OnSubscribe<MediaFileModel>) _subscriber -> {
+                do {
+                    MediaFileModel model = new MediaFileModel();
+                    model.setId(CursorUtils.getInt(c, columns[0]));
+                    model.setName(CursorUtils.getString(c, columns[1]));
+                    model.setMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
+                    model.setPathName(CursorUtils.getString(c, columns[2]));
+
+                    _subscriber.onNext(model);
+                } while (c.moveToNext());
+
+                _subscriber.onCompleted();
+            }).buffer(300)
+                    .subscribe(subscriber::onNext);
+        }
     }
 
     @Override

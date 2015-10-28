@@ -7,6 +7,8 @@ import com.battleshippark.bsp_gallery.media.MediaMode;
 
 import java.util.List;
 
+import rx.Subscriber;
+
 /**
  */
 public abstract class MediaFileController {
@@ -35,6 +37,11 @@ public abstract class MediaFileController {
      * 디렉토리내의 파일 목록을 가져온다.
      */
     public abstract List<MediaFileModel> getMediaFileList();
+
+    /**
+     * 디렉토리내의 파일 목록을 가져온다. n건씩 끊어서 넘어온다
+     */
+    public abstract void getMediaFileList(Subscriber<? super List<MediaFileModel>> subscriber);
 
     /**
      * 파일의 손톱 이미지 경로를 추가한다

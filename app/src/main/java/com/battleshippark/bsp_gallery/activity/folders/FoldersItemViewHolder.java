@@ -55,9 +55,11 @@ public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
     public void setModel(MediaFolderModel model) {
         this.model = model;
 
-        if (model.getCoverThumbPath() != null) {
-//            coverImageView.setImageBitmap(BitmapFactory.decodeFile(model.getCoverThumbPath()));
-            Picasso.with(context).load(new File(model.getCoverThumbPath())).error(R.drawable.ic_launcher).into(coverImageView);
+        if (model.getCoverThumbPath() == null) {
+            Picasso.with(context).load(R.drawable.error_100).into(coverImageView);
+            playImageView.setVisibility(View.GONE);
+        } else {
+            Picasso.with(context).load(new File(model.getCoverThumbPath())).error(R.drawable.error_100).into(coverImageView);
 
             if (model.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                 playImageView.setVisibility(View.VISIBLE);

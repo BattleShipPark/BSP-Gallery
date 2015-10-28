@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.activity.files.FilesModel;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
@@ -98,22 +99,32 @@ public class MediaController {
     public void refreshFileListAsync(FilesModel model) {
         MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaMode());
 
+        /* 파일 목록이 너무 많을 수 있으므로 n건씩 끊어서 받는다 */
         Observable.create((Observable.OnSubscribe<List<MediaFileModel>>) subscriber -> {
-            List<MediaFileModel> files;
-
-            files = fileController.getMediaFileList();
-            subscriber.onNext(files);
-
-            files = fileController.addMediaThumbPath(files);
-            subscriber.onNext(files);
+            fileController.getMediaFileList(subscriber);
 
             subscriber.onCompleted();
         }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        model::setMediaFileModelList,
-                        Throwable::printStackTrace
-                );
+                .subscribe(new Subscriber<List<MediaFileModel>>() {
+                    List<MediaFileModel> mediaFileModelList = new ArrayList<>();
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<MediaFileModel> mediaFileModels) {
+                        List<MediaFileModel> files = fileController.addMediaThumbPath(mediaFileModels);
+                        mediaFileModelList.addAll(files);
+
+                        BspApplication.getHandler().post(() -> model.setMediaFileModelList(mediaFileModelList));
+                    }
+                });
     }
 
     /*
@@ -121,8 +132,8 @@ public class MediaController {
      * 반환할 때는 전체 디렉토리없이 한다
      */
     private List<MediaFolderModel> getDirsWithAllAndNext(@Nullable MediaFolderModel allDir,
-                                                            Subscriber<? super List<MediaFolderModel>> subscriber,
-                                                            Func0<List<MediaFolderModel>> func) {
+                                                         Subscriber<? super List<MediaFolderModel>> subscriber,
+                                                         Func0<List<MediaFolderModel>> func) {
         List<MediaFolderModel> dirs = func.call();
         List<MediaFolderModel> result = new ArrayList<>();
 
@@ -136,8 +147,8 @@ public class MediaController {
     }
 
     private List<MediaFolderModel> getDirsWithAllAndNext(@Nullable MediaFolderModel allDir, List<MediaFolderModel> dirs,
-                                                            Subscriber<? super List<MediaFolderModel>> subscriber,
-                                                            Func1<List<MediaFolderModel>, List<MediaFolderModel>> func) {
+                                                         Subscriber<? super List<MediaFolderModel>> subscriber,
+                                                         Func1<List<MediaFolderModel>, List<MediaFolderModel>> func) {
         dirs = func.call(dirs);
         List<MediaFolderModel> result = new ArrayList<>();
 
