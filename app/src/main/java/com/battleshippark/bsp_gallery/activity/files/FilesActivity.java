@@ -156,6 +156,6 @@ public class FilesActivity extends AppCompatActivity {
 
         listview.setAdapter(adapter);
         listview.setLayoutManager(new GridLayoutManager(this, 3));
-        listview.addItemDecoration(decoration);
+//        listview.addItemDecoration(decoration);
     }
 }

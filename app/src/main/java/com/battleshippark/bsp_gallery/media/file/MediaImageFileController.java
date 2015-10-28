@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +30,13 @@ public class MediaImageFileController extends MediaFileController {
                 MediaStore.Images.ImageColumns.DISPLAY_NAME,
                 MediaStore.Images.ImageColumns.DATA
         };
-        String selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
-        String[] selectionArgs = new String[]{
-                String.valueOf(dirId),
-        };
+
+        String selectionClause = null;
+        String[] selectionArgs = null;
+        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+            selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
+            selectionArgs = new String[]{String.valueOf(dirId)};
+        }
 
         List<MediaFileModel> result = new ArrayList<>();
 

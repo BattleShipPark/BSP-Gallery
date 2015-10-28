@@ -8,6 +8,7 @@ import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +32,35 @@ public class MediaAllFileController extends MediaFileController {
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
                 MediaStore.Files.FileColumns.DATA
         };
-        String selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
-                MediaStore.Images.ImageColumns.BUCKET_ID,
-                MediaStore.Files.FileColumns.MEDIA_TYPE,
-                MediaStore.Files.FileColumns.MEDIA_TYPE
-        );
-        String[] selectionArgs = new String[]{
-                String.valueOf(dirId),
-                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
-                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
 
-        };
+        String selectionClause;
+        if (dirId == MediaFolderModel.ALL_DIR_ID) {
+            selectionClause = String.format("%s = ? OR %s = ?",
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE
+            );
+        } else {
+            selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
+                    MediaStore.Images.ImageColumns.BUCKET_ID,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE
+            );
+        }
+
+
+        String[] selectionArgs;
+        if (dirId == MediaFolderModel.ALL_DIR_ID) {
+            selectionArgs = new String[]{
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
+            };
+        } else {
+            selectionArgs = new String[]{
+                    String.valueOf(dirId),
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
+            };
+        }
 
         List<MediaFileModel> result = new ArrayList<>();
 
