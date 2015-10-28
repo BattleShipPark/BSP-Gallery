@@ -1,6 +1,9 @@
-package com.battleshippark.bsp_gallery.media;
+package com.battleshippark.bsp_gallery.media.file;
 
 import android.content.Context;
+
+import com.battleshippark.bsp_gallery.media.MediaFileModel;
+import com.battleshippark.bsp_gallery.media.MediaMode;
 
 import java.util.List;
 
@@ -31,10 +34,10 @@ public abstract class MediaFileController {
     /**
      * 디렉토리내의 파일 목록을 가져온다.
      */
-    abstract List<MediaFileModel> getMediaFileList();
+    public abstract List<MediaFileModel> getMediaFileList();
 
     /**
      * 파일의 손톱 이미지 경로를 추가한다
      */
-    abstract List<MediaFileModel> addMediaThumbPath(List<MediaFileModel> files);
+    public abstract List<MediaFileModel> addMediaThumbPath(List<MediaFileModel> files);
 }

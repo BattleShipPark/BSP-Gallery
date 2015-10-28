@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.media;
+package com.battleshippark.bsp_gallery.media.folder;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ public class MediaAllFolderController extends MediaFolderController {
         super(context);
     }
 
-    List<MediaFolderModel> getMediaDirectoryList() {
+    @Override
+    public List<MediaFolderModel> getMediaDirectoryList() {
         String[] columns = new String[]{
                 MediaStore.Images.ImageColumns.BUCKET_ID,
                 MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
@@ -54,7 +56,8 @@ public class MediaAllFolderController extends MediaFolderController {
         return result;
     }
 
-    List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> dirs) {
+    @Override
+    public List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> dirs) {
         String[] countClauses = new String[]{"count(*) AS count"};
 
         List<MediaFolderModel> result = new ArrayList<>();
@@ -84,7 +87,8 @@ public class MediaAllFolderController extends MediaFolderController {
         return result;
     }
 
-    List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs) {
+    @Override
+    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs) {
         String[] projectionClauses = new String[]{MediaStore.Images.Media._ID, MediaStore.Files.FileColumns.MEDIA_TYPE};
         String orderClause = MediaStore.Images.Media._ID + " desc";
 
@@ -114,7 +118,8 @@ public class MediaAllFolderController extends MediaFolderController {
         return result;
     }
 
-    List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs) {
+    @Override
+    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs) {
         String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
 
         List<MediaFolderModel> result = new ArrayList<>();

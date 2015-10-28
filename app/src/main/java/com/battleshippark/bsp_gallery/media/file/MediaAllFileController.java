@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.media;
+package com.battleshippark.bsp_gallery.media.file;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
+import com.battleshippark.bsp_gallery.media.MediaFileModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class MediaAllFileController extends MediaFileController {
     }
 
     @Override
-    List<MediaFileModel> getMediaFileList() {
+    public List<MediaFileModel> getMediaFileList() {
         String[] columns = new String[]{
                 MediaStore.Files.FileColumns._ID,
                 MediaStore.Files.FileColumns.DISPLAY_NAME,
@@ -61,7 +62,7 @@ public class MediaAllFileController extends MediaFileController {
     }
 
     @Override
-    List<MediaFileModel> addMediaThumbPath(List<MediaFileModel> files) {
+    public List<MediaFileModel> addMediaThumbPath(List<MediaFileModel> files) {
         String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
 
         List<MediaFileModel> result = new ArrayList<>();

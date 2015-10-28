@@ -1,12 +1,12 @@
-package com.battleshippark.bsp_gallery.media;
+package com.battleshippark.bsp_gallery.media.folder;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,17 +15,18 @@ import lombok.Cleanup;
 
 /**
  */
-public class MediaVideoFolderController extends MediaFolderController {
-    private Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+public class MediaImageFolderController extends MediaFolderController {
+    private Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-    public MediaVideoFolderController(Context context) {
+    public MediaImageFolderController(Context context) {
         super(context);
     }
 
-    List<MediaFolderModel> getMediaDirectoryList() {
+    @Override
+    public List<MediaFolderModel> getMediaDirectoryList() {
         String[] columns = new String[]{
-                MediaStore.Video.VideoColumns.BUCKET_ID,
-                MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.ImageColumns.BUCKET_ID,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
         };
 
         List<MediaFolderModel> result = new ArrayList<>();
@@ -44,13 +45,14 @@ public class MediaVideoFolderController extends MediaFolderController {
         return result;
     }
 
-    List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> dirs) {
+    @Override
+    public List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> dirs) {
         String[] countClauses = new String[]{"count(*) AS count"};
 
         List<MediaFolderModel> result = new ArrayList<>();
 
         for (MediaFolderModel dir : dirs) {
-            String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
+            String selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
             String[] selectionArgs = new String[]{String.valueOf(dir.getId())};
 
             @Cleanup Cursor c = context.getContentResolver().query(uri, countClauses, selectionClause, selectionArgs, null);
@@ -66,21 +68,22 @@ public class MediaVideoFolderController extends MediaFolderController {
         return result;
     }
 
-    List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs) {
-        String[] projectionClauses = new String[]{MediaStore.Video.Media._ID};
-        String orderClause = MediaStore.Video.Media._ID + " desc";
+    @Override
+    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs) {
+        String[] projectionClauses = new String[]{MediaStore.Images.Media._ID};
+        String orderClause = MediaStore.Images.Media._ID + " desc";
 
         List<MediaFolderModel> result = new ArrayList<>();
 
         for (MediaFolderModel dir : dirs) {
-            String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
+            String selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
             String[] selectionArgs = new String[]{String.valueOf(dir.getId())};
 
             @Cleanup Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause);
             if (c != null && c.moveToFirst()) {
                 MediaFolderModel model = dir.copy();
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
-                model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
+                model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
                 result.add(model);
             }
         }
@@ -88,13 +91,14 @@ public class MediaVideoFolderController extends MediaFolderController {
         return result;
     }
 
-    List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs) {
-        String[] projectionClauses = new String[]{MediaStore.Video.Thumbnails.DATA,};
+    @Override
+    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs) {
+        String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
 
         List<MediaFolderModel> result = new ArrayList<>();
 
         for (MediaFolderModel dir : dirs) {
-            @Cleanup Cursor c = queryVideoMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
+            @Cleanup Cursor c = MediaStore.Images.Thumbnails.queryMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
             if (c != null && c.moveToFirst()) {
                 MediaFolderModel model = dir.copy();
                 model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
@@ -103,11 +107,5 @@ public class MediaVideoFolderController extends MediaFolderController {
         }
 
         return result;
-    }
-
-    private Cursor queryVideoMiniThumbnail(ContentResolver cr, long origId, int kind, String[] projection) {
-        return cr.query(MediaStore.Video.Thumbnails.EXTERNAL_CONTENT_URI, projection,
-                MediaStore.Video.Thumbnails.VIDEO_ID + " = " + origId + " AND " +
-                        MediaStore.Video.Thumbnails.KIND + " = " + kind, null, null);
     }
 }
