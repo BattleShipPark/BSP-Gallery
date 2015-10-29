@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.battleshippark.bsp_gallery.Consts;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
@@ -28,6 +27,10 @@ import butterknife.BindInt;
 import butterknife.ButterKnife;
 
 public class FilesActivity extends AppCompatActivity {
+    private static final String KEY_MEDIA_MODE = "mediaMode";
+    private static final String KEY_FOLDER_NAME = "folderName";
+    private static final String KEY_FOLDER_ID = "folderId";
+
     /* */
     private FilesModel model;
 
@@ -68,6 +71,17 @@ public class FilesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt(KEY_FOLDER_ID, model.getFolderId());
+
+        outState.putString(KEY_FOLDER_NAME, model.getFolderName());
+
+        outState.putString(KEY_MEDIA_MODE, model.getMediaMode().name());
     }
 
     @Override
@@ -119,9 +133,9 @@ public class FilesActivity extends AppCompatActivity {
 
     public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
         Intent i = new Intent(context, FilesActivity.class);
-        i.putExtra(Consts.KEY_FOLDER_ID, mediaFolderModel.getId());
-        i.putExtra(Consts.KEY_FOLDER_NAME, mediaFolderModel.getName());
-        i.putExtra(Consts.KEY_MEDIA_MODE, foldersModel.getMediaMode().name());
+        i.putExtra(KEY_FOLDER_ID, mediaFolderModel.getId());
+        i.putExtra(KEY_FOLDER_NAME, mediaFolderModel.getName());
+        i.putExtra(KEY_MEDIA_MODE, foldersModel.getMediaMode().name());
 
         return i;
     }
@@ -147,11 +161,11 @@ public class FilesActivity extends AppCompatActivity {
     private FilesModel parseBundle(Bundle bundle) {
         FilesModel model = new FilesModel();
 
-        model.setFolderId(bundle.getInt(Consts.KEY_FOLDER_ID, 0));
+        model.setFolderId(bundle.getInt(KEY_FOLDER_ID, 0));
 
-        model.setFolderName(bundle.getString(Consts.KEY_FOLDER_NAME));
+        model.setFolderName(bundle.getString(KEY_FOLDER_NAME));
 
-        String mode = bundle.getString(Consts.KEY_MEDIA_MODE);
+        String mode = bundle.getString(KEY_MEDIA_MODE);
         model.setMediaMode(MediaMode.valueOf(mode));
 
         return model;
@@ -160,11 +174,11 @@ public class FilesActivity extends AppCompatActivity {
     private FilesModel parseIntent() {
         FilesModel model = new FilesModel();
 
-        model.setFolderId(getIntent().getIntExtra(Consts.KEY_FOLDER_ID, 0));
+        model.setFolderId(getIntent().getIntExtra(KEY_FOLDER_ID, 0));
 
-        model.setFolderName(getIntent().getStringExtra(Consts.KEY_FOLDER_NAME));
+        model.setFolderName(getIntent().getStringExtra(KEY_FOLDER_NAME));
 
-        String mode = getIntent().getStringExtra(Consts.KEY_MEDIA_MODE);
+        String mode = getIntent().getStringExtra(KEY_MEDIA_MODE);
         model.setMediaMode(MediaMode.valueOf(mode));
 
         return model;

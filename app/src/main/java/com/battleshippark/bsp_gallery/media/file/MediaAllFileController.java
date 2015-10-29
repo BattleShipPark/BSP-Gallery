@@ -74,7 +74,7 @@ public class MediaAllFileController extends MediaFileController {
                 model.setId(CursorUtils.getInt(c, columns[0]));
                 model.setName(CursorUtils.getString(c, columns[1]));
                 model.setMediaType(CursorUtils.getInt(c, columns[2]));
-                model.setPathName(CursorUtils.getString(c, columns[3]));
+                model.setPath(CursorUtils.getString(c, columns[3]));
                 result.add(model);
             } while (c.moveToNext());
         }
@@ -129,7 +129,7 @@ public class MediaAllFileController extends MediaFileController {
                     model.setId(CursorUtils.getInt(c, columns[0]));
                     model.setName(CursorUtils.getString(c, columns[1]));
                     model.setMediaType(CursorUtils.getInt(c, columns[2]));
-                    model.setPathName(CursorUtils.getString(c, columns[3]));
+                    model.setPath(CursorUtils.getString(c, columns[3]));
 
                     _subscriber.onNext(model);
                 } while (c.moveToNext());

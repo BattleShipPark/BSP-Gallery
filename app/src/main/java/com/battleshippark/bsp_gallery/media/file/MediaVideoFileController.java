@@ -51,7 +51,7 @@ public class MediaVideoFileController extends MediaFileController {
                 model.setId(CursorUtils.getInt(c, columns[0]));
                 model.setName(CursorUtils.getString(c, columns[1]));
                 model.setMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
-                model.setPathName(CursorUtils.getString(c, columns[2]));
+                model.setPath(CursorUtils.getString(c, columns[2]));
                 result.add(model);
             } while (c.moveToNext());
         }
@@ -83,7 +83,7 @@ public class MediaVideoFileController extends MediaFileController {
                     model.setId(CursorUtils.getInt(c, columns[0]));
                     model.setName(CursorUtils.getString(c, columns[1]));
                     model.setMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
-                    model.setPathName(CursorUtils.getString(c, columns[2]));
+                    model.setPath(CursorUtils.getString(c, columns[2]));
 
                     _subscriber.onNext(model);
                 } while (c.moveToNext());

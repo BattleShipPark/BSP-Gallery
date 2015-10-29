@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.battleshippark.bsp_gallery.R;
+import com.battleshippark.bsp_gallery.activity.file.FileActivity;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.squareup.picasso.Picasso;
 
@@ -19,21 +20,25 @@ import butterknife.ButterKnife;
  */
 public class FilesItemViewHolder extends RecyclerView.ViewHolder {
     private final Context context;
+    private int position;
 
     @Bind(R.id.image)
     ImageView imageView;
-
     @Bind(R.id.play)
     ImageView playImageView;
 
-    public FilesItemViewHolder(Context context, View view) {
+    public FilesItemViewHolder(Context context, View view, FilesModel filesModel) {
         super(view);
         this.context = context;
 
         ButterKnife.bind(this, view);
+
+        view.setOnClickListener(v -> context.startActivity(FileActivity.createIntent(context, position, filesModel.getMediaFileModelList())));
     }
 
-    public void setModel(MediaFileModel model) {
+    public void bind(int position, MediaFileModel model) {
+        this.position = position;
+
         if (model.getThumbPath() == null) {
             Picasso.with(context).load(R.drawable.error_100).into(imageView);
             playImageView.setVisibility(View.GONE);
