@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.Consts;
@@ -23,6 +24,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
+import butterknife.BindInt;
 import butterknife.ButterKnife;
 
 public class FilesActivity extends AppCompatActivity {
@@ -41,7 +43,12 @@ public class FilesActivity extends AppCompatActivity {
 
     /* */
     private FilesAdapter adapter;
-    private FilesItemDecoration decoration;
+//    private FilesItemDecoration decoration;
+
+    @BindInt(R.integer.files_column_count)
+    int FILES_COLUMN_COUNT;
+
+
     private Bus eventBus;
 
     @Override
@@ -106,6 +113,8 @@ public class FilesActivity extends AppCompatActivity {
         if (layoutManager.findFirstVisibleItemPosition() == RecyclerView.NO_POSITION ||
                 (layoutManager.findFirstVisibleItemPosition() <= adapter.getItemCount() && adapter.getItemCount() <= layoutManager.findLastVisibleItemPosition()))
             adapter.refresh();
+
+        toolbar.findViewById(R.id.progress).setVisibility(View.GONE);
     }
 
     public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
@@ -130,7 +139,7 @@ public class FilesActivity extends AppCompatActivity {
         model.setEventBus(eventBus);
 
         adapter = new FilesAdapter(this, model);
-        decoration = new FilesItemDecoration(model);
+//        decoration = new FilesItemDecoration(model);
 
         mediaController = new MediaController(this);
     }
@@ -166,7 +175,7 @@ public class FilesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         listview.setAdapter(adapter);
-        listview.setLayoutManager(new GridLayoutManager(this, 3));
+        listview.setLayoutManager(new GridLayoutManager(this, FILES_COLUMN_COUNT));
 //        listview.addItemDecoration(decoration);
 
         ((TextView) toolbar.findViewById(R.id.title)).setText(model.getFolderName());

@@ -89,7 +89,7 @@ public class MediaVideoFileController extends MediaFileController {
                 } while (c.moveToNext());
 
                 _subscriber.onCompleted();
-            }).buffer(300)
+            }).buffer(BUFFER_COUNT)
                     .subscribe(subscriber::onNext);
         }
     }

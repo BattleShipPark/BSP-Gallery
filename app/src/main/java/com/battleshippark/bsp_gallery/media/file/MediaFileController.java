@@ -12,6 +12,7 @@ import rx.Subscriber;
 /**
  */
 public abstract class MediaFileController {
+    static final int BUFFER_COUNT = 100;
     final Context context;
     final int dirId;
 
