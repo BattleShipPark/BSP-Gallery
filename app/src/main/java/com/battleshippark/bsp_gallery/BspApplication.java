@@ -12,6 +12,8 @@ public class BspApplication extends Application {
 
     public BspApplication() {
         super();
+
+        AnalyticsTrackers.initialize(this);
     }
 
     public static Handler getHandler() {
