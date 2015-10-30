@@ -38,6 +38,15 @@ public class FilesActivity extends AppCompatActivity {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    @Bind(R.id.toolbar_back)
+    View toolbarBack;
+
+    @Bind(R.id.toolbar_title)
+    TextView toolbarTitle;
+
+    @Bind(R.id.toolbar_progress)
+    View toolbarProgress;
+
     @Bind(R.id.listview)
     RecyclerView listview;
 
@@ -128,7 +137,7 @@ public class FilesActivity extends AppCompatActivity {
                 (layoutManager.findFirstVisibleItemPosition() <= adapter.getItemCount() && adapter.getItemCount() <= layoutManager.findLastVisibleItemPosition()))
             adapter.refresh();
 
-        toolbar.findViewById(R.id.progress).setVisibility(View.GONE);
+        toolbarProgress.setVisibility(View.GONE);
     }
 
     public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
@@ -188,10 +197,13 @@ public class FilesActivity extends AppCompatActivity {
     private void initUI() {
         setSupportActionBar(toolbar);
 
+        toolbarBack.setOnClickListener(v -> onBackPressed());
+
+        toolbarTitle.setText(model.getFolderName());
+        toolbarTitle.setOnClickListener(v -> onBackPressed());
+
         listview.setAdapter(adapter);
         listview.setLayoutManager(new GridLayoutManager(this, FILES_COLUMN_COUNT));
 //        listview.addItemDecoration(decoration);
-
-        ((TextView) toolbar.findViewById(R.id.title)).setText(model.getFolderName());
     }
 }
