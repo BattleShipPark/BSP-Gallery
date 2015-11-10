@@ -120,8 +120,10 @@ public class MediaAllFileController extends MediaFileController {
             };
         }
 
+        String sortClause = MediaStore.Files.FileColumns._ID + " DESC";
+
         @Cleanup
-        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, null);
+        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, sortClause);
         if (c != null && c.moveToFirst()) {
             Observable.create((Observable.OnSubscribe<MediaFileModel>) _subscriber -> {
                 do {

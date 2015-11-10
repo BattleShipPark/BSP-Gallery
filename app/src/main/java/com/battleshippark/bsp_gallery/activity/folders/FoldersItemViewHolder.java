@@ -1,7 +1,6 @@
 package com.battleshippark.bsp_gallery.activity.folders;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -56,7 +55,6 @@ public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
         this.model = model;
 
         if (model.getCoverThumbPath() == null) {
-            Picasso.with(context).load(R.drawable.error_100).into(coverImageView);
             playImageView.setVisibility(View.GONE);
         } else {
             Picasso.with(context).load(new File(model.getCoverThumbPath())).error(R.drawable.error_100).into(coverImageView);
