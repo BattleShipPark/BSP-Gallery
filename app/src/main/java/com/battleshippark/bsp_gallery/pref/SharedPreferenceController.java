@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.Events;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
+import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Subscribe;
 
@@ -22,16 +22,16 @@ import rx.schedulers.Schedulers;
 public class SharedPreferenceController {
     private static final String NAME = "sp";
     private final Context context;
-    private final FoldersModel foldersModel;
+    private final FoldersActivityModel foldersActivityModel;
     private final SharedPreferenceModel model;
     private final Map<String, Action1<String>> readingProcessMap = new HashMap<>();
     private final Map<String, Action1<String>> writingProcessMap = new HashMap<>();
 
-    public SharedPreferenceController(Context context, FoldersModel foldersModel) {
+    public SharedPreferenceController(Context context, FoldersActivityModel foldersActivityModel) {
         this.context = context;
-        this.foldersModel = foldersModel;
+        this.foldersActivityModel = foldersActivityModel;
 
-        foldersModel.getEventBus().register(this);
+        foldersActivityModel.getEventBus().register(this);
 
         model = new SharedPreferenceModel();
 
@@ -54,7 +54,7 @@ public class SharedPreferenceController {
 
     @Subscribe
     public void OnActivityDestroyed(Events.OnActivityDestroyed event) {
-        foldersModel.getEventBus().unregister(this);
+        foldersActivityModel.getEventBus().unregister(this);
     }
 
     @Subscribe
@@ -67,7 +67,7 @@ public class SharedPreferenceController {
 
     private void sendEvent() {
         BspApplication.getHandler().post(
-                () -> foldersModel.getEventBus().post(new Events.OnSharedPreferenceRead(model))
+                () -> foldersActivityModel.getEventBus().post(new Events.OnSharedPreferenceRead(model))
         );
     }
 
@@ -78,6 +78,6 @@ public class SharedPreferenceController {
 
     private void writeMediaMode(String key) {
         SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        p.edit().putString(key, foldersModel.getMediaMode().name()).apply();
+        p.edit().putString(key, foldersActivityModel.getMediaMode().name()).apply();
     }
 }

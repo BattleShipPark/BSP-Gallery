@@ -6,15 +6,13 @@ import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
-
 /**
  */
 public class FilesItemDecoration extends RecyclerView.ItemDecoration {
-    private final FilesModel model;
+    private final FilesActivityModel model;
     private Paint paint;
 
-    public FilesItemDecoration(FilesModel model) {
+    public FilesItemDecoration(FilesActivityModel model) {
         this.model = model;
 
         paint = new Paint();

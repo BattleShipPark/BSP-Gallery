@@ -13,12 +13,12 @@ import lombok.Data;
 /**
  */
 @Data
-public class FoldersModel {
+public final class FoldersActivityModel {
     private final Bus eventBus;
     private List<MediaFolderModel> mediaFolderModelList;
     private MediaMode mediaMode = MediaMode.ALL;
 
-    public FoldersModel(Bus eventBus) {
+    public FoldersActivityModel(Bus eventBus) {
         this.eventBus = eventBus;
     }
 

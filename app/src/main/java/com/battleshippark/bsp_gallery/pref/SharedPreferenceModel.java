@@ -1,6 +1,5 @@
 package com.battleshippark.bsp_gallery.pref;
 
-import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
 import com.battleshippark.bsp_gallery.media.MediaMode;
 
 import lombok.Data;

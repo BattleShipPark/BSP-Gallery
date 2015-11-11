@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
+import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.media.MediaMode;
@@ -32,7 +32,7 @@ public class FilesActivity extends AppCompatActivity {
     private static final String KEY_FOLDER_ID = "folderId";
 
     /* */
-    private FilesModel model;
+    private FilesActivityModel model;
 
     /* View */
     @Bind(R.id.toolbar)
@@ -74,7 +74,7 @@ public class FilesActivity extends AppCompatActivity {
 
         eventBus.post(Events.OnActivityCreated.EVENT);
 
-        mediaController.refreshFileListAsync(model);
+        mediaController.refreshFileListWithThumbAsync(this, model);
     }
 
     @Override
@@ -129,22 +129,18 @@ public class FilesActivity extends AppCompatActivity {
 
     @Subscribe
     public void OnMediaFileListUpdated(Events.OnMediaFileListUpdated event) {
-        Log.d("DEBUG", "OnMediaFileListUpdated()");
+        Log.d("", getClass().getSimpleName() + ".OnMediaFileListUpdated()");
 
-        GridLayoutManager layoutManager = (GridLayoutManager) listview.getLayoutManager();
-
-        if (layoutManager.findFirstVisibleItemPosition() == RecyclerView.NO_POSITION ||
-                (layoutManager.findFirstVisibleItemPosition() <= adapter.getItemCount() && adapter.getItemCount() <= layoutManager.findLastVisibleItemPosition()))
-            adapter.refresh();
+        adapter.refresh();
 
         toolbarProgress.setVisibility(View.GONE);
     }
 
-    public static Intent createIntent(Context context, FoldersModel foldersModel, MediaFolderModel mediaFolderModel) {
+    public static Intent createIntent(Context context, FoldersActivityModel foldersActivityModel, MediaFolderModel mediaFolderModel) {
         Intent i = new Intent(context, FilesActivity.class);
         i.putExtra(KEY_FOLDER_ID, mediaFolderModel.getId());
         i.putExtra(KEY_FOLDER_NAME, mediaFolderModel.getName());
-        i.putExtra(KEY_MEDIA_MODE, foldersModel.getMediaMode().name());
+        i.putExtra(KEY_MEDIA_MODE, foldersActivityModel.getMediaMode().name());
 
         return i;
     }
@@ -167,8 +163,8 @@ public class FilesActivity extends AppCompatActivity {
         mediaController = new MediaController(this);
     }
 
-    private FilesModel parseBundle(Bundle bundle) {
-        FilesModel model = new FilesModel();
+    private FilesActivityModel parseBundle(Bundle bundle) {
+        FilesActivityModel model = new FilesActivityModel();
 
         model.setFolderId(bundle.getInt(KEY_FOLDER_ID, 0));
 
@@ -180,8 +176,8 @@ public class FilesActivity extends AppCompatActivity {
         return model;
     }
 
-    private FilesModel parseIntent() {
-        FilesModel model = new FilesModel();
+    private FilesActivityModel parseIntent() {
+        FilesActivityModel model = new FilesActivityModel();
 
         model.setFolderId(getIntent().getIntExtra(KEY_FOLDER_ID, 0));
 

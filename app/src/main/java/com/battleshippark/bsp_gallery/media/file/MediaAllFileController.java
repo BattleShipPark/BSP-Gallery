@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
@@ -21,21 +22,21 @@ import rx.Subscriber;
  */
 public class MediaAllFileController extends MediaFileController {
     private Uri uri = MediaStore.Files.getContentUri("external");
+    private String[] columns;
+    private String selectionClause;
+    private String[] selectionArgs;
+    private String sortClause;
 
     public MediaAllFileController(Context context, int dirId) {
         super(context, dirId);
-    }
 
-    @Override
-    public List<MediaFileModel> getMediaFileList() {
-        String[] columns = new String[]{
+        columns = new String[]{
                 MediaStore.Files.FileColumns._ID,
                 MediaStore.Files.FileColumns.DISPLAY_NAME,
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
                 MediaStore.Files.FileColumns.DATA
         };
 
-        String selectionClause;
         if (dirId == MediaFolderModel.ALL_DIR_ID) {
             selectionClause = String.format("%s = ? OR %s = ?",
                     MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -49,8 +50,6 @@ public class MediaAllFileController extends MediaFileController {
             );
         }
 
-
-        String[] selectionArgs;
         if (dirId == MediaFolderModel.ALL_DIR_ID) {
             selectionArgs = new String[]{
                     String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
@@ -64,10 +63,15 @@ public class MediaAllFileController extends MediaFileController {
             };
         }
 
+        sortClause = MediaStore.Files.FileColumns._ID + " DESC";
+    }
+
+    @Override
+    public List<MediaFileModel> getMediaFileList() {
         List<MediaFileModel> result = new ArrayList<>();
 
         @Cleanup
-        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, null);
+        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, sortClause);
         if (c != null && c.moveToFirst()) {
             do {
                 MediaFileModel model = new MediaFileModel();
@@ -79,49 +83,12 @@ public class MediaAllFileController extends MediaFileController {
             } while (c.moveToNext());
         }
 
+//        Log.d("", "getMediaFileList(): " + result.size());
         return result;
     }
 
     @Override
     public void getMediaFileList(Subscriber<? super List<MediaFileModel>> subscriber) {
-        String[] columns = new String[]{
-                MediaStore.Files.FileColumns._ID,
-                MediaStore.Files.FileColumns.DISPLAY_NAME,
-                MediaStore.Files.FileColumns.MEDIA_TYPE,
-                MediaStore.Files.FileColumns.DATA
-        };
-
-        String selectionClause;
-        if (dirId == MediaFolderModel.ALL_DIR_ID) {
-            selectionClause = String.format("%s = ? OR %s = ?",
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE
-            );
-        } else {
-            selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
-                    MediaStore.Images.ImageColumns.BUCKET_ID,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE
-            );
-        }
-
-
-        String[] selectionArgs;
-        if (dirId == MediaFolderModel.ALL_DIR_ID) {
-            selectionArgs = new String[]{
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
-            };
-        } else {
-            selectionArgs = new String[]{
-                    String.valueOf(dirId),
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
-            };
-        }
-
-        String sortClause = MediaStore.Files.FileColumns._ID + " DESC";
-
         @Cleanup
         Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, sortClause);
         if (c != null && c.moveToFirst()) {

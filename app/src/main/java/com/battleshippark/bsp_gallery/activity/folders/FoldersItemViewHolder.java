@@ -22,7 +22,7 @@ import butterknife.OnClick;
  */
 public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
     private final Context context;
-    private final FoldersModel foldersModel;
+    private final FoldersActivityModel foldersActivityModel;
 
     @Bind(R.id.image)
     ImageView coverImageView;
@@ -38,17 +38,17 @@ public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
 
     private MediaFolderModel model;
 
-    public FoldersItemViewHolder(Context context, View view, FoldersModel foldersModel) {
+    public FoldersItemViewHolder(Context context, View view, FoldersActivityModel foldersActivityModel) {
         super(view);
         this.context = context;
-        this.foldersModel = foldersModel;
+        this.foldersActivityModel = foldersActivityModel;
 
         ButterKnife.bind(this, view);
     }
 
     @OnClick(R.id.root)
     public void onClick() {
-        context.startActivity(FilesActivity.createIntent(context, foldersModel, model));
+        context.startActivity(FilesActivity.createIntent(context, foldersActivityModel, model));
     }
 
     public void setModel(MediaFolderModel model) {

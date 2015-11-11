@@ -3,30 +3,29 @@ package com.battleshippark.bsp_gallery.activity.file;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.media.MediaFileModel;
+import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
+import com.battleshippark.bsp_gallery.media.MediaController;
 import com.squareup.otto.Bus;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class FileActivity extends AppCompatActivity {
     private static final String KEY_POSITION = "position";
-    private static final String KEY_LIST = "list";
+    private static final String KEY_FILES_ACTIVITY_MODEL = "filesActivityModel";
+    private static final String KEY_MODEL = "model";
 
     /* */
-    private FileModel model;
+    private FileActivityModel model;
 
     /* View */
     @Bind(R.id.viewpager)
@@ -38,6 +37,7 @@ public class FileActivity extends AppCompatActivity {
     private FileAdapter adapter;
 
     private Bus eventBus;
+    private MediaController mediaController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,8 @@ public class FileActivity extends AppCompatActivity {
         initUI();
 
         eventBus.post(Events.OnActivityCreated.EVENT);
+
+        mediaController.refreshFileListAsync(this, model);
 
         viewPager.setCurrentItem(model.getPosition());
     }
@@ -62,9 +64,8 @@ public class FileActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt(KEY_POSITION, model.getPosition());
-
-        outState.putParcelableArrayList(KEY_LIST, (ArrayList<? extends Parcelable>) model.getMediaFileModelList());
+        model.setPosition(viewPager.getCurrentItem());
+        outState.putParcelable(KEY_MODEL, model);
     }
 
     @Override
@@ -101,10 +102,17 @@ public class FileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static Intent createIntent(Context context, int position, List<MediaFileModel> mediaFileModelList) {
+    @Subscribe
+    public void OnMediaFileListUpdated(Events.OnMediaFileListUpdated event) {
+        Log.d("", getClass().getSimpleName() + ".OnMediaFileListUpdated()");
+
+        adapter.refresh();
+    }
+
+    public static Intent createIntent(Context context, int position, FilesActivityModel filesActivityModel) {
         Intent i = new Intent(context, FileActivity.class);
         i.putExtra(KEY_POSITION, position);
-        BspApplication.TempStorage.mediaFileModelList = mediaFileModelList;
+        i.putExtra(KEY_FILES_ACTIVITY_MODEL, filesActivityModel);
         return i;
     }
 
@@ -118,26 +126,26 @@ public class FileActivity extends AppCompatActivity {
         eventBus = new Bus();
         eventBus.register(this);
 
-        adapter = new FileAdapter(getSupportFragmentManager(), model.getMediaFileModelList());
-//        decoration = new FilesItemDecoration(model);
+        model.setEventBus(eventBus);
 
-//        mediaController = new MediaController(this);
+        adapter = new FileAdapter(getSupportFragmentManager(), model);
+
+        mediaController = new MediaController(this);
     }
 
-    private FileModel parseBundle(Bundle bundle) {
-        FileModel model = new FileModel();
-
-        model.setPosition(bundle.getInt(KEY_POSITION, 0));
-        model.setMediaFileModelList(bundle.getParcelableArrayList(KEY_LIST));
-
-        return model;
+    private FileActivityModel parseBundle(Bundle bundle) {
+        return bundle.getParcelable(KEY_MODEL);
     }
 
-    private FileModel parseIntent() {
-        FileModel model = new FileModel();
+    private FileActivityModel parseIntent() {
+        FileActivityModel model = new FileActivityModel();
 
         model.setPosition(getIntent().getIntExtra(KEY_POSITION, 0));
-        model.setMediaFileModelList(BspApplication.TempStorage.mediaFileModelList);
+
+        FilesActivityModel filesActivityModel = getIntent().getParcelableExtra(KEY_FILES_ACTIVITY_MODEL);
+        model.setFolderId(filesActivityModel.getFolderId());
+        model.setFolderName(filesActivityModel.getFolderName());
+        model.setMediaMode(filesActivityModel.getMediaMode());
 
         return model;
     }

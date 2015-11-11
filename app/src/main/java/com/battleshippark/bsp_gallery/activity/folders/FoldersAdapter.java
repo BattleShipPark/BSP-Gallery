@@ -16,12 +16,12 @@ import java.util.List;
  */
 public class FoldersAdapter extends RecyclerView.Adapter {
     private final Context context;
-    private final FoldersModel foldersModel;
+    private final FoldersActivityModel foldersActivityModel;
     private List<MediaFolderModel> mediaFolderModelList;
 
-    public FoldersAdapter(Context context, FoldersModel foldersModel) {
+    public FoldersAdapter(Context context, FoldersActivityModel foldersActivityModel) {
         this.context = context;
-        this.foldersModel = foldersModel;
+        this.foldersActivityModel = foldersActivityModel;
 
         mediaFolderModelList = new ArrayList<>();
     }
@@ -29,7 +29,7 @@ public class FoldersAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(context, R.layout.listitem_folders, null);
-        RecyclerView.ViewHolder vh = new FoldersItemViewHolder(context, view, foldersModel);
+        RecyclerView.ViewHolder vh = new FoldersItemViewHolder(context, view, foldersActivityModel);
         return vh;
     }
 
@@ -45,8 +45,8 @@ public class FoldersAdapter extends RecyclerView.Adapter {
     }
 
     public void refresh() {
-        if (foldersModel.getMediaFolderModelList() != null) {
-            mediaFolderModelList = Collections.unmodifiableList(foldersModel.getMediaFolderModelList());
+        if (foldersActivityModel.getMediaFolderModelList() != null) {
+            mediaFolderModelList = Collections.unmodifiableList(foldersActivityModel.getMediaFolderModelList());
             notifyDataSetChanged();
         }
     }

@@ -21,30 +21,34 @@ import rx.Subscriber;
  */
 public class MediaVideoFileController extends MediaFileController {
     private Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+    private String[] columns;
+    private String selectionClause = null;
+    private String[] selectionArgs = null;
+    private String sortClause;
 
     public MediaVideoFileController(Context context, int dirId) {
         super(context, dirId);
-    }
 
-    @Override
-    public List<MediaFileModel> getMediaFileList() {
-        String[] columns = new String[]{
+        columns = new String[]{
                 MediaStore.Video.VideoColumns._ID,
                 MediaStore.Video.VideoColumns.DISPLAY_NAME,
                 MediaStore.Video.VideoColumns.DATA
         };
 
-        String selectionClause = null;
-        String[] selectionArgs = null;
         if (dirId != MediaFolderModel.ALL_DIR_ID) {
             selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
             selectionArgs = new String[]{String.valueOf(dirId)};
         }
 
+        sortClause = MediaStore.Files.FileColumns._ID + " DESC";
+    }
+
+    @Override
+    public List<MediaFileModel> getMediaFileList() {
         List<MediaFileModel> result = new ArrayList<>();
 
         @Cleanup
-        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, null);
+        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, sortClause);
         if (c != null && c.moveToFirst()) {
             do {
                 MediaFileModel model = new MediaFileModel();
@@ -61,21 +65,6 @@ public class MediaVideoFileController extends MediaFileController {
 
     @Override
     public void getMediaFileList(Subscriber<? super List<MediaFileModel>> subscriber) {
-        String[] columns = new String[]{
-                MediaStore.Video.VideoColumns._ID,
-                MediaStore.Video.VideoColumns.DISPLAY_NAME,
-                MediaStore.Video.VideoColumns.DATA
-        };
-
-        String selectionClause = null;
-        String[] selectionArgs = null;
-        if (dirId != MediaFolderModel.ALL_DIR_ID) {
-            selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
-            selectionArgs = new String[]{String.valueOf(dirId)};
-        }
-
-        String sortClause = MediaStore.Files.FileColumns._ID + " DESC";
-
         @Cleanup
         Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, sortClause);
         if (c != null && c.moveToFirst()) {

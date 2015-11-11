@@ -2,6 +2,7 @@ package com.battleshippark.bsp_gallery.activity.file;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,8 @@ public class FileFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Picasso.with(getActivity()).load(new File(model.getPath())).into(imageView);
+//        Log.i("DEBUG", model.getPath());
+        Picasso.with(getActivity()).load(new File(model.getPath())).resize(1080, 1920).centerInside().into(imageView);
     }
 
     public static Fragment newInstance(MediaFileModel mediaFileModel) {

@@ -1,12 +1,15 @@
 package com.battleshippark.bsp_gallery.media;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.battleshippark.bsp_gallery.BspApplication;
-import com.battleshippark.bsp_gallery.activity.files.FilesModel;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersModel;
+import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
+import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
+import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
 import com.google.gson.Gson;
@@ -46,7 +49,7 @@ public class MediaController {
      * 쿼리를 던질때마다 FoldersModel을 갱신한다.
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
-    public void refreshDirListAsync(FoldersModel model) {
+    public void refreshDirListAsync(FoldersActivityModel model) {
         MediaFolderController directoryController = MediaFolderController.create(context, model.getMediaMode());
 
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
@@ -94,9 +97,48 @@ public class MediaController {
     }
 
     /**
-     * 파일 목록을 갱신해서 FilesModel을 갱신한다
+     * 파일 목록을 갱신해서 FilesModel을 갱신한다. 전체를 한 번에 다 읽는다.
      */
-    public void refreshFileListAsync(FilesModel model) {
+    public void refreshFileListAsync(Activity activity, FileActivityModel model) {
+        MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaMode());
+
+        Observable.create((Observable.OnSubscribe<List<MediaFileModel>>) subscriber -> {
+            subscriber.onNext(fileController.getMediaFileList());
+
+            subscriber.onCompleted();
+        }).subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<List<MediaFileModel>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<MediaFileModel> mediaFileModels) {
+                        if (isActivityInvalid()) return;
+
+                        BspApplication.getHandler().post(() -> {
+                            if (isActivityInvalid()) return;
+
+                            model.setMediaFileModelList(mediaFileModels);
+                        });
+                    }
+
+                    boolean isActivityInvalid() {
+                        return activity == null || activity.isFinishing() || (Build.VERSION.SDK_INT >= 17 && activity.isDestroyed());
+                    }
+                });
+    }
+
+    /**
+     * 파일 목록을 갱신해서 FilesModel을 갱신한다. 내부적으로는 N건씩 끊어서 FilesModel이 갱신되고,
+     * 엄지 손톱의 값을 가지고 있다
+     */
+    public void refreshFileListWithThumbAsync(Activity activity, FilesActivityModel model) {
         MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaMode());
 
         /* 파일 목록이 너무 많을 수 있으므로 n건씩 끊어서 받는다 */
@@ -119,10 +161,21 @@ public class MediaController {
 
                     @Override
                     public void onNext(List<MediaFileModel> mediaFileModels) {
+                        if (isActivityInvalid()) return;
+
                         List<MediaFileModel> files = fileController.addMediaThumbPath(mediaFileModels);
                         mediaFileModelList.addAll(files);
 
-                        BspApplication.getHandler().post(() -> model.setMediaFileModelList(mediaFileModelList));
+
+                        BspApplication.getHandler().post(() -> {
+                            if (isActivityInvalid()) return;
+
+                            model.setMediaFileModelList(mediaFileModelList);
+                        });
+                    }
+
+                    boolean isActivityInvalid() {
+                        return activity == null || activity.isFinishing() || (Build.VERSION.SDK_INT >= 17 && activity.isDestroyed());
                     }
                 });
     }
@@ -193,15 +246,15 @@ public class MediaController {
     }
 
 
-    private String toJson(FoldersModel model) {
+    private String toJson(FoldersActivityModel model) {
         return new Gson().toJson(model.getMediaFolderModelList());
     }
 
-    private String getCacheFileName(FoldersModel model) {
+    private String getCacheFileName(FoldersActivityModel model) {
         return CACHE_FILENAME + model.getMediaMode();
     }
 
-    private List<MediaFolderModel> getFromCache(Context context, FoldersModel model) throws IOException {
+    private List<MediaFolderModel> getFromCache(Context context, FoldersActivityModel model) throws IOException {
         File cacheDirFile = context.getCacheDir();
         File inputFile = new File(cacheDirFile, getCacheFileName(model));
 
@@ -218,7 +271,7 @@ public class MediaController {
         }
     }
 
-    private void writeToCache(String json, FoldersModel model) {
+    private void writeToCache(String json, FoldersActivityModel model) {
         File cacheDirFile = context.getCacheDir();
         File outputFile = new File(cacheDirFile, getCacheFileName(model));
 

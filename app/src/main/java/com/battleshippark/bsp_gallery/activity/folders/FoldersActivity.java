@@ -40,7 +40,7 @@ public class FoldersActivity extends AppCompatActivity {
     /* */
     private FoldersAdapter adapter;
     private FoldersItemDecoration decoration;
-    private FoldersModel model;
+    private FoldersActivityModel model;
     private Bus eventBus;
 
 
@@ -131,7 +131,7 @@ public class FoldersActivity extends AppCompatActivity {
         eventBus = new Bus();
         eventBus.register(this);
 
-        model = new FoldersModel(eventBus);
+        model = new FoldersActivityModel(eventBus);
 
         adapter = new FoldersAdapter(this, model);
         decoration = new FoldersItemDecoration(model);

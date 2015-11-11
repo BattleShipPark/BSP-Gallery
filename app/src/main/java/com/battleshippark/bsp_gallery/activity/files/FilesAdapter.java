@@ -9,17 +9,16 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  */
 public class FilesAdapter extends RecyclerView.Adapter {
     private final Context context;
-    private final FilesModel model;
+    private final FilesActivityModel model;
     private List<MediaFileModel> mediaFileModelList;
 
-    public FilesAdapter(Context context, FilesModel model) {
+    public FilesAdapter(Context context, FilesActivityModel model) {
         this.context = context;
         this.model = model;
 
@@ -45,9 +44,8 @@ public class FilesAdapter extends RecyclerView.Adapter {
     }
 
     public void refresh() {
-        if (model.getMediaFileModelList() != null) {
-            mediaFileModelList = Collections.unmodifiableList(model.getMediaFileModelList());
-            notifyDataSetChanged();
-        }
+        mediaFileModelList.clear();
+        mediaFileModelList.addAll(model.getMediaFileModelList());
+        notifyDataSetChanged();
     }
 }

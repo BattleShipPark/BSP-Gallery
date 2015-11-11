@@ -27,13 +27,13 @@ public class FilesItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.play)
     ImageView playImageView;
 
-    public FilesItemViewHolder(Context context, View view, FilesModel filesModel) {
+    public FilesItemViewHolder(Context context, View view, FilesActivityModel filesActivityModel) {
         super(view);
         this.context = context;
 
         ButterKnife.bind(this, view);
 
-        view.setOnClickListener(v -> context.startActivity(FileActivity.createIntent(context, position, filesModel.getMediaFileModelList())));
+        view.setOnClickListener(v -> context.startActivity(FileActivity.createIntent(context, position, filesActivityModel)));
     }
 
     public void bind(int position, MediaFileModel model) {
