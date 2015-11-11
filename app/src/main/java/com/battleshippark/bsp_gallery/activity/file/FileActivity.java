@@ -51,8 +51,6 @@ public class FileActivity extends AppCompatActivity {
         eventBus.post(Events.OnActivityCreated.EVENT);
 
         mediaController.refreshFileListAsync(this, model);
-
-        viewPager.setCurrentItem(model.getPosition());
     }
 
     @Override
@@ -107,6 +105,8 @@ public class FileActivity extends AppCompatActivity {
         Log.d("", getClass().getSimpleName() + ".OnMediaFileListUpdated()");
 
         adapter.refresh();
+
+        viewPager.setCurrentItem(model.getPosition());
     }
 
     public static Intent createIntent(Context context, int position, FilesActivityModel filesActivityModel) {
