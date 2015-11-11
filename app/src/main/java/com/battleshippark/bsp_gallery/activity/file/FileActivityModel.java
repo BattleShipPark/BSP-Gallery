@@ -42,7 +42,6 @@ public final class FileActivityModel implements Parcelable {
         dest.writeInt(position);
         dest.writeInt(folderId);
         dest.writeString(folderName);
-        dest.writeTypedList(mediaFileModelList);
         dest.writeString(mediaMode.name());
     }
 

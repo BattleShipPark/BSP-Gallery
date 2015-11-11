@@ -33,6 +33,8 @@ public final class AnalyticsTrackers {
         }
 
         sInstance = new AnalyticsTrackers(context);
+        sInstance.get(Target.APP);
+//        GoogleAnalytics.getInstance(context).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
     }
 
     public static synchronized AnalyticsTrackers getInstance() {

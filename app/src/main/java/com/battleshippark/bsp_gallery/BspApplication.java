@@ -12,6 +12,11 @@ public class BspApplication extends Application {
 
     public BspApplication() {
         super();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
         AnalyticsTrackers.initialize(this);
     }
