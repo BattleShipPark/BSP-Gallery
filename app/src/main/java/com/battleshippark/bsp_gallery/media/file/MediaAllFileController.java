@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
@@ -122,9 +121,11 @@ public class MediaAllFileController extends MediaFileController {
             else
                 c = queryVideoMiniThumbnail(context.getContentResolver(), file.getId(), MediaStore.Video.Thumbnails.MINI_KIND, projectionClauses);
 
-            if (c != null && c.moveToFirst()) {
+            if (c != null) {
                 MediaFileModel model = file.copy();
-                model.setThumbPath(CursorUtils.getString(c, projectionClauses[0]));
+                if (c.moveToFirst()) {
+                    model.setThumbPath(CursorUtils.getString(c, projectionClauses[0]));
+                }
                 result.add(model);
             }
         }
