@@ -1,7 +1,10 @@
 package com.battleshippark.bsp_gallery.activity.file;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +13,15 @@ import android.widget.ProgressBar;
 
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
+import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -53,24 +61,67 @@ public class FileFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-//        Log.i("DEBUG", model.getPath());
         progressBar.setVisibility(View.VISIBLE);
 
-        Picasso.with(getActivity()).load(new File(model.getPath()))
-                .resize(getContext().getResources().getDisplayMetrics().widthPixels,
-                        getContext().getResources().getDisplayMetrics().heightPixels)
-                .centerInside().error(R.drawable.error_100).into(imageView, new Callback() {
-            @Override
-            public void onSuccess() {
-                progressBar.setVisibility(View.GONE);
-            }
+        if (model.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
+            Picasso.with(getActivity()).load(new File(model.getPath()))
+                    .resize(getContext().getResources().getDisplayMetrics().widthPixels,
+                            getContext().getResources().getDisplayMetrics().heightPixels)
+                    .centerInside().error(R.drawable.error_100).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    progressBar.setVisibility(View.GONE);
+                }
 
-            @Override
-            public void onError() {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+                @Override
+                public void onError() {
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            ExecutorService executor = ((FragmentAccessible) getActivity()).getExecutor();
 
+            new AsyncTask<Void, Void, MediaFileModel>() {
+                @Override
+                protected MediaFileModel doInBackground(Void... params) {
+                    MediaFileController mediaFileController = MediaFileController.create(getActivity(), 0, MediaFilterMode.ALL);
+
+                    List<MediaFileModel> mediaFileModelList = new ArrayList<>();
+                    mediaFileModelList.add(model);
+                    mediaFileModelList = mediaFileController.addMediaThumbPath(mediaFileModelList);
+
+                    return mediaFileModelList.get(0);
+                }
+
+                @Override
+                protected void onPostExecute(MediaFileModel mediaFileModel) {
+                    model = mediaFileModel;
+
+                    if (TextUtils.isEmpty(model.getThumbPath())) {
+                        Picasso.with(getActivity()).load(R.drawable.error_100)
+                                .resize(getContext().getResources().getDisplayMetrics().widthPixels / 6,
+                                        getContext().getResources().getDisplayMetrics().heightPixels / 6)
+                                .centerInside().into(imageView);
+                        progressBar.setVisibility(View.GONE);
+                    } else {
+                        Picasso.with(getActivity()).load(new File(model.getThumbPath()))
+                                .resize(getContext().getResources().getDisplayMetrics().widthPixels,
+                                        getContext().getResources().getDisplayMetrics().heightPixels)
+                                .centerInside().error(R.drawable.error_100).into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                progressBar.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+                }
+            }.executeOnExecutor(executor);
+        }
     }
 
     public static Fragment newInstance(MediaFileModel mediaFileModel) {

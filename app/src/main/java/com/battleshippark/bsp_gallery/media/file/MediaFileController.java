@@ -3,7 +3,7 @@ package com.battleshippark.bsp_gallery.media.file;
 import android.content.Context;
 
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
-import com.battleshippark.bsp_gallery.media.MediaMode;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 
 import java.util.List;
 
@@ -21,8 +21,8 @@ public abstract class MediaFileController {
         this.dirId = dirId;
     }
 
-    public static MediaFileController create(Context context, int dirId, MediaMode mediaMode) {
-        switch (mediaMode) {
+    public static MediaFileController create(Context context, int dirId, MediaFilterMode mediaFilterMode) {
+        switch (mediaFilterMode) {
             case ALL:
                 return new MediaAllFileController(context, dirId);
             case IMAGE:

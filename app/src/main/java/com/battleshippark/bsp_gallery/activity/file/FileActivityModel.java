@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
-import com.battleshippark.bsp_gallery.media.MediaMode;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.squareup.otto.Bus;
 
 import java.util.List;
@@ -21,20 +21,22 @@ public final class FileActivityModel implements Parcelable {
     private int folderId;
     private String folderName;
     private List<MediaFileModel> mediaFileModelList;
-    private MediaMode mediaMode;
+    private MediaFilterMode mediaFilterMode;
 
     public FileActivityModel() {
     }
 
     public FileActivityModel(Bus eventBus) {
+        this();
         this.eventBus = eventBus;
     }
 
     protected FileActivityModel(Parcel in) {
+        this();
         position = in.readInt();
         folderId = in.readInt();
         folderName = in.readString();
-        mediaMode = MediaMode.valueOf(in.readString());
+        mediaFilterMode = MediaFilterMode.valueOf(in.readString());
     }
 
     @Override
@@ -42,7 +44,7 @@ public final class FileActivityModel implements Parcelable {
         dest.writeInt(position);
         dest.writeInt(folderId);
         dest.writeString(folderName);
-        dest.writeString(mediaMode.name());
+        dest.writeString(mediaFilterMode.name());
     }
 
     @Override

@@ -16,10 +16,13 @@ import com.battleshippark.bsp_gallery.media.MediaController;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class FileActivity extends AppCompatActivity {
+public class FileActivity extends AppCompatActivity implements FragmentAccessible {
     private static final String KEY_POSITION = "position";
     private static final String KEY_FILES_ACTIVITY_MODEL = "filesActivityModel";
     private static final String KEY_MODEL = "model";
@@ -38,6 +41,7 @@ public class FileActivity extends AppCompatActivity {
 
     private Bus eventBus;
     private MediaController mediaController;
+    private ExecutorService executor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +113,11 @@ public class FileActivity extends AppCompatActivity {
         viewPager.setCurrentItem(model.getPosition());
     }
 
+    @Override
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
     public static Intent createIntent(Context context, int position, FilesActivityModel filesActivityModel) {
         Intent i = new Intent(context, FileActivity.class);
         i.putExtra(KEY_POSITION, position);
@@ -131,11 +140,14 @@ public class FileActivity extends AppCompatActivity {
         adapter = new FileAdapter(getSupportFragmentManager(), model);
 
         mediaController = new MediaController(this);
+
+        executor = Executors.newCachedThreadPool();
     }
 
     private FileActivityModel parseBundle(Bundle bundle) {
         return bundle.getParcelable(KEY_MODEL);
     }
+
 
     private FileActivityModel parseIntent() {
         FileActivityModel model = new FileActivityModel();
@@ -145,11 +157,10 @@ public class FileActivity extends AppCompatActivity {
         FilesActivityModel filesActivityModel = getIntent().getParcelableExtra(KEY_FILES_ACTIVITY_MODEL);
         model.setFolderId(filesActivityModel.getFolderId());
         model.setFolderName(filesActivityModel.getFolderName());
-        model.setMediaMode(filesActivityModel.getMediaMode());
+        model.setMediaFilterMode(filesActivityModel.getMediaFilterMode());
 
         return model;
     }
-
 
     private void initUI() {
         viewPager.setAdapter(adapter);

@@ -1,6 +1,8 @@
 package com.battleshippark.bsp_gallery.activity.files;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -33,7 +35,7 @@ public class FilesItemViewHolder extends RecyclerView.ViewHolder {
 
         ButterKnife.bind(this, view);
 
-        view.setOnClickListener(v -> context.startActivity(FileActivity.createIntent(context, position, filesActivityModel)));
+        view.setOnClickListener(v -> startActivity(context, filesActivityModel));
     }
 
     public void bind(int position, MediaFileModel model) {
@@ -50,6 +52,19 @@ public class FilesItemViewHolder extends RecyclerView.ViewHolder {
             } else {
                 playImageView.setVisibility(View.GONE);
             }
+        }
+    }
+
+    private void startActivity(Context context, FilesActivityModel filesActivityModel) {
+        MediaFileModel mediaFileModel = filesActivityModel.getMediaFileModelList().get(position);
+
+        if (mediaFileModel.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+            context.startActivity(FileActivity.createIntent(context, position, filesActivityModel));
+        else {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_VIEW);
+            sendIntent.setDataAndType(Uri.fromFile(new File(mediaFileModel.getPath())), "video/*");
+            context.startActivity(sendIntent);
         }
     }
 }

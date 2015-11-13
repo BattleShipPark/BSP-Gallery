@@ -50,7 +50,7 @@ public class MediaController {
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
     public void refreshDirListAsync(FoldersActivityModel model) {
-        MediaFolderController directoryController = MediaFolderController.create(context, model.getMediaMode());
+        MediaFolderController directoryController = MediaFolderController.create(context, model.getMediaFilterMode());
 
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
@@ -100,7 +100,7 @@ public class MediaController {
      * 파일 목록을 갱신해서 FilesModel을 갱신한다. 전체를 한 번에 다 읽는다.
      */
     public void refreshFileListAsync(Activity activity, FileActivityModel model) {
-        MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaMode());
+        MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaFilterMode());
 
         Observable.create((Observable.OnSubscribe<List<MediaFileModel>>) subscriber -> {
             subscriber.onNext(fileController.getMediaFileList());
@@ -139,7 +139,7 @@ public class MediaController {
      * 엄지 손톱의 값을 가지고 있다
      */
     public void refreshFileListWithThumbAsync(Activity activity, FilesActivityModel model) {
-        MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaMode());
+        MediaFileController fileController = MediaFileController.create(context, model.getFolderId(), model.getMediaFilterMode());
 
         /* 파일 목록이 너무 많을 수 있으므로 n건씩 끊어서 받는다 */
         Observable.create((Observable.OnSubscribe<List<MediaFileModel>>) subscriber -> {
@@ -251,7 +251,7 @@ public class MediaController {
     }
 
     private String getCacheFileName(FoldersActivityModel model) {
-        return CACHE_FILENAME + model.getMediaMode();
+        return CACHE_FILENAME + model.getMediaFilterMode();
     }
 
     private List<MediaFolderModel> getFromCache(Context context, FoldersActivityModel model) throws IOException {

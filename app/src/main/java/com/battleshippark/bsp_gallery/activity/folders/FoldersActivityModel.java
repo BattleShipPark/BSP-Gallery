@@ -1,8 +1,8 @@
 package com.battleshippark.bsp_gallery.activity.folders;
 
 import com.battleshippark.bsp_gallery.Events;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
-import com.battleshippark.bsp_gallery.media.MediaMode;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -16,7 +16,7 @@ import lombok.Data;
 public final class FoldersActivityModel {
     private final Bus eventBus;
     private List<MediaFolderModel> mediaFolderModelList;
-    private MediaMode mediaMode = MediaMode.ALL;
+    private MediaFilterMode mediaFilterMode = MediaFilterMode.ALL;
 
     public FoldersActivityModel(Bus eventBus) {
         this.eventBus = eventBus;
@@ -38,8 +38,8 @@ public final class FoldersActivityModel {
         eventBus.post(Events.OnMediaDirectoryListUpdated.EVENT);
     }
 
-    public void setMediaMode(MediaMode mode) {
-        mediaMode = mode;
+    public void setMediaFilterMode(MediaFilterMode mode) {
+        mediaFilterMode = mode;
 
         eventBus.post(Events.OnMediaModeUpdated.EVENT);
     }

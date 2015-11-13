@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaController;
-import com.battleshippark.bsp_gallery.media.MediaMode;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -106,7 +106,7 @@ public class FoldersActivity extends AppCompatActivity {
         Log.d("", getClass().getSimpleName() + ".OnMediaModeUpdated()");
 
         TextView tv = (TextView) toolbar.findViewById(R.id.media);
-        switch (model.getMediaMode()) {
+        switch (model.getMediaFilterMode()) {
             case ALL:
                 tv.setText(R.string.media_mode_all);
                 break;
@@ -123,7 +123,7 @@ public class FoldersActivity extends AppCompatActivity {
     @Subscribe
     public void OnSharedPreferenceRead(Events.OnSharedPreferenceRead event) {
         Log.d("", "OnSharedPreferenceRead()");
-        model.setMediaMode(event.getModel().getMediaMode());
+        model.setMediaFilterMode(event.getModel().getMediaFilterMode());
         mediaController.refreshDirListAsync(model);
     }
 
@@ -156,13 +156,13 @@ public class FoldersActivity extends AppCompatActivity {
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.action_media_all:
-                    model.setMediaMode(MediaMode.ALL);
+                    model.setMediaFilterMode(MediaFilterMode.ALL);
                     break;
                 case R.id.action_media_image:
-                    model.setMediaMode(MediaMode.IMAGE);
+                    model.setMediaFilterMode(MediaFilterMode.IMAGE);
                     break;
                 case R.id.action_media_video:
-                    model.setMediaMode(MediaMode.VIDEO);
+                    model.setMediaFilterMode(MediaFilterMode.VIDEO);
                     break;
             }
 

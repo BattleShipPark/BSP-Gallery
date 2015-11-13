@@ -2,8 +2,8 @@ package com.battleshippark.bsp_gallery.media.folder;
 
 import android.content.Context;
 
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
-import com.battleshippark.bsp_gallery.media.MediaMode;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ public abstract class MediaFolderController {
         this.context = context;
     }
 
-    public static MediaFolderController create(Context context, MediaMode mediaMode) {
-        switch (mediaMode) {
+    public static MediaFolderController create(Context context, MediaFilterMode mediaFilterMode) {
+        switch (mediaFilterMode) {
             case ALL:
                 return new MediaAllFolderController(context);
             case IMAGE:

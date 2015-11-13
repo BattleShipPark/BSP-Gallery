@@ -18,7 +18,7 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
-import com.battleshippark.bsp_gallery.media.MediaMode;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -27,7 +27,7 @@ import butterknife.BindInt;
 import butterknife.ButterKnife;
 
 public class FilesActivity extends AppCompatActivity {
-    private static final String KEY_MEDIA_MODE = "mediaMode";
+    private static final String KEY_MEDIA_MODE = "mediaFilterMode";
     private static final String KEY_FOLDER_NAME = "folderName";
     private static final String KEY_FOLDER_ID = "folderId";
 
@@ -90,7 +90,7 @@ public class FilesActivity extends AppCompatActivity {
 
         outState.putString(KEY_FOLDER_NAME, model.getFolderName());
 
-        outState.putString(KEY_MEDIA_MODE, model.getMediaMode().name());
+        outState.putString(KEY_MEDIA_MODE, model.getMediaFilterMode().name());
     }
 
     @Override
@@ -140,7 +140,7 @@ public class FilesActivity extends AppCompatActivity {
         Intent i = new Intent(context, FilesActivity.class);
         i.putExtra(KEY_FOLDER_ID, mediaFolderModel.getId());
         i.putExtra(KEY_FOLDER_NAME, mediaFolderModel.getName());
-        i.putExtra(KEY_MEDIA_MODE, foldersActivityModel.getMediaMode().name());
+        i.putExtra(KEY_MEDIA_MODE, foldersActivityModel.getMediaFilterMode().name());
 
         return i;
     }
@@ -171,7 +171,7 @@ public class FilesActivity extends AppCompatActivity {
         model.setFolderName(bundle.getString(KEY_FOLDER_NAME));
 
         String mode = bundle.getString(KEY_MEDIA_MODE);
-        model.setMediaMode(MediaMode.valueOf(mode));
+        model.setMediaFilterMode(MediaFilterMode.valueOf(mode));
 
         return model;
     }
@@ -184,7 +184,7 @@ public class FilesActivity extends AppCompatActivity {
         model.setFolderName(getIntent().getStringExtra(KEY_FOLDER_NAME));
 
         String mode = getIntent().getStringExtra(KEY_MEDIA_MODE);
-        model.setMediaMode(MediaMode.valueOf(mode));
+        model.setMediaFilterMode(MediaFilterMode.valueOf(mode));
 
         return model;
     }

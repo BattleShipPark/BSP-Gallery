@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
-import com.battleshippark.bsp_gallery.media.MediaMode;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -21,7 +21,7 @@ public final class FilesActivityModel implements Parcelable {
     private int folderId;
     private String folderName;
     private List<MediaFileModel> mediaFileModelList;
-    private MediaMode mediaMode;
+    private MediaFilterMode mediaFilterMode;
 
     public FilesActivityModel() {
     }
@@ -34,14 +34,14 @@ public final class FilesActivityModel implements Parcelable {
         folderId = in.readInt();
         folderName = in.readString();
         /* not save mediaFileModelList because I don't use it through Parcel*/
-        mediaMode = MediaMode.valueOf(in.readString());
+        mediaFilterMode = MediaFilterMode.valueOf(in.readString());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(folderId);
         dest.writeString(folderName);
-        dest.writeString(mediaMode.name());
+        dest.writeString(mediaFilterMode.name());
     }
 
     @Override
