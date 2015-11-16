@@ -3,9 +3,16 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file("..\\battleshippark.keystore")
+            storePassword System.getenv("store_pwd")
+            keyAlias System.getenv("key_alias")
+            keyPassword System.getenv("key_pwd")
+        }
+    }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "com.battleshippark.bsp_gallery"
         minSdkVersion 15
@@ -18,6 +25,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -25,8 +33,39 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor' // due to butterknife + lombok
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        // due to butterknife + lombok
     }
+    productFlavors {
+    }
+}
+
+def appModuleRootFolder = '.'
+def googleServicesJson = 'google-services.json'
+
+task switchToDebug(type: Copy) {
+    def buildType = 'debug'
+    description = 'Switches to DEBUG google-services.json'
+    from "conf/${buildType}"
+    include "$googleServicesJson"
+    into "$appModuleRootFolder"
+    inputs.file file("conf/${buildType}/${googleServicesJson}")
+    outputs.file file("${appModuleRootFolder}/${googleServicesJson}")
+}
+
+task switchToRelease(type: Copy) {
+    def buildType = 'release'
+    description = 'Switches to RELEASE google-services.json'
+    from "conf/${buildType}/"
+    include "$googleServicesJson"
+    into "$appModuleRootFolder"
+    inputs.file file("conf/${buildType}/${googleServicesJson}")
+    outputs.file file("${appModuleRootFolder}/${googleServicesJson}")
+}
+
+afterEvaluate {
+    processDebugGoogleServices.dependsOn switchToDebug
+    processReleaseGoogleServices.dependsOn switchToRelease
 }
 
 dependencies {
@@ -35,7 +74,6 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4'
     // Set this dependency to use JUnit 4 rules
     androidTestCompile 'com.android.support.test:rules:0.4'
-
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:recyclerview-v7:23.0.1'
     compile 'com.jakewharton:butterknife:7.0.1'
