@@ -1,5 +1,7 @@
 package com.battleshippark.bsp_gallery.activity.file;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -37,6 +39,11 @@ public class VideoFileFragment extends FileFragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_video_file, container, false);
         ButterKnife.bind(this, v);
+        v.setOnClickListener(v1 -> {
+            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+            sendIntent.setDataAndType(Uri.fromFile(new File(model.getPath())), "video/*");
+            getActivity().startActivity(sendIntent);
+        });
         return v;
     }
 
