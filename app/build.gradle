@@ -45,33 +45,40 @@ android {
     }
 }
 
-def appModuleRootFolder = '.'
-def googleServicesJson = 'google-services.json'
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
 
-task switchToDebug(type: Copy) {
-    def buildType = 'debug'
-    description = 'Switches to DEBUG google-services.json'
-    from "conf/${buildType}"
-    include "$googleServicesJson"
-    into "$appModuleRootFolder"
-    inputs.file file("conf/${buildType}/${googleServicesJson}")
-    outputs.file file("${appModuleRootFolder}/${googleServicesJson}")
+        tasks.getByPath(":${project.name}:process${buildType.name.capitalize()}GoogleServices").doFirst {
+            def appModuleRootFolder = '.'
+            def googleServicesJson = 'google-services.json'
+            def copyTask = project.tasks.create("switchGoogleServices", Copy)
+
+            copyTask.from("conf/${buildType.name}")
+            copyTask.include("$googleServicesJson")
+            copyTask.into("$appModuleRootFolder")
+            copyTask.inputs.file "conf/${buildType.name}/${googleServicesJson}"
+            copyTask.outputs.file "${appModuleRootFolder}/${googleServicesJson}"
+            copyTask.execute();
+        }
+
+        tasks.getByPath(":${project.name}:assemble${buildType.name.capitalize()}").doLast {
+            def file = output.outputFile
+            def copyTask = project.tasks.create("renameApk", Copy)
+            copyTask.from(file)
+            copyTask.into(file.parent)
+            copyTask.rename(file.name, file.name.replace("app-", "bsp-gallery-" + android.defaultConfig.versionName + "-")
+                    .replace(".apk", "-" + getDate() + ".apk"))
+            copyTask.execute()
+        }
+    }
 }
 
-task switchToRelease(type: Copy) {
-    def buildType = 'release'
-    description = 'Switches to RELEASE google-services.json'
-    from "conf/${buildType}/"
-    include "$googleServicesJson"
-    into "$appModuleRootFolder"
-    inputs.file file("conf/${buildType}/${googleServicesJson}")
-    outputs.file file("${appModuleRootFolder}/${googleServicesJson}")
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmmss')
+    return formattedDate
 }
 
-afterEvaluate {
-    processDebugGoogleServices.dependsOn switchToDebug
-    processReleaseGoogleServices.dependsOn switchToRelease
-}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
