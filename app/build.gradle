@@ -6,9 +6,9 @@ android {
     signingConfigs {
         release {
             storeFile file("..\\battleshippark.keystore")
-            storePassword System.getenv("store_pwd")
-            keyAlias System.getenv("key_alias")
-            keyPassword System.getenv("key_pwd")
+            storePassword System.getProperty("store_pwd")
+            keyAlias System.getProperty("key_alias")
+            keyPassword System.getProperty("key_pwd")
         }
     }
     compileSdkVersion 23
@@ -23,9 +23,14 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [app_name: 'BSP-Gallery']
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+        debug {
+            applicationIdSuffix '.beta'
+            manifestPlaceholders = [app_name: 'BSP-Gallery.beta']
         }
     }
     compileOptions {

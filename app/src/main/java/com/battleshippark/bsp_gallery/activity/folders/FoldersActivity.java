@@ -27,7 +27,6 @@ public class FoldersActivity extends AppCompatActivity {
     /* */
 
     /* View */
-
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
