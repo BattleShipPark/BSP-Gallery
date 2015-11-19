@@ -11,4 +11,6 @@ Libraries that I used are:
 - rxandroid
 - lombok
 
-This is for only myself, but I hope it also can be helpful to someone as an example.
+You can download here: https://play.google.com/store/apps/details?id=com.battleshippark.bsp_gallery
+
+This is only for myself, but I hope it also can be helpful to someone as an example.
