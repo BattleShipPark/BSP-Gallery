@@ -51,7 +51,7 @@ android.applicationVariants.all { variant ->
         tasks.getByPath(":${project.name}:process${buildType.name.capitalize()}GoogleServices").doFirst {
             def appModuleRootFolder = '.'
             def googleServicesJson = 'google-services.json'
-            def copyTask = project.tasks.create("switchGoogleServices", Copy)
+            def copyTask = project.tasks.create("_switchGoogleServices", Copy)
 
             copyTask.from("conf/${buildType.name}")
             copyTask.include("$googleServicesJson")
