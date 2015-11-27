@@ -1,5 +1,5 @@
+[![Build Status](https://travis-ci.org/BattleShipPark/BSP-Gallery.svg?branch=master)](https://travis-ci.org/BattleShipPark/BSP-Gallery)
 # BSP-Gallery
-https://travis-ci.org/BattleShipPark/BSP-Gallery.svg?branch=master
 
 This is a personal project for coding practice implementing android gallery with several libraries that I can't use in the company.<br>
 I focused on using libraries, not gallery itself.
