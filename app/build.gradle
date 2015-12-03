@@ -3,6 +3,7 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    //noinspection GroovyAssignabilityCheck
     signingConfigs {
         release {
             storeFile file("..\\battleshippark.keystore")
@@ -13,6 +14,8 @@ android {
     }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
+
+    //noinspection GroovyAssignabilityCheck
     defaultConfig {
         applicationId "com.battleshippark.bsp_gallery"
         minSdkVersion 15
@@ -21,6 +24,8 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    //noinspection GroovyAssignabilityCheck
     buildTypes {
         release {
             manifestPlaceholders = [app_name: 'BSP-Gallery']
@@ -33,15 +38,17 @@ android {
             manifestPlaceholders = [app_name: 'BSP-Gallery.beta']
         }
     }
+
+    //noinspection GroovyAssignabilityCheck
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    //noinspection GroovyAssignabilityCheck
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
         // due to butterknife + lombok
-    }
-    productFlavors {
     }
 }
 
@@ -79,17 +86,19 @@ def getDate() {
     return formattedDate
 }
 
-
+//noinspection GroovyAssignabilityCheck
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //
     androidTestCompile 'com.android.support.test:runner:0.4'
     // Set this dependency to use JUnit 4 rules
     androidTestCompile 'com.android.support.test:rules:0.4'
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.android.support:recyclerview-v7:23.0.1'
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'com.google.android.gms:play-services-analytics:8.1.0'
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup:otto:1.3.8'
     compile 'com.squareup.picasso:picasso:2.5.2'
