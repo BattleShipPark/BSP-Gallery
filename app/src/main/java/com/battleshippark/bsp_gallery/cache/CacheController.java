@@ -11,6 +11,7 @@ import java.util.List;
 import io.realm.Realm;
 
 /**
+ * 폴더 목록에서 사용하는 캐시를 관리한다
  */
 public class CacheController {
     public static void writeCache(Context context, MediaFilterMode mediaFilterMode, List<MediaFolderModel> models) {
@@ -32,9 +33,9 @@ public class CacheController {
         FoldersCacheModel foldersCacheModel = realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name()).findFirst();
 
         List<MediaFolderModel> results = new ArrayList<>();
-        for (MediaFolderModel model : foldersCacheModel.getFolderModels()) {
+        //noinspection Convert2streamapi
+        for (MediaFolderModel model : foldersCacheModel.getFolderModels())
             results.add(MediaFolderModel.copy(model));
-        }
         return results;
     }
 }
