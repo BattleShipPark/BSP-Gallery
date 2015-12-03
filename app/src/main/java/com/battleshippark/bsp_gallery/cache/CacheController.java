@@ -1,6 +1,40 @@
 package com.battleshippark.bsp_gallery.cache;
 
+import android.content.Context;
+
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.Realm;
+
 /**
  */
 public class CacheController {
+    public static void writeCache(Context context, MediaFilterMode mediaFilterMode, List<MediaFolderModel> models) {
+        Realm realm = Realm.getInstance(context);
+        realm.executeTransaction(_realm -> {
+            _realm.clear(FoldersCacheModel.class);
+
+            FoldersCacheModel cacheModel = _realm.createObject(FoldersCacheModel.class);
+            cacheModel.setMediaFilterMode(mediaFilterMode.name());
+            for (MediaFolderModel model : models) {
+                cacheModel.getFolderModels().add(model);
+            }
+        });
+        realm.close();
+    }
+
+    public static List<MediaFolderModel> readCache(Context context, MediaFilterMode mediaFilterMode) {
+        Realm realm = Realm.getInstance(context);
+        FoldersCacheModel foldersCacheModel = realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name()).findFirst();
+
+        List<MediaFolderModel> results = new ArrayList<>();
+        for (MediaFolderModel model : foldersCacheModel.getFolderModels()) {
+            results.add(MediaFolderModel.copy(model));
+        }
+        return results;
+    }
 }

@@ -9,6 +9,7 @@ import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
+import com.battleshippark.bsp_gallery.cache.CacheController;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
 
@@ -48,14 +49,14 @@ public class MediaController {
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
-                        aVoid -> writeToCache(model.getMediaFolderModelList()),
+                        aVoid -> CacheController.writeCache(context, model.getMediaFilterMode(), model.getMediaFolderModelList()),
                         Throwable::printStackTrace);
 
         Observable.create((Observable.OnSubscribe<List<MediaFolderModel>>) subscriber -> {
             List<MediaFolderModel> dirs = null;
             MediaFolderModel allDir = null;
 
-            dirs = getFromCache(context);
+            dirs = CacheController.readCache(context, model.getMediaFilterMode());
             subscriber.onNext(dirs);
 
             if (dirs != null)
@@ -229,25 +230,4 @@ public class MediaController {
         directories.add(0, allDir);
         return directories;
     }
-
-    private List<MediaFolderModel> getFromCache(Context context) {
-        List<MediaFolderModel> result = new ArrayList<>();
-
-        Realm realm = Realm.getInstance(context);
-        RealmQuery<MediaFolderModel> query = realm.where(MediaFolderModel.class);
-        RealmResults<MediaFolderModel> realmResults = query.findAll();
-        for (MediaFolderModel model : realmResults) {
-            result.add(model);
-        }
-        realm.close();
-
-        return result;
-    }
-
-    private void writeToCache(List<MediaFolderModel> mediaFolderModelList) {
-        Realm realm = Realm.getInstance(context);
-        realm.executeTransaction(_realm -> _realm.copyToRealm(mediaFolderModelList));
-        realm.close();
-    }
-
 }

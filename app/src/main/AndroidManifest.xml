@@ -9,10 +9,10 @@
     <!-- GA -->
 
     <application
+        android:name=".BspApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".BspApplication"
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.folders.FoldersActivity"
@@ -41,6 +41,10 @@
                 <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".BlankActivity"
+            android:label="@string/app_name" />
 
         <meta-data
             android:name="com.google.android.gms.version"

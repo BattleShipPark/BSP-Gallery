@@ -2,6 +2,7 @@ package com.battleshippark.bsp_gallery.cache;
 
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = false)
 public class FoldersCacheModel extends RealmObject {
     private String mediaFilterMode; /* MediaFilterMode */
-    private MediaFolderModel folderModel;
+    private RealmList<MediaFolderModel> folderModels;
 
     public String getMediaFilterMode() {
         return mediaFilterMode;
@@ -22,11 +23,11 @@ public class FoldersCacheModel extends RealmObject {
         this.mediaFilterMode = mediaFilterMode;
     }
 
-    public MediaFolderModel getFolderModel() {
-        return folderModel;
+    public RealmList<MediaFolderModel> getFolderModels() {
+        return folderModels;
     }
 
-    public void setFolderModel(MediaFolderModel folderModel) {
-        this.folderModel = folderModel;
+    public void setFolderModels(RealmList<MediaFolderModel> folderModels) {
+        this.folderModels = folderModels;
     }
 }

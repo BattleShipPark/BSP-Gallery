@@ -20,12 +20,12 @@ public class MediaFolderModel extends RealmObject {
 
     public static MediaFolderModel copy(MediaFolderModel model) {
         MediaFolderModel result = new MediaFolderModel();
-        result.setId(model.id);
-        result.setCoverMediaId(model.coverMediaId);
-        result.setCoverThumbPath(model.coverThumbPath);
-        result.setName(model.name);
-        result.setCount(model.count);
-        result.setCoverMediaType(model.coverMediaType);
+        result.setId(model.getId());
+        result.setCoverMediaId(model.getCoverMediaId());
+        result.setCoverThumbPath(model.getCoverThumbPath());
+        result.setName(model.getName());
+        result.setCount(model.getCount());
+        result.setCoverMediaType(model.getCoverMediaType());
         return result;
     }
 
