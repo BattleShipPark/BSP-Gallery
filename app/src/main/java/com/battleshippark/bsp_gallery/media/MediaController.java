@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
@@ -12,19 +11,13 @@ import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Cleanup;
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -55,23 +48,15 @@ public class MediaController {
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
-                        aVoid -> {
-                            String json = toJson(model);
-                            writeToCache(json, model);
-
-                        },
+                        aVoid -> writeToCache(model.getMediaFolderModelList()),
                         Throwable::printStackTrace);
 
         Observable.create((Observable.OnSubscribe<List<MediaFolderModel>>) subscriber -> {
             List<MediaFolderModel> dirs = null;
             MediaFolderModel allDir = null;
 
-            try {
-                dirs = getFromCache(context, model);
-                subscriber.onNext(dirs);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            dirs = getFromCache(context);
+            subscriber.onNext(dirs);
 
             if (dirs != null)
                 allDir = dirs.get(0);
@@ -245,43 +230,24 @@ public class MediaController {
         return directories;
     }
 
+    private List<MediaFolderModel> getFromCache(Context context) {
+        List<MediaFolderModel> result = new ArrayList<>();
 
-    private String toJson(FoldersActivityModel model) {
-        return new Gson().toJson(model.getMediaFolderModelList());
-    }
-
-    private String getCacheFileName(FoldersActivityModel model) {
-        return CACHE_FILENAME + model.getMediaFilterMode();
-    }
-
-    private List<MediaFolderModel> getFromCache(Context context, FoldersActivityModel model) throws IOException {
-        File cacheDirFile = context.getCacheDir();
-        File inputFile = new File(cacheDirFile, getCacheFileName(model));
-
-        @Cleanup FileReader reader = new FileReader(inputFile);
-
-        try {
-            Type type = new TypeToken<List<MediaFolderModel>>() {
-            }.getType();
-            return new Gson().fromJson(reader, type);
-        } catch (JsonParseException e) {
-            throw new IOException(e);
-        } finally {
-            Log.d("DEBUG", "MediaController.getFromCache()");
+        Realm realm = Realm.getInstance(context);
+        RealmQuery<MediaFolderModel> query = realm.where(MediaFolderModel.class);
+        RealmResults<MediaFolderModel> realmResults = query.findAll();
+        for (MediaFolderModel model : realmResults) {
+            result.add(model);
         }
+        realm.close();
+
+        return result;
     }
 
-    private void writeToCache(String json, FoldersActivityModel model) {
-        File cacheDirFile = context.getCacheDir();
-        File outputFile = new File(cacheDirFile, getCacheFileName(model));
-
-        try {
-            @Cleanup FileWriter writer = new FileWriter(outputFile);
-            writer.write(json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            Log.d("DEBUG", "MediaController.writeToCache()");
-        }
+    private void writeToCache(List<MediaFolderModel> mediaFolderModelList) {
+        Realm realm = Realm.getInstance(context);
+        realm.executeTransaction(_realm -> _realm.copyToRealm(mediaFolderModelList));
+        realm.close();
     }
+
 }

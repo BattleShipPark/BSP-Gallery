@@ -1,13 +1,14 @@
 package com.battleshippark.bsp_gallery.media;
 
-import android.database.Cursor;
-
-import lombok.Data;
+import io.realm.RealmObject;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  */
-@Data
-public class MediaFolderModel {
+@ToString
+@EqualsAndHashCode(callSuper = false)
+public class MediaFolderModel extends RealmObject {
     public static final int ALL_DIR_ID = 0;
 
     private int id;
@@ -17,30 +18,62 @@ public class MediaFolderModel {
     private int count;
     private int coverMediaType; /* MediaStore.File.FileColumns.MEDIA_TYPE_? */
 
-    public static MediaFolderModel of(Cursor c) {
+    public static MediaFolderModel copy(MediaFolderModel model) {
         MediaFolderModel result = new MediaFolderModel();
-
-//        CursorUtils.getString(c, MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME)
-//                MediaStore.Images.ImageColumns.BUCKET_ID,
-//                MediaStore.Images.ImageColumns.DATE_TAKEN,
-//                MediaStore.Images.ImageColumns.DESCRIPTION,
-//                MediaStore.Images.ImageColumns.IS_PRIVATE,
-//                MediaStore.Images.ImageColumns._COUNT,
-//                MediaStore.Images.ImageColumns.DISPLAY_NAME,
-//                MediaStore.Images.ImageColumns.SIZE,
-//                MediaStore.Images.ImageColumns.TITLE
-//        result
-        return null;
+        result.setId(model.id);
+        result.setCoverMediaId(model.coverMediaId);
+        result.setCoverThumbPath(model.coverThumbPath);
+        result.setName(model.name);
+        result.setCount(model.count);
+        result.setCoverMediaType(model.coverMediaType);
+        return result;
     }
 
-    public MediaFolderModel copy() {
-        MediaFolderModel result = new MediaFolderModel();
-        result.setId(id);
-        result.setCoverMediaId(coverMediaId);
-        result.setCoverThumbPath(coverThumbPath);
-        result.setName(name);
-        result.setCount(count);
-        result.setCoverMediaType(coverMediaType);
-        return result;
+    public int getId() {
+        return id;
+    }
+
+    public long getCoverMediaId() {
+        return coverMediaId;
+    }
+
+    public String getCoverThumbPath() {
+        return coverThumbPath;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public int getCoverMediaType() {
+        return coverMediaType;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setCoverMediaId(long coverMediaId) {
+        this.coverMediaId = coverMediaId;
+    }
+
+    public void setCoverThumbPath(String coverThumbPath) {
+        this.coverThumbPath = coverThumbPath;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public void setCoverMediaType(int coverMediaType) {
+        this.coverMediaType = coverMediaType;
     }
 }

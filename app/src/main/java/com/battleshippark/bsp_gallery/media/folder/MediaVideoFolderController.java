@@ -59,7 +59,7 @@ public class MediaVideoFolderController extends MediaFolderController {
             @Cleanup Cursor c = context.getContentResolver().query(uri, countClauses, selectionClause, selectionArgs, null);
             if (c != null && c.moveToFirst()) {
                 do {
-                    MediaFolderModel model = dir.copy();
+                    MediaFolderModel model = MediaFolderModel.copy(dir);
                     model.setCount(CursorUtils.getInt(c, "count"));
                     result.add(model);
                 } while (c.moveToNext());
@@ -82,7 +82,7 @@ public class MediaVideoFolderController extends MediaFolderController {
 
             @Cleanup Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause);
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = dir.copy();
+                MediaFolderModel model = MediaFolderModel.copy(dir);
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
                 model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
                 result.add(model);
@@ -101,7 +101,7 @@ public class MediaVideoFolderController extends MediaFolderController {
         for (MediaFolderModel dir : dirs) {
             @Cleanup Cursor c = queryVideoMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = dir.copy();
+                MediaFolderModel model = MediaFolderModel.copy(dir);
                 model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
                 result.add(model);
             }
