@@ -34,6 +34,16 @@
             android:text="@string/media_mode_all"
             android:textSize="18sp" />
 
+        <ProgressBar
+            android:id="@+id/toolbar_progress"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/media"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="match_parent"

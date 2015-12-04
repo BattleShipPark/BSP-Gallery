@@ -30,6 +30,9 @@ public class FoldersActivity extends AppCompatActivity {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    @Bind(R.id.toolbar_progress)
+    View progress;
+
     @Bind(R.id.listview)
     RecyclerView listview;
 
@@ -124,6 +127,7 @@ public class FoldersActivity extends AppCompatActivity {
         Log.d("", "OnSharedPreferenceRead()");
         model.setMediaFilterMode(event.getModel().getMediaFilterMode());
         mediaController.refreshDirListAsync(model);
+        progress.setVisibility(View.VISIBLE);
     }
 
     private void initData() {

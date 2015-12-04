@@ -10,6 +10,7 @@ import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,19 @@ import java.util.List;
 public class CacheControllerTest {
     @Rule
     public ActivityTestRule<BlankActivity> rule = new ActivityTestRule<>(BlankActivity.class);
+
+    @Before
+    public void clear() {
+        CacheController.clear(rule.getActivity());
+    }
+
+    @Test
+    public void testReadCache_fromEmpty() {
+        Context context = rule.getActivity();
+
+        List<MediaFolderModel> newModels = CacheController.readCache(context, MediaFilterMode.ALL);
+        Assert.assertTrue(newModels.isEmpty());
+    }
 
     @Test
     public void testReadWriteCache_All() {

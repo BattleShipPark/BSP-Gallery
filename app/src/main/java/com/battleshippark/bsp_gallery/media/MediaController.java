@@ -16,9 +16,6 @@ import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -31,7 +28,6 @@ import rx.subjects.Subject;
 /**
  */
 public class MediaController {
-    private static final String CACHE_FILENAME = "dirCache";
     private final Context context;
 
     public MediaController(Context context) {
@@ -57,10 +53,11 @@ public class MediaController {
             MediaFolderModel allDir = null;
 
             dirs = CacheController.readCache(context, model.getMediaFilterMode());
-            subscriber.onNext(dirs);
+            if (!dirs.isEmpty()) {
+                subscriber.onNext(dirs);
 
-            if (dirs != null)
                 allDir = dirs.get(0);
+            }
 
             dirs = getDirsWithAllAndNext(allDir, subscriber, directoryController::getMediaDirectoryList);
 
