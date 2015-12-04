@@ -17,7 +17,7 @@ public class CacheController {
     public static void writeCache(Context context, MediaFilterMode mediaFilterMode, List<MediaFolderModel> models) {
         Realm realm = Realm.getInstance(context);
         realm.executeTransaction(_realm -> {
-            _realm.clear(FoldersCacheModel.class);
+            _realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name()).findAll().clear();
 
             FoldersCacheModel cacheModel = _realm.createObject(FoldersCacheModel.class);
             cacheModel.setMediaFilterMode(mediaFilterMode.name());
