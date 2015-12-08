@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.battleshippark.bsp_gallery.BspApplication;
+import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.cache.CacheController;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
+import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +32,11 @@ import rx.subjects.Subject;
  */
 public class MediaController {
     private final Context context;
+    private final Bus eventBus;
 
-    public MediaController(Context context) {
+    public MediaController(Context context, Bus eventBus) {
         this.context = context;
+        this.eventBus = eventBus;
     }
 
     /**
@@ -39,9 +44,14 @@ public class MediaController {
      * 쿼리를 던질때마다 FoldersModel을 갱신한다.
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
-    public void refreshDirListAsync(FoldersActivityModel model) {
-        MediaFolderController directoryController = MediaFolderController.create(context, model.getMediaFilterMode());
+    public void refreshFolderListAsync(FoldersActivityModel model) {
+        MediaFolderController folderController = MediaFolderController.create(context, model.getMediaFilterMode());
 
+        refreshFolderList(model, folderController);
+    }
+
+    @VisibleForTesting
+    public void refreshFolderList(FoldersActivityModel model, MediaFolderController folderController) {
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
@@ -59,13 +69,13 @@ public class MediaController {
                 allDir = dirs.get(0);
             }
 
-            dirs = getDirsWithAllAndNext(allDir, subscriber, directoryController::getMediaDirectoryList);
+            dirs = getDirsWithAllAndNext(allDir, subscriber, folderController::getMediaDirectoryList);
 
-            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, directoryController::addMediaFileCount);
+            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, folderController::addMediaFileCount);
 
-            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, directoryController::addMediaFileId);
+            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, folderController::addMediaFileId);
 
-            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, directoryController::addMediaThumbPath);
+            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, folderController::addMediaThumbPath);
 
             dirs = addAllDirectory(dirs);
             subscriber.onNext(dirs);
@@ -73,10 +83,24 @@ public class MediaController {
             subscriber.onCompleted();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        model::setMediaFolderModelList,
-                        Throwable::printStackTrace,
-                        () -> writeToCacheSubject.onNext(null));
+                .subscribe(new Subscriber<List<MediaFolderModel>>() {
+                    @Override
+                    public void onCompleted() {
+                        writeToCacheSubject.onNext(null);
+                        eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
+                    }
+
+                    @Override
+                    public void onNext(List<MediaFolderModel> mediaFolderModels) {
+                        model.setMediaFolderModelList(mediaFolderModels);
+                    }
+                });
     }
 
     /**

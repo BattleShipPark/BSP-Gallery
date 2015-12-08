@@ -139,7 +139,7 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
 
         adapter = new FileAdapter(getSupportFragmentManager(), model);
 
-        mediaController = new MediaController(this);
+        mediaController = new MediaController(this, eventBus);
 
         executor = Executors.newCachedThreadPool();
     }

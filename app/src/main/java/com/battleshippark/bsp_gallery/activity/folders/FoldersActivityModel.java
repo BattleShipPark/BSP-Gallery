@@ -35,7 +35,7 @@ public final class FoldersActivityModel {
     public void setMediaFolderModelList(List<MediaFolderModel> modelList) {
         mediaFolderModelList = modelList;
 
-        eventBus.post(Events.OnMediaDirectoryListUpdated.EVENT);
+        eventBus.post(Events.OnMediaFolderListUpdated.UPDATED);
     }
 
     public void setMediaFilterMode(MediaFilterMode mode) {

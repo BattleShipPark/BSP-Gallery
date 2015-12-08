@@ -98,9 +98,12 @@ public class FoldersActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void OnMediaDirectoryListUpdated(Events.OnMediaDirectoryListUpdated event) {
-        Log.d("", "OnMediaDirectoryListUpdated()");
+    public void OnMediaDirectoryListUpdated(Events.OnMediaFolderListUpdated event) {
+        Log.d("", "OnMediaFolderListUpdated(): " + event);
+
         adapter.refresh();
+        if (event == Events.OnMediaFolderListUpdated.FINISHED)
+            progress.setVisibility(View.GONE);
     }
 
     @Subscribe
@@ -126,7 +129,7 @@ public class FoldersActivity extends AppCompatActivity {
     public void OnSharedPreferenceRead(Events.OnSharedPreferenceRead event) {
         Log.d("", "OnSharedPreferenceRead()");
         model.setMediaFilterMode(event.getModel().getMediaFilterMode());
-        mediaController.refreshDirListAsync(model);
+        mediaController.refreshFolderListAsync(model);
         progress.setVisibility(View.VISIBLE);
     }
 
@@ -139,7 +142,7 @@ public class FoldersActivity extends AppCompatActivity {
         adapter = new FoldersAdapter(this, model);
         decoration = new FoldersItemDecoration(model);
 
-        mediaController = new MediaController(this);
+        mediaController = new MediaController(this, eventBus);
 
         new SharedPreferenceController(this, model);
     }
@@ -169,7 +172,7 @@ public class FoldersActivity extends AppCompatActivity {
                     break;
             }
 
-            mediaController.refreshDirListAsync(model);
+            mediaController.refreshFolderListAsync(model);
             return true;
         });
         popupMenu.show();

@@ -27,8 +27,9 @@ public class Events {
      * MediaStore에서 디렉토리 구조를 읽어서, 모델을 갱신했다.
      * 화면갱신이나 다른 컨트롤러들의 작업을 할 수 있다
      */
-    public enum OnMediaDirectoryListUpdated {
-        EVENT
+    public enum OnMediaFolderListUpdated {
+        UPDATED,
+        FINISHED
     }
 
     /**

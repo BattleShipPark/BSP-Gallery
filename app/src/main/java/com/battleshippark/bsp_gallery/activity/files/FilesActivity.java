@@ -160,7 +160,7 @@ public class FilesActivity extends AppCompatActivity {
         adapter = new FilesAdapter(this, model);
 //        decoration = new FilesItemDecoration(model);
 
-        mediaController = new MediaController(this);
+        mediaController = new MediaController(this, eventBus);
     }
 
     private FilesActivityModel parseBundle(Bundle bundle) {
