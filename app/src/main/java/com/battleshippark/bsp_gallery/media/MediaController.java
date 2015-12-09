@@ -17,9 +17,13 @@ import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func0;
@@ -47,60 +51,71 @@ public class MediaController {
     public void refreshFolderListAsync(FoldersActivityModel model) {
         MediaFolderController folderController = MediaFolderController.create(context, model.getMediaFilterMode());
 
-        refreshFolderList(model, folderController);
-    }
-
-    @VisibleForTesting
-    public void refreshFolderList(FoldersActivityModel model, MediaFolderController folderController) {
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
-                        aVoid -> CacheController.writeCache(context, model.getMediaFilterMode(), model.getMediaFolderModelList()),
+                        aVoid -> new CacheController(context).writeCache(context, model.getMediaFilterMode(), model.getMediaFolderModelList()),
                         Throwable::printStackTrace);
 
-        Observable.create((Observable.OnSubscribe<List<MediaFolderModel>>) subscriber -> {
-            List<MediaFolderModel> dirs = null;
-            MediaFolderModel allDir = null;
-
-            dirs = CacheController.readCache(context, model.getMediaFilterMode());
-            if (!dirs.isEmpty()) {
-                subscriber.onNext(dirs);
-
-                allDir = dirs.get(0);
+        Subscriber<List<MediaFolderModel>> subscriber = new Subscriber<List<MediaFolderModel>>() {
+            @Override
+            public void onCompleted() {
+                writeToCacheSubject.onNext(null);
+                eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
             }
 
-            dirs = getDirsWithAllAndNext(allDir, subscriber, folderController::getMediaDirectoryList);
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+                eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
+            }
 
-            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, folderController::addMediaFileCount);
+            @Override
+            public void onNext(List<MediaFolderModel> mediaFolderModels) {
+                model.setMediaFolderModelList(mediaFolderModels);
+            }
+        };
 
-            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, folderController::addMediaFileId);
+        CacheController cacheController = new CacheController(context);
 
-            dirs = getDirsWithAllAndNext(allDir, dirs, subscriber, folderController::addMediaThumbPath);
+        refreshFolderList(model.getMediaFilterMode(), folderController, cacheController, subscriber, Schedulers.io(), AndroidSchedulers.mainThread());
+    }
 
-            dirs = addAllDirectory(dirs);
-            subscriber.onNext(dirs);
+    @VisibleForTesting
+    public void refreshFolderList(MediaFilterMode mediaFilterMode, MediaFolderController folderController,
+                                  CacheController cacheController, Subscriber<List<MediaFolderModel>> subscriber,
+                                  Scheduler subscribeOnScheduler, Scheduler observeOnScheduler) {
+        Observable.create(
+                (Observable.OnSubscribe<List<MediaFolderModel>>) _subscriber -> {
+                    List<MediaFolderModel> mediaFolderModels = null;
 
-            subscriber.onCompleted();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<MediaFolderModel>>() {
-                    @Override
-                    public void onCompleted() {
-                        writeToCacheSubject.onNext(null);
-                        eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
-                    }
+                    mediaFolderModels = MediaController.this.readCache(cacheController, _subscriber, mediaFilterMode);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
-                    }
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::getMediaDirectoryList);
 
-                    @Override
-                    public void onNext(List<MediaFolderModel> mediaFolderModels) {
-                        model.setMediaFolderModelList(mediaFolderModels);
-                    }
-                });
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaFileCount);
+
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaFileId);
+
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaThumbPath);
+
+                    mediaFolderModels = MediaController.this.addAllDirectory(mediaFolderModels);
+                    _subscriber.onNext(mediaFolderModels);
+
+                    _subscriber.onCompleted();
+                }
+        ).subscribeOn(subscribeOnScheduler)
+                .observeOn(observeOnScheduler)
+                .subscribe(subscriber);
+    }
+
+    @VisibleForTesting
+    public List<MediaFolderModel> readCache(CacheController cacheController, Subscriber<? super List<MediaFolderModel>> subscriber, MediaFilterMode mediaFilterMode) {
+        List<MediaFolderModel> mediaFolderModels = cacheController.readCache(mediaFilterMode);
+        if (!mediaFolderModels.isEmpty()) {
+            subscriber.onNext(mediaFolderModels);
+        }
+        return mediaFolderModels;
     }
 
     /**
@@ -187,46 +202,65 @@ public class MediaController {
                 });
     }
 
-    /*
-     * func을 수행해서 디렉토리 목록을 구하고, 거기에 전체 디렉토리를 붙여서 발행한다.
-     * 반환할 때는 전체 디렉토리없이 한다
+    /**
+     * func을 수행해서 폴더 목록을 구하고, mediaFolderModels에 없던 폴더는 추가해서 발행 및 반환
+     *
+     * @param mediaFolderModels all 폴더 포함
      */
-    private List<MediaFolderModel> getDirsWithAllAndNext(@Nullable MediaFolderModel allDir,
-                                                         Subscriber<? super List<MediaFolderModel>> subscriber,
-                                                         Func0<List<MediaFolderModel>> func) {
-        List<MediaFolderModel> dirs = func.call();
-        List<MediaFolderModel> result = new ArrayList<>();
+    private List<MediaFolderModel> getFoldersAndOnNext(@Nullable List<MediaFolderModel> mediaFolderModels,
+                                                       Subscriber<? super List<MediaFolderModel>> subscriber,
+                                                       Func0<List<MediaFolderModel>> func) {
+        List<MediaFolderModel> newMediaFolderModels = func.call();
+        if (mediaFolderModels == null)
+            return newMediaFolderModels;
 
-        result.clear();
-        if (allDir != null)
-            result.add(allDir);
-        result.addAll(dirs);
+        /* map을 사용해서 중복 폴더를 제외한다 */
+        Map<Integer, MediaFolderModel> map = new HashMap<>();
+        for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
+            map.put(mediaFolderModel.getId(), mediaFolderModel);
+        }
+
+        for (MediaFolderModel mediaFolderModel : newMediaFolderModels) {
+            if (map.containsKey(mediaFolderModel.getId()))
+                continue;
+
+            map.put(mediaFolderModel.getId(), mediaFolderModel);
+        }
+
+        List<MediaFolderModel> result = new ArrayList<>();
+        for (MediaFolderModel mediaFolderModel : map.values()) {
+            result.add(mediaFolderModel);
+        }
+
+        Collections.sort(result, (lhs, rhs) -> {
+            if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
+            if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
+            return lhs.getId() - rhs.getId();
+        });
+
         subscriber.onNext(result);
 
-        return dirs;
+        return result;
     }
 
-    private List<MediaFolderModel> getDirsWithAllAndNext(@Nullable MediaFolderModel allDir, List<MediaFolderModel> dirs,
-                                                         Subscriber<? super List<MediaFolderModel>> subscriber,
-                                                         Func1<List<MediaFolderModel>, List<MediaFolderModel>> func) {
-        dirs = func.call(dirs);
-        List<MediaFolderModel> result = new ArrayList<>();
+    private List<MediaFolderModel> getFoldersAndOnNext(List<MediaFolderModel> mediaFolderModels,
+                                                       Subscriber<? super List<MediaFolderModel>> subscriber,
+                                                       Func1<List<MediaFolderModel>, List<MediaFolderModel>> func) {
+        List<MediaFolderModel> result = func.call(mediaFolderModels);
 
-        result.clear();
-        if (allDir != null)
-            result.add(allDir);
-        result.addAll(dirs);
         subscriber.onNext(result);
 
-        return dirs;
+        return result;
     }
 
     List<MediaFolderModel> addAllDirectory(List<MediaFolderModel> directories) {
         MediaFolderModel allDir = new MediaFolderModel();
 
         allDir.setId(MediaFolderModel.ALL_DIR_ID);
-
         allDir.setName("All");
+
+        if (directories.get(0).getId() == MediaFolderModel.ALL_DIR_ID)
+            directories.remove(0);
 
         int count = Observable.from(directories)
                 .map(MediaFolderModel::getCount)

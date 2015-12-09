@@ -15,7 +15,13 @@ import io.realm.RealmQuery;
  * 폴더 목록에서 사용하는 캐시를 관리한다
  */
 public class CacheController {
-    public static void writeCache(Context context, MediaFilterMode mediaFilterMode, List<MediaFolderModel> models) {
+    private final Context context;
+
+    public CacheController(Context context) {
+        this.context = context;
+    }
+
+    public void writeCache(Context context, MediaFilterMode mediaFilterMode, List<MediaFolderModel> models) {
         Realm realm = Realm.getInstance(context);
         realm.executeTransaction(_realm -> {
             _realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name()).findAll().clear();
@@ -29,7 +35,7 @@ public class CacheController {
         realm.close();
     }
 
-    public static List<MediaFolderModel> readCache(Context context, MediaFilterMode mediaFilterMode) {
+    public List<MediaFolderModel> readCache(MediaFilterMode mediaFilterMode) {
         Realm realm = Realm.getInstance(context);
 
         RealmQuery<FoldersCacheModel> query = realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name());
@@ -47,7 +53,7 @@ public class CacheController {
         return results;
     }
 
-    public static void clear(Context context) {
+    public void clear() {
         Realm r = Realm.getInstance(context);
         r.executeTransaction(realm -> realm.clear(FoldersCacheModel.class));
         r.close();

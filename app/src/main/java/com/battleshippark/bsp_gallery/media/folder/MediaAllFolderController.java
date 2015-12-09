@@ -57,12 +57,17 @@ public class MediaAllFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> dirs) {
+    public List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> mediaFolderModels) {
         String[] countClauses = new String[]{"count(*) AS count"};
 
         List<MediaFolderModel> result = new ArrayList<>();
 
-        for (MediaFolderModel dir : dirs) {
+        for (MediaFolderModel dir : mediaFolderModels) {
+            if (dir.getId() == MediaFolderModel.ALL_DIR_ID) {
+                result.add(MediaFolderModel.copy(dir));
+                continue;
+            }
+
             String selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
                     MediaStore.Images.ImageColumns.BUCKET_ID,
                     MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -88,13 +93,18 @@ public class MediaAllFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs) {
+    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> mediaFolderModels) {
         String[] projectionClauses = new String[]{MediaStore.Images.Media._ID, MediaStore.Files.FileColumns.MEDIA_TYPE};
         String orderClause = MediaStore.Images.Media._ID + " desc";
 
         List<MediaFolderModel> result = new ArrayList<>();
 
-        for (MediaFolderModel dir : dirs) {
+        for (MediaFolderModel dir : mediaFolderModels) {
+            if (dir.getId() == MediaFolderModel.ALL_DIR_ID) {
+                result.add(MediaFolderModel.copy(dir));
+                continue;
+            }
+
             String selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
                     MediaStore.Images.ImageColumns.BUCKET_ID,
                     MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -119,12 +129,17 @@ public class MediaAllFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs) {
+    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> mediaFolderModels) {
         String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
 
         List<MediaFolderModel> result = new ArrayList<>();
 
-        for (MediaFolderModel dir : dirs) {
+        for (MediaFolderModel dir : mediaFolderModels) {
+            if (dir.getId() == MediaFolderModel.ALL_DIR_ID) {
+                result.add(MediaFolderModel.copy(dir));
+                continue;
+            }
+
             @Cleanup Cursor c = null;
             if (dir.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
                 c = MediaStore.Images.Thumbnails.queryMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);

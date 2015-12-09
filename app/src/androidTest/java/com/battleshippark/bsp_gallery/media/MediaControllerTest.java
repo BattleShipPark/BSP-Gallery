@@ -62,7 +62,7 @@ public class MediaControllerTest {
         Bus spyBus = spy(eventBus);
 
         MediaController controller = new MediaController(null, eventBus);
-        controller.refreshFolderList(null, folderController);
+//        controller.refreshFolderList(null, folderController);
 
         latch.await();
 

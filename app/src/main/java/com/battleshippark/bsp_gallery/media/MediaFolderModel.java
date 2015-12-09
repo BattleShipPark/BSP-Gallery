@@ -1,11 +1,15 @@
 package com.battleshippark.bsp_gallery.media;
 
 import io.realm.RealmObject;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class MediaFolderModel extends RealmObject {
