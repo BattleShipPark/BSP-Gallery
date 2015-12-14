@@ -10,7 +10,10 @@ import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Cleanup;
 
@@ -24,7 +27,7 @@ public class MediaAllFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> getMediaDirectoryList() {
+    public List<MediaFolderModel> getMediaDirectoryList(List<MediaFolderModel> mediaFolderModels) {
         String[] columns = new String[]{
                 MediaStore.Images.ImageColumns.BUCKET_ID,
                 MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
@@ -39,7 +42,12 @@ public class MediaAllFolderController extends MediaFolderController {
 
         };
 
-        List<MediaFolderModel> result = new ArrayList<>();
+        Map<Integer, MediaFolderModel> map = new HashMap<>();
+        if (!mediaFolderModels.isEmpty()) {
+            for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
+                map.put(mediaFolderModel.getId(), mediaFolderModel);
+            }
+        }
 
         Uri distinctUri = uri.buildUpon().appendQueryParameter("distinct", "true").build();
         @Cleanup
@@ -49,9 +57,18 @@ public class MediaAllFolderController extends MediaFolderController {
                 MediaFolderModel model = new MediaFolderModel();
                 model.setId(CursorUtils.getInt(c, columns[0]));
                 model.setName(CursorUtils.getString(c, columns[1]));
-                result.add(model);
+
+                if (!map.containsKey(model.getId()))
+                    map.put(model.getId(), model);
             } while (c.moveToNext());
         }
+
+        List<MediaFolderModel> result = new ArrayList<>(map.values());
+        Collections.sort(result, (lhs, rhs) -> {
+            if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
+            if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
+            return lhs.getId() - rhs.getId();
+        });
 
         return result;
     }

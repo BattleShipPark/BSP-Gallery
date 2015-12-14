@@ -24,7 +24,7 @@ public class MediaVideoFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> getMediaDirectoryList() {
+    public List<MediaFolderModel> getMediaDirectoryList(List<MediaFolderModel> mediaFolderModels) {
         String[] columns = new String[]{
                 MediaStore.Video.VideoColumns.BUCKET_ID,
                 MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME,
@@ -70,13 +70,13 @@ public class MediaVideoFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs) {
+    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> folders) {
         String[] projectionClauses = new String[]{MediaStore.Video.Media._ID};
         String orderClause = MediaStore.Video.Media._ID + " desc";
 
         List<MediaFolderModel> result = new ArrayList<>();
 
-        for (MediaFolderModel dir : dirs) {
+        for (MediaFolderModel dir : folders) {
             String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
             String[] selectionArgs = new String[]{String.valueOf(dir.getId())};
 
@@ -93,12 +93,12 @@ public class MediaVideoFolderController extends MediaFolderController {
     }
 
     @Override
-    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs) {
+    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> folders) {
         String[] projectionClauses = new String[]{MediaStore.Video.Thumbnails.DATA,};
 
         List<MediaFolderModel> result = new ArrayList<>();
 
-        for (MediaFolderModel dir : dirs) {
+        for (MediaFolderModel dir : folders) {
             @Cleanup Cursor c = queryVideoMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
             if (c != null && c.moveToFirst()) {
                 MediaFolderModel model = MediaFolderModel.copy(dir);

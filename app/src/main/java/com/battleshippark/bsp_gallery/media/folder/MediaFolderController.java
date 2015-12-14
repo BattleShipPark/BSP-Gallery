@@ -34,20 +34,20 @@ public abstract class MediaFolderController {
      *
      * @return ID와 이름만 유효하다
      */
-    public abstract List<MediaFolderModel> getMediaDirectoryList();
+    public abstract List<MediaFolderModel> getMediaDirectoryList(List<MediaFolderModel> folders);
 
     /**
      * 디렉토리에 파일 갯수를 추가한다
      */
-    public abstract List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> dirs);
+    public abstract List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> folders);
 
     /**
      * 디렉토리에 가장 최근 파일의 ID를 추가한다
      */
-    public abstract List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> dirs);
+    public abstract List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> folders);
 
     /**
      * 디렉토리에 가장 최근 파일의 손톱 이미지 경로를 추가한다
      */
-    public abstract List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> dirs);
+    public abstract List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> folders);
 }
