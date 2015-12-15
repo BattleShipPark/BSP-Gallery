@@ -91,7 +91,7 @@ public class MediaController {
 
                     mediaFolderModels = MediaController.this.readCache(cacheController, _subscriber, mediaFilterMode);
 
-                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::getMediaDirectoryList);
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::queryMediaFolderList);
 
                     mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaFileCount);
 

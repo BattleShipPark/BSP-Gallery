@@ -110,7 +110,7 @@ public class MediaControllerTest {
     @Test
     public void refreshFolderList_fromEmpty_all() throws Exception {
         when(cacheController.readCache(MediaFilterMode.ALL)).thenReturn(new ArrayList<>());
-        when(folderController.getMediaDirectoryList(any())).thenReturn(mediaFolderModels1);
+        when(folderController.queryMediaFolderList(any())).thenReturn(mediaFolderModels1);
         when(folderController.addMediaFileCount(any())).thenReturn(mediaFolderModels2);
         when(folderController.addMediaFileId(any())).thenReturn(mediaFolderModels3);
         when(folderController.addMediaThumbPath(any())).thenReturn(mediaFolderModels4);
@@ -129,7 +129,7 @@ public class MediaControllerTest {
     @Test
     public void refreshFolderList_fromCache_all() throws Exception {
         when(cacheController.readCache(MediaFilterMode.ALL)).thenReturn(mediaFolderModels_all1);
-        when(folderController.getMediaDirectoryList(any())).thenReturn(mediaFolderModels_all2);
+        when(folderController.queryMediaFolderList(any())).thenReturn(mediaFolderModels_all2);
         when(folderController.addMediaFileCount(any())).thenReturn(mediaFolderModels_all3);
         when(folderController.addMediaFileId(any())).thenReturn(mediaFolderModels_all4);
         when(folderController.addMediaThumbPath(any())).thenReturn(mediaFolderModels_all5);
