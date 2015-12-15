@@ -35,28 +35,39 @@ public class MediaControllerTest {
     Bus eventBus;
 
     @Captor
-    private ArgumentCaptor<Events.OnMediaFolderListUpdated> captor;
+    ArgumentCaptor<Events.OnMediaFolderListUpdated> captor;
 
-    private List<MediaFolderModel> mediaFolderModels1;
-    private List<MediaFolderModel> mediaFolderModels2;
-    private List<MediaFolderModel> mediaFolderModels3;
-    private List<MediaFolderModel> mediaFolderModels4;
-    private List<MediaFolderModel> mediaFolderModels5;
+    TestSubscriber<List<MediaFolderModel>> testSubscriber;
 
-    private List<MediaFolderModel> mediaFolderModels_all1;
-    private List<MediaFolderModel> mediaFolderModels_all2;
-    private List<MediaFolderModel> mediaFolderModels_all3;
-    private List<MediaFolderModel> mediaFolderModels_all4;
-    private List<MediaFolderModel> mediaFolderModels_all5;
-    private List<MediaFolderModel> mediaFolderModels_all6;
+    List<MediaFolderModel> mediaFolderModels1;
+    List<MediaFolderModel> mediaFolderModels2;
+    List<MediaFolderModel> mediaFolderModels3;
+    List<MediaFolderModel> mediaFolderModels4;
 
-    <T> ArrayList<T> createList(T... array) {
+    List<MediaFolderModel> mediaFolderModels5;
+    List<MediaFolderModel> mediaFolderModels_all1;
+    List<MediaFolderModel> mediaFolderModels_all2;
+    List<MediaFolderModel> mediaFolderModels_all3;
+    List<MediaFolderModel> mediaFolderModels_all4;
+    List<MediaFolderModel> mediaFolderModels_all5;
+
+    List<MediaFolderModel> mediaFolderModels_all6;
+
+    @SafeVarargs
+    final <T> ArrayList<T> createList(T... array) {
         return new ArrayList<>(Arrays.asList(array));
     }
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+
+        testSubscriber = new TestSubscriber<List<MediaFolderModel>>() {
+            @Override
+            public void onNext(List<MediaFolderModel> mediaFolderModels) {
+                super.onNext(mediaFolderModels);
+            }
+        };
 
         mediaFolderModels1 = createList(new MediaFolderModel(1, 0, "", "4", 5, 6), new MediaFolderModel(2, 0, "", "5", 6, 7));
         mediaFolderModels2 = createList(new MediaFolderModel(1, 0, "", "4", 1, 6), new MediaFolderModel(2, 0, "", "5", 2, 7));
@@ -97,14 +108,7 @@ public class MediaControllerTest {
 
 
     @Test
-    public void testRefreshFolderList_fromEmpty_verifyResult() throws Exception {
-        TestSubscriber<List<MediaFolderModel>> testSubscriber = new TestSubscriber<List<MediaFolderModel>>() {
-            @Override
-            public void onNext(List<MediaFolderModel> mediaFolderModels) {
-                super.onNext(mediaFolderModels);
-            }
-        };
-
+    public void refreshFolderList_fromEmpty_all() throws Exception {
         when(cacheController.readCache(MediaFilterMode.ALL)).thenReturn(new ArrayList<>());
         when(folderController.getMediaDirectoryList(any())).thenReturn(mediaFolderModels1);
         when(folderController.addMediaFileCount(any())).thenReturn(mediaFolderModels2);
@@ -123,14 +127,7 @@ public class MediaControllerTest {
     }
 
     @Test
-    public void testRefreshFolderList_fromCache_verifyResult() throws Exception {
-        TestSubscriber<List<MediaFolderModel>> testSubscriber = new TestSubscriber<List<MediaFolderModel>>() {
-            @Override
-            public void onNext(List<MediaFolderModel> mediaFolderModels) {
-                super.onNext(mediaFolderModels);
-            }
-        };
-
+    public void refreshFolderList_fromCache_all() throws Exception {
         when(cacheController.readCache(MediaFilterMode.ALL)).thenReturn(mediaFolderModels_all1);
         when(folderController.getMediaDirectoryList(any())).thenReturn(mediaFolderModels_all2);
         when(folderController.addMediaFileCount(any())).thenReturn(mediaFolderModels_all3);
