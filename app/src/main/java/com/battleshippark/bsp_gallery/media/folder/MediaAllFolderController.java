@@ -12,10 +12,7 @@ import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import lombok.Cleanup;
 import rx.Subscriber;
 
 /**
@@ -86,68 +83,55 @@ public class MediaAllFolderController extends MediaFolderController {
         throw new IOException();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
-    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> mediaFolderModels) {
+    protected MediaFolderModel queryMediaFileId(MediaFolderModel mediaFolderModel) throws IOException {
         String[] projectionClauses = new String[]{MediaStore.Images.Media._ID, MediaStore.Files.FileColumns.MEDIA_TYPE};
         String orderClause = MediaStore.Images.Media._ID + " desc";
 
-        List<MediaFolderModel> result = new ArrayList<>();
+        String selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
+                MediaStore.Images.ImageColumns.BUCKET_ID,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MEDIA_TYPE
+        );
+        String[] selectionArgs = new String[]{
+                String.valueOf(mediaFolderModel.getId()),
+                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
+        };
 
-        for (MediaFolderModel dir : mediaFolderModels) {
-            if (dir.getId() == MediaFolderModel.ALL_DIR_ID) {
-                result.add(MediaFolderModel.copy(dir));
-                continue;
-            }
-
-            String selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
-                    MediaStore.Images.ImageColumns.BUCKET_ID,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE
-            );
-            String[] selectionArgs = new String[]{
-                    String.valueOf(dir.getId()),
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
-            };
-
-            @Cleanup Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause);
+        try (Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(dir);
+                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
                 model.setCoverMediaType(CursorUtils.getInt(c, projectionClauses[1]));
-                result.add(model);
+                return model;
             }
         }
-
-        return result;
+        throw new IOException();
     }
 
     @Override
-    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> mediaFolderModels) {
+    protected MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) throws IOException {
         String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
 
-        List<MediaFolderModel> result = new ArrayList<>();
-
-        for (MediaFolderModel dir : mediaFolderModels) {
-            if (dir.getId() == MediaFolderModel.ALL_DIR_ID) {
-                result.add(MediaFolderModel.copy(dir));
-                continue;
-            }
-
-            @Cleanup Cursor c = null;
-            if (dir.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
-                c = MediaStore.Images.Thumbnails.queryMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
+        Cursor c = null;
+        try {
+            if (mediaFolderModel.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+                c = MediaStore.Images.Thumbnails.queryMiniThumbnail(context.getContentResolver(), mediaFolderModel.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
             else
-                c = queryVideoMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
+                c = queryVideoMiniThumbnail(context.getContentResolver(), mediaFolderModel.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
 
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(dir);
+                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
                 model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
-                result.add(model);
+                return model;
             }
+        } finally {
+            if (c != null)
+                c.close();
         }
-
-        return result;
+        throw new IOException();
     }
 
     private Cursor queryVideoMiniThumbnail(ContentResolver cr, long origId, int kind, String[] projection) {

@@ -84,10 +84,21 @@ public abstract class MediaFolderController {
 
     protected abstract void queryMediaFolderAndOnNext(Subscriber<? super MediaFolderModel> subscriber);
 
+    interface IOExceptionFunc1<T1, R> {
+        R call(T1 t1) throws IOException;
+    }
+
     /**
      * 디렉토리에 파일 갯수를 추가한다
      */
     public List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> mediaFolderModels) {
+        return callAndMergeWithAll(mediaFolderModels, this::queryMediaFileCount);
+    }
+
+    /**
+     * mediaFolderModels에 대해 func 파라미터를 호출해서 필요한 정보를 갱신한다 . All 폴더는 유지한다
+     */
+    List<MediaFolderModel> callAndMergeWithAll(List<MediaFolderModel> mediaFolderModels, IOExceptionFunc1<MediaFolderModel, MediaFolderModel> func) {
         List<MediaFolderModel> result = new ArrayList<>();
 
         for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
@@ -98,7 +109,7 @@ public abstract class MediaFolderController {
 
             MediaFolderModel newMediaFolderModel = null;
             try {
-                newMediaFolderModel = queryMediaFileCount(mediaFolderModel);
+                newMediaFolderModel = func.call(mediaFolderModel);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -108,7 +119,6 @@ public abstract class MediaFolderController {
         }
 
         return result;
-
     }
 
     protected abstract MediaFolderModel queryMediaFileCount(MediaFolderModel mediaFolderModel) throws IOException;
@@ -116,10 +126,18 @@ public abstract class MediaFolderController {
     /**
      * 디렉토리에 가장 최근 파일의 ID를 추가한다
      */
-    public abstract List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> folders);
+    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> mediaFolderModels) {
+        return callAndMergeWithAll(mediaFolderModels, this::queryMediaFileId);
+    }
+
+    protected abstract MediaFolderModel queryMediaFileId(MediaFolderModel mediaFolderModel) throws IOException;
 
     /**
      * 디렉토리에 가장 최근 파일의 손톱 이미지 경로를 추가한다
      */
-    public abstract List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> folders);
+    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> mediaFolderModels) {
+        return callAndMergeWithAll(mediaFolderModels, this::queryMediaThumbPath);
+    }
+
+    protected abstract MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) throws IOException;
 }

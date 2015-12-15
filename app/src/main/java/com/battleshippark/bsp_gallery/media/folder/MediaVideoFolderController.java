@@ -12,10 +12,7 @@ import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import lombok.Cleanup;
 import rx.Subscriber;
 
 /**
@@ -69,45 +66,39 @@ public class MediaVideoFolderController extends MediaFolderController {
         throw new IOException();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
-    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> folders) {
+    protected MediaFolderModel queryMediaFileId(MediaFolderModel mediaFolderModel) throws IOException {
         String[] projectionClauses = new String[]{MediaStore.Video.Media._ID};
         String orderClause = MediaStore.Video.Media._ID + " desc";
 
-        List<MediaFolderModel> result = new ArrayList<>();
+        String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
+        String[] selectionArgs = new String[]{String.valueOf(mediaFolderModel.getId())};
 
-        for (MediaFolderModel dir : folders) {
-            String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
-            String[] selectionArgs = new String[]{String.valueOf(dir.getId())};
-
-            @Cleanup Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause);
+        try (Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(dir);
+                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
                 model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
-                result.add(model);
+                return model;
             }
         }
-
-        return result;
+        throw new IOException();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
-    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> folders) {
+    protected MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) throws IOException {
         String[] projectionClauses = new String[]{MediaStore.Video.Thumbnails.DATA,};
 
-        List<MediaFolderModel> result = new ArrayList<>();
-
-        for (MediaFolderModel dir : folders) {
-            @Cleanup Cursor c = queryVideoMiniThumbnail(context.getContentResolver(), dir.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
+        try (Cursor c = queryVideoMiniThumbnail(context.getContentResolver(), mediaFolderModel.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(dir);
+                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
                 model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
-                result.add(model);
+                return model;
             }
         }
-
-        return result;
+        throw new IOException();
     }
 
     private Cursor queryVideoMiniThumbnail(ContentResolver cr, long origId, int kind, String[] projection) {
