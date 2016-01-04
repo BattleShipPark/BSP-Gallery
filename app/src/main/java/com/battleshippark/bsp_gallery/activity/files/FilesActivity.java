@@ -17,8 +17,8 @@ import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaController;
-import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 

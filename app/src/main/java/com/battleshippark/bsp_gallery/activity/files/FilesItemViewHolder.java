@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.file.FileActivity;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 
@@ -42,10 +42,10 @@ public class FilesItemViewHolder extends RecyclerView.ViewHolder {
         this.position = position;
 
         if (model.getThumbPath() == null) {
-            Picasso.with(context).load(R.drawable.error_100).into(imageView);
+            Glide.with(context).load(R.drawable.error_100).into(imageView);
             playImageView.setVisibility(View.GONE);
         } else {
-            Picasso.with(context).load(new File(model.getThumbPath())).error(R.drawable.error_100).into(imageView);
+            Glide.with(context).load(new File(model.getThumbPath())).error(R.drawable.error_100).into(imageView);
 
             if (model.getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                 playImageView.setVisibility(View.VISIBLE);

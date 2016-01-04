@@ -14,8 +14,10 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -72,29 +74,30 @@ public class VideoFileFragment extends FileFragment {
                 model = mediaFileModel;
 
                 if (TextUtils.isEmpty(model.getThumbPath())) {
-                    Picasso.with(getActivity()).load(R.drawable.error_100)
-                            .resize(getContext().getResources().getDisplayMetrics().widthPixels / 6,
-                                    getContext().getResources().getDisplayMetrics().heightPixels / 6)
-                            .centerInside().into(imageView);
+                    Glide.with(getActivity()).load(R.drawable.error_100)
+                            .fitCenter().into(imageView);
                     progressBar.setVisibility(View.GONE);
                     playImageView.setVisibility(View.GONE);
                 } else {
-                    Picasso.with(getActivity()).load(new File(model.getThumbPath()))
-                            .resize(getContext().getResources().getDisplayMetrics().widthPixels,
-                                    getContext().getResources().getDisplayMetrics().heightPixels)
-                            .centerInside().error(R.drawable.error_100).into(imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            progressBar.setVisibility(View.GONE);
-                            playImageView.setVisibility(View.VISIBLE);
-                        }
+                    Glide.with(getActivity()).load(new File(model.getThumbPath()))
+                            .fitCenter().error(R.drawable.error_100)
+                            .listener(new RequestListener<File, GlideDrawable>() {
+                                @Override
+                                public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                    e.printStackTrace();
+                                    progressBar.setVisibility(View.GONE);
+                                    playImageView.setVisibility(View.GONE);
+                                    return false;
+                                }
 
-                        @Override
-                        public void onError() {
-                            progressBar.setVisibility(View.GONE);
-                            playImageView.setVisibility(View.GONE);
-                        }
-                    });
+                                @Override
+                                public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                    progressBar.setVisibility(View.GONE);
+                                    playImageView.setVisibility(View.GONE);
+                                    return false;
+                                }
+                            })
+                            .into(imageView);
                 }
             }
         }.executeOnExecutor(executor);

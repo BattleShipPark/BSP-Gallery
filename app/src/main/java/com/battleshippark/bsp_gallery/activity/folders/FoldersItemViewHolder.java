@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivity;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 
@@ -57,7 +57,7 @@ public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
         if (model.getCoverThumbPath() == null) {
             playImageView.setVisibility(View.GONE);
         } else {
-            Picasso.with(context).load(new File(model.getCoverThumbPath())).error(R.drawable.error_100).into(coverImageView);
+            Glide.with(context).load(new File(model.getCoverThumbPath())).error(R.drawable.error_100).into(coverImageView);
 
             if (model.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                 playImageView.setVisibility(View.VISIBLE);

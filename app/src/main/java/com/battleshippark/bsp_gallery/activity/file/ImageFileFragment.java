@@ -8,8 +8,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.battleshippark.bsp_gallery.R;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 
@@ -42,19 +44,23 @@ public class ImageFileFragment extends FileFragment {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        Picasso.with(getActivity()).load(new File(model.getPath()))
-                .resize(getContext().getResources().getDisplayMetrics().widthPixels,
-                        getContext().getResources().getDisplayMetrics().heightPixels)
-                .centerInside().error(R.drawable.error_100).into(imageView, new Callback() {
-            @Override
-            public void onSuccess() {
-                progressBar.setVisibility(View.GONE);
-            }
+        Glide.with(getActivity()).load(new File(model.getPath()))
+                .fitCenter()
+                .error(R.drawable.error_100)
+                .listener(new RequestListener<File, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        e.printStackTrace();
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
 
-            @Override
-            public void onError() {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageView);
     }
 }
