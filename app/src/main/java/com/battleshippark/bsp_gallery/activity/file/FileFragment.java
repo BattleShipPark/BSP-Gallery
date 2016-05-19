@@ -9,6 +9,8 @@ import android.widget.ProgressBar;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 
+import org.parceler.Parcels;
+
 import butterknife.Bind;
 
 public class FileFragment extends Fragment {
@@ -41,7 +43,7 @@ public class FileFragment extends Fragment {
             fragment = new VideoFileFragment();
         }
         Bundle args = new Bundle();
-        args.putParcelable(KEY_MODEL, mediaFileModel);
+        args.putParcelable(KEY_MODEL, Parcels.wrap(mediaFileModel));
         fragment.setArguments(args);
         return fragment;
     }

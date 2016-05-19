@@ -20,6 +20,8 @@ import com.battleshippark.bsp_gallery.media.MediaController;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import org.parceler.Parcels;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -71,7 +73,7 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
         super.onSaveInstanceState(outState);
 
         model.setPosition(viewPager.getCurrentItem());
-        outState.putParcelable(KEY_MODEL, model);
+        outState.putParcelable(KEY_MODEL, Parcels.wrap(model));
     }
 
     @Override
@@ -123,7 +125,7 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
     public static Intent createIntent(Context context, int position, FilesActivityModel filesActivityModel) {
         Intent i = new Intent(context, FileActivity.class);
         i.putExtra(KEY_POSITION, position);
-        i.putExtra(KEY_FILES_ACTIVITY_MODEL, filesActivityModel);
+        i.putExtra(KEY_FILES_ACTIVITY_MODEL, Parcels.wrap(filesActivityModel));
         return i;
     }
 

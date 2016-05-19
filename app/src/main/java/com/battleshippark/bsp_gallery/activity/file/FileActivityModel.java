@@ -1,7 +1,5 @@
 package com.battleshippark.bsp_gallery.activity.file;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.VisibleForTesting;
 
 import com.battleshippark.bsp_gallery.EventBusHelper;
@@ -17,7 +15,9 @@ import lombok.Data;
 /**
  */
 @Data
-public final class FileActivityModel implements Parcelable {
+@org.parceler.Parcel(org.parceler.Parcel.Serialization.BEAN)
+public final class FileActivityModel {
+    @org.parceler.Transient
     private final Bus eventBus;
     private int position;
     private int folderId;
@@ -34,42 +34,9 @@ public final class FileActivityModel implements Parcelable {
         this.eventBus = eventBus;
     }
 
-    protected FileActivityModel(Parcel in) {
-        this();
-        position = in.readInt();
-        folderId = in.readInt();
-        folderName = in.readString();
-        mediaFilterMode = MediaFilterMode.valueOf(in.readString());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(position);
-        dest.writeInt(folderId);
-        dest.writeString(folderName);
-        dest.writeString(mediaFilterMode.name());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
     public void setMediaFileModelList(List<MediaFileModel> modelList) {
         mediaFileModelList = modelList;
 
         eventBus.post(Events.OnMediaFileListUpdated.EVENT);
     }
-
-    public static final Creator<FileActivityModel> CREATOR = new Creator<FileActivityModel>() {
-        @Override
-        public FileActivityModel createFromParcel(Parcel in) {
-            return new FileActivityModel(in);
-        }
-
-        @Override
-        public FileActivityModel[] newArray(int size) {
-            return new FileActivityModel[size];
-        }
-    };
 }
