@@ -2,6 +2,7 @@ package com.battleshippark.bsp_gallery.pref;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.MainThread;
 import android.util.Log;
 
 import com.battleshippark.bsp_gallery.EventBusHelper;
@@ -21,35 +22,27 @@ import rx.schedulers.Schedulers;
  */
 public class SharedPreferenceController {
     private static final String NAME = "sp";
+    private static SharedPreferenceController INSTANCE;
     private final Context context;
-    private final FoldersActivityModel foldersActivityModel;
     private final SharedPreferenceModel model;
-    private final Map<String, Action1<String>> readingProcessMap = new HashMap<>();
     private final Map<String, Action1<String>> writingProcessMap = new HashMap<>();
 
-    public SharedPreferenceController(Context context, FoldersActivityModel foldersActivityModel) {
+    private SharedPreferenceController(Context context) {
         this.context = context;
-        this.foldersActivityModel = foldersActivityModel;
-
+        this.model = new SharedPreferenceModel();
         EventBusHelper.eventBus.register(this);
-
-        model = new SharedPreferenceModel();
-
-        readingProcessMap.put(SharedPreferenceModel.KEY_MEDIA_MODE, this::readMediaMode);
-        writingProcessMap.put(SharedPreferenceModel.KEY_MEDIA_MODE, this::writeMediaMode);
     }
 
-    @Subscribe
-    public void OnActivityCreated(Events.OnActivityCreated event) {
-        Log.d("", getClass().getSimpleName() + ".OnActivityCreated()");
+    @MainThread
+    public static void create(Context context) {
+        if (INSTANCE != null) {
+            throw new IllegalStateException();
+        }
+        INSTANCE = new SharedPreferenceController(context);
+    }
 
-        Observable.from(readingProcessMap.keySet())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        key -> readingProcessMap.get(key).call(key),
-                        Throwable::printStackTrace,
-                        this::sendEvent
-                );
+    public static SharedPreferenceController instance() {
+        return INSTANCE;
     }
 
     @Subscribe
@@ -60,17 +53,21 @@ public class SharedPreferenceController {
         writingProcessMap.get(key).call(key);
     }
 
+    public MediaFilterMode readMediaMode(String key) {
+        if (model.getMediaFilterMode() == null) {
+            SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+            model.setMediaFilterMode(MediaFilterMode.valueOf(p.getString(key, MediaFilterMode.ALL.name())));
+        }
+        return model.getMediaFilterMode();
+    }
+
+    public void writeMediaMode(String key, FoldersActivityModel model) {
+        SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        p.edit().putString(key, model.getMediaFilterMode().name()).apply();
+        model.setMediaFilterMode(model.getMediaFilterMode());
+    }
+
     private void sendEvent() {
         EventBusHelper.eventBus.post(new Events.OnSharedPreferenceRead(model));
-    }
-
-    private void readMediaMode(String key) {
-        SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        model.setMediaFilterMode(MediaFilterMode.valueOf(p.getString(key, MediaFilterMode.ALL.name())));
-    }
-
-    private void writeMediaMode(String key) {
-        SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        p.edit().putString(key, foldersActivityModel.getMediaFilterMode().name()).apply();
     }
 }

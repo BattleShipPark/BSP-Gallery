@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
+
 
 /**
  */
@@ -19,6 +21,7 @@ public class BspApplication extends Application {
         super.onCreate();
 
         AnalyticsTrackers.initialize(this);
+        SharedPreferenceController.create(this);
     }
 
     public static Handler getHandler() {

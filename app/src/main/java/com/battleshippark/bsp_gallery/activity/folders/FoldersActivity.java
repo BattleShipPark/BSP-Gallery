@@ -18,6 +18,7 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
+import com.battleshippark.bsp_gallery.pref.SharedPreferenceModel;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
@@ -139,7 +140,7 @@ public class FoldersActivity extends AppCompatActivity {
 
         mediaController = new MediaController(this);
 
-        new SharedPreferenceController(this, model);
+        SharedPreferenceController.instance().readMediaMode(SharedPreferenceModel.KEY_MEDIA_MODE);
     }
 
     private void initUI() {
