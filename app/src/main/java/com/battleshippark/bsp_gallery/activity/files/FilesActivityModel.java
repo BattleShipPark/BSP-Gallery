@@ -2,7 +2,9 @@ package com.battleshippark.bsp_gallery.activity.files;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.VisibleForTesting;
 
+import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
@@ -17,20 +19,23 @@ import lombok.Data;
  */
 @Data
 public final class FilesActivityModel implements Parcelable {
-    private Bus eventBus;
+    private final Bus eventBus;
     private int folderId;
     private String folderName;
     private List<MediaFileModel> mediaFileModelList;
     private MediaFilterMode mediaFilterMode;
 
     public FilesActivityModel() {
+        this(EventBusHelper.eventBus);
     }
 
-    public FilesActivityModel(Bus eventBus) {
+    @VisibleForTesting
+    FilesActivityModel(Bus eventBus) {
         this.eventBus = eventBus;
     }
 
     protected FilesActivityModel(Parcel in) {
+        this();
         folderId = in.readInt();
         folderName = in.readString();
         /* not save mediaFileModelList because I don't use it through Parcel*/
@@ -47,16 +52,6 @@ public final class FilesActivityModel implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Subscribe
-    public void OnActivityCreated(Events.OnActivityCreated event) {
-//        eventBus.register(this);
-    }
-
-    @Subscribe
-    public void OnActivityDestroyed(Events.OnActivityDestroyed event) {
-//        eventBus.unregister(this);
     }
 
     public void setMediaFileModelList(List<MediaFileModel> modelList) {

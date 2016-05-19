@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
@@ -45,7 +46,6 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
     /* */
     private FileAdapter adapter;
 
-    private Bus eventBus;
     private MediaController mediaController;
     private ExecutorService executor;
 
@@ -57,8 +57,6 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
 
         initData(savedInstanceState);
         initUI();
-
-        eventBus.post(Events.OnActivityCreated.EVENT);
 
         mediaController.refreshFileListAsync(this, model);
     }
@@ -83,8 +81,6 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
 
     @Override
     protected void onDestroy() {
-        eventBus.post(Events.OnActivityDestroyed.EVENT);
-        eventBus.unregister(this);
         super.onDestroy();
     }
 
@@ -138,14 +134,11 @@ public class FileActivity extends AppCompatActivity implements FragmentAccessibl
             model = parseIntent();
         }
 
-        eventBus = new Bus();
-        eventBus.register(this);
-
-        model.setEventBus(eventBus);
+        EventBusHelper.eventBus.register(this);
 
         adapter = new FileAdapter(getSupportFragmentManager(), model);
 
-        mediaController = new MediaController(this, eventBus);
+        mediaController = new MediaController(this);
 
         executor = Executors.newCachedThreadPool();
     }

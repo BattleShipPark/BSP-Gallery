@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import com.battleshippark.bsp_gallery.BspApplication;
+import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
@@ -38,7 +39,12 @@ public class MediaController {
     private final Context context;
     private final Bus eventBus;
 
-    public MediaController(Context context, Bus eventBus) {
+    public MediaController(Context context) {
+        this(context, EventBusHelper.eventBus);
+    }
+
+    @VisibleForTesting
+    MediaController(Context context, Bus eventBus) {
         this.context = context;
         this.eventBus = eventBus;
     }
@@ -54,7 +60,7 @@ public class MediaController {
         Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
         writeToCacheSubject.subscribeOn(Schedulers.io())
                 .subscribe(
-                        aVoid -> new CacheController(context).writeCache(context, model.getMediaFilterMode(), model.getMediaFolderModelList()),
+                        aVoid -> new CacheController(context).writeCache(model.getMediaFilterMode(), model.getMediaFolderModelList()),
                         Throwable::printStackTrace);
 
         Subscriber<List<MediaFolderModel>> subscriber = new Subscriber<List<MediaFolderModel>>() {

@@ -1,6 +1,5 @@
 package com.battleshippark.bsp_gallery.cache;
 
-import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -25,23 +24,22 @@ public class CacheControllerTest {
     @Rule
     public ActivityTestRule<BlankActivity> rule = new ActivityTestRule<>(BlankActivity.class);
 
+    private CacheController controller;
+
     @Before
-    public void clear() {
-        CacheController.clear(rule.getActivity());
+    public void setUp() {
+        controller = new CacheController(rule.getActivity());
+        controller.clear();
     }
 
     @Test
     public void testReadCache_fromEmpty() {
-        Context context = rule.getActivity();
-
-        List<MediaFolderModel> newModels = CacheController.readCache(context, MediaFilterMode.ALL);
+        List<MediaFolderModel> newModels = controller.readCache(MediaFilterMode.ALL);
         Assert.assertTrue(newModels.isEmpty());
     }
 
     @Test
     public void testReadWriteCache_All() {
-        Context context = rule.getActivity();
-
         MediaFolderModel mediaFolderModel1 = new MediaFolderModel();
         mediaFolderModel1.setId(1);
         mediaFolderModel1.setCoverMediaId(2);
@@ -59,17 +57,15 @@ public class CacheControllerTest {
         mediaFolderModel2.setCoverMediaType(7);
 
         List<MediaFolderModel> models = Arrays.asList(mediaFolderModel1, mediaFolderModel2);
-        CacheController.writeCache(context, MediaFilterMode.ALL, models);
+        controller.writeCache(MediaFilterMode.ALL, models);
 
-        List<MediaFolderModel> newModels = CacheController.readCache(context, MediaFilterMode.ALL);
+        List<MediaFolderModel> newModels = controller.readCache(MediaFilterMode.ALL);
 
         Assert.assertEquals(models, newModels);
     }
 
     @Test
     public void testReadWriteCache_Image() {
-        Context context = rule.getActivity();
-
         MediaFolderModel mediaFolderModel1 = new MediaFolderModel();
         mediaFolderModel1.setId(2);
         mediaFolderModel1.setCoverMediaId(3);
@@ -87,17 +83,15 @@ public class CacheControllerTest {
         mediaFolderModel2.setCoverMediaType(6);
 
         List<MediaFolderModel> models = Arrays.asList(mediaFolderModel1, mediaFolderModel2);
-        CacheController.writeCache(context, MediaFilterMode.IMAGE, models);
+        controller.writeCache(MediaFilterMode.IMAGE, models);
 
-        List<MediaFolderModel> newModels = CacheController.readCache(context, MediaFilterMode.IMAGE);
+        List<MediaFolderModel> newModels = controller.readCache(MediaFilterMode.IMAGE);
 
         Assert.assertEquals(models, newModels);
     }
 
     @Test
     public void testReadWriteCache_Video() {
-        Context context = rule.getActivity();
-
         MediaFolderModel mediaFolderModel1 = new MediaFolderModel();
         mediaFolderModel1.setId(3);
         mediaFolderModel1.setCoverMediaId(4);
@@ -115,17 +109,15 @@ public class CacheControllerTest {
         mediaFolderModel2.setCoverMediaType(6);
 
         List<MediaFolderModel> models = Arrays.asList(mediaFolderModel1, mediaFolderModel2);
-        CacheController.writeCache(context, MediaFilterMode.VIDEO, models);
+        controller.writeCache(MediaFilterMode.VIDEO, models);
 
-        List<MediaFolderModel> newModels = CacheController.readCache(context, MediaFilterMode.VIDEO);
+        List<MediaFolderModel> newModels = controller.readCache(MediaFilterMode.VIDEO);
 
         Assert.assertEquals(models, newModels);
     }
 
     @Test
     public void testReadWriteCache_together() {
-        Context context = rule.getActivity();
-
         MediaFolderModel mediaFolderModelAll1 = new MediaFolderModel();
         mediaFolderModelAll1.setId(1);
         mediaFolderModelAll1.setCoverMediaId(2);
@@ -143,7 +135,7 @@ public class CacheControllerTest {
         mediaFolderModelAll2.setCoverMediaType(7);
 
         List<MediaFolderModel> allModels = Arrays.asList(mediaFolderModelAll1, mediaFolderModelAll2);
-        CacheController.writeCache(context, MediaFilterMode.ALL, allModels);
+        controller.writeCache(MediaFilterMode.ALL, allModels);
 
         /* */
 
@@ -164,7 +156,7 @@ public class CacheControllerTest {
         mediaFolderModelImage2.setCoverMediaType(6);
 
         List<MediaFolderModel> imageModels = Arrays.asList(mediaFolderModelImage1, mediaFolderModelImage2);
-        CacheController.writeCache(context, MediaFilterMode.IMAGE, imageModels);
+        controller.writeCache(MediaFilterMode.IMAGE, imageModels);
 
         /* */
 
@@ -185,17 +177,17 @@ public class CacheControllerTest {
         mediaFolderModelVideo2.setCoverMediaType(6);
 
         List<MediaFolderModel> videoModels = Arrays.asList(mediaFolderModelVideo1, mediaFolderModelVideo2);
-        CacheController.writeCache(context, MediaFilterMode.VIDEO, videoModels);
+        controller.writeCache(MediaFilterMode.VIDEO, videoModels);
 
         /* */
 
-        List<MediaFolderModel> newModels = CacheController.readCache(context, MediaFilterMode.ALL);
+        List<MediaFolderModel> newModels = controller.readCache(MediaFilterMode.ALL);
         Assert.assertEquals(allModels, newModels);
 
-        newModels = CacheController.readCache(context, MediaFilterMode.IMAGE);
+        newModels = controller.readCache(MediaFilterMode.IMAGE);
         Assert.assertEquals(imageModels, newModels);
 
-        newModels = CacheController.readCache(context, MediaFilterMode.VIDEO);
+        newModels = controller.readCache(MediaFilterMode.VIDEO);
         Assert.assertEquals(videoModels, newModels);
     }
 }

@@ -12,12 +12,12 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
@@ -43,7 +43,6 @@ public class FoldersActivity extends AppCompatActivity {
     private FoldersAdapter adapter;
     private FoldersItemDecoration decoration;
     private FoldersActivityModel model;
-    private Bus eventBus;
 
 
     @Override
@@ -54,8 +53,6 @@ public class FoldersActivity extends AppCompatActivity {
 
         initData();
         initUI();
-
-        eventBus.post(Events.OnActivityCreated.EVENT);
     }
 
     @Override
@@ -70,8 +67,7 @@ public class FoldersActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        eventBus.post(Events.OnActivityDestroyed.EVENT);
-        eventBus.unregister(this);
+        EventBusHelper.eventBus.unregister(this);
         super.onDestroy();
     }
 
@@ -134,15 +130,14 @@ public class FoldersActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        eventBus = new Bus();
-        eventBus.register(this);
+        EventBusHelper.eventBus.register(this);
 
-        model = new FoldersActivityModel(eventBus);
+        model = new FoldersActivityModel();
 
         adapter = new FoldersAdapter(this, model);
         decoration = new FoldersItemDecoration(model);
 
-        mediaController = new MediaController(this, eventBus);
+        mediaController = new MediaController(this);
 
         new SharedPreferenceController(this, model);
     }

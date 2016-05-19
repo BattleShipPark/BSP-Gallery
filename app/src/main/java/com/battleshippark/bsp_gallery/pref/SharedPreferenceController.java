@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.battleshippark.bsp_gallery.BspApplication;
+import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
@@ -31,7 +31,7 @@ public class SharedPreferenceController {
         this.context = context;
         this.foldersActivityModel = foldersActivityModel;
 
-        foldersActivityModel.getEventBus().register(this);
+        EventBusHelper.eventBus.register(this);
 
         model = new SharedPreferenceModel();
 
@@ -53,11 +53,6 @@ public class SharedPreferenceController {
     }
 
     @Subscribe
-    public void OnActivityDestroyed(Events.OnActivityDestroyed event) {
-        foldersActivityModel.getEventBus().unregister(this);
-    }
-
-    @Subscribe
     public void OnMediaModeUpdated(Events.OnMediaModeUpdated event) {
         Log.d("", getClass().getSimpleName() + ".OnMediaModeUpdated()");
 
@@ -66,9 +61,7 @@ public class SharedPreferenceController {
     }
 
     private void sendEvent() {
-        BspApplication.getHandler().post(
-                () -> foldersActivityModel.getEventBus().post(new Events.OnSharedPreferenceRead(model))
-        );
+        EventBusHelper.eventBus.post(new Events.OnSharedPreferenceRead(model));
     }
 
     private void readMediaMode(String key) {

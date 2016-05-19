@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
@@ -61,7 +62,6 @@ public class FilesActivity extends AppCompatActivity {
     int FILES_COLUMN_COUNT;
 
 
-    private Bus eventBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +71,6 @@ public class FilesActivity extends AppCompatActivity {
 
         initData(savedInstanceState);
         initUI();
-
-        eventBus.post(Events.OnActivityCreated.EVENT);
 
         mediaController.refreshFileListWithThumbAsync(this, model);
     }
@@ -100,8 +98,7 @@ public class FilesActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        eventBus.post(Events.OnActivityDestroyed.EVENT);
-        eventBus.unregister(this);
+        EventBusHelper.eventBus.unregister(this);
         super.onDestroy();
     }
 
@@ -152,15 +149,12 @@ public class FilesActivity extends AppCompatActivity {
             model = parseIntent();
         }
 
-        eventBus = new Bus();
-        eventBus.register(this);
-
-        model.setEventBus(eventBus);
+        EventBusHelper.eventBus.register(this);
 
         adapter = new FilesAdapter(this, model);
 //        decoration = new FilesItemDecoration(model);
 
-        mediaController = new MediaController(this, eventBus);
+        mediaController = new MediaController(this);
     }
 
     private FilesActivityModel parseBundle(Bundle bundle) {
