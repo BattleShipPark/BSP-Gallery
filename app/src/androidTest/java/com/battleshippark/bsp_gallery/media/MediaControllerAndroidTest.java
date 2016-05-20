@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 /**
  */
 @RunWith(AndroidJUnit4.class)
-public class MediaControllerTest {
+public class MediaControllerAndroidTest {
     @Mock
     MediaFolderController folderController;
 
@@ -66,9 +66,6 @@ public class MediaControllerTest {
 
         latch.await();
 
-        verify(spyBus).post(Events.OnMediaFolderListUpdated.FINISHED);
-//        verify(eventBus).post(captor.capture());
-//        Log.w("TEST", captor.getValue().name());
-//        System.out.println(captor.getValue().name());
+//        verify(spyBus).post(Events.OnMediaFolderListUpdated.FINISHED);
     }
 }

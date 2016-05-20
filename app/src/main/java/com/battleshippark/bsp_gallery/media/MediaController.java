@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import rx.Observable;
 import rx.Scheduler;
@@ -57,34 +58,34 @@ public class MediaController {
     public void refreshFolderListAsync(FoldersActivityModel model) {
         MediaFolderController folderController = MediaFolderController.create(context, model.getMediaFilterMode());
 
-        Subject<Void, Void> writeToCacheSubject = PublishSubject.create();
-        writeToCacheSubject.subscribeOn(Schedulers.io())
-                .subscribe(
-                        aVoid -> new CacheController(context).writeCache(model.getMediaFilterMode(), model.getMediaFolderModelList()),
-                        Throwable::printStackTrace);
-
         Subscriber<List<MediaFolderModel>> subscriber = new Subscriber<List<MediaFolderModel>>() {
             @Override
             public void onCompleted() {
-                writeToCacheSubject.onNext(null);
-                eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
+                writeCache(model);
             }
 
             @Override
             public void onError(Throwable e) {
                 e.printStackTrace();
-                eventBus.post(Events.OnMediaFolderListUpdated.FINISHED);
             }
 
             @Override
             public void onNext(List<MediaFolderModel> mediaFolderModels) {
                 model.setMediaFolderModelList(mediaFolderModels);
+                eventBus.post(Events.OnMediaFolderListUpdated.EVENT);
             }
         };
 
         CacheController cacheController = new CacheController(context);
 
-        refreshFolderList(model.getMediaFilterMode(), folderController, cacheController, subscriber, Schedulers.io(), AndroidSchedulers.mainThread());
+        refreshFolderList(model.getMediaFilterMode(), folderController, cacheController,
+                subscriber, Schedulers.io(), AndroidSchedulers.mainThread());
+    }
+
+    private void writeCache(FoldersActivityModel model) {
+        Executors.newSingleThreadExecutor().execute(() ->
+                new CacheController(context).writeCache(model.getMediaFilterMode(),
+                        model.getMediaFolderModelList()));
     }
 
     @VisibleForTesting

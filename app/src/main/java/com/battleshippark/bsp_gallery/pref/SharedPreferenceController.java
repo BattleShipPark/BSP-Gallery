@@ -53,10 +53,11 @@ public class SharedPreferenceController {
         writingProcessMap.get(key).call(key);
     }
 
-    public MediaFilterMode readMediaMode(String key) {
+    public MediaFilterMode readMediaMode() {
         if (model.getMediaFilterMode() == null) {
             SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-            model.setMediaFilterMode(MediaFilterMode.valueOf(p.getString(key, MediaFilterMode.ALL.name())));
+            model.setMediaFilterMode(MediaFilterMode.valueOf(
+                    p.getString(SharedPreferenceModel.KEY_MEDIA_MODE, MediaFilterMode.ALL.name())));
         }
         return model.getMediaFilterMode();
     }

@@ -12,8 +12,7 @@ public class Events {
      * 화면갱신이나 다른 컨트롤러들의 작업을 할 수 있다
      */
     public enum OnMediaFolderListUpdated {
-        UPDATED,
-        FINISHED
+        EVENT
     }
 
     /**

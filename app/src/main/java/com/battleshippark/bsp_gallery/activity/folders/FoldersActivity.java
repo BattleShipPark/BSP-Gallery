@@ -21,6 +21,8 @@ import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceModel;
 import com.squareup.otto.Subscribe;
 
+import java.util.concurrent.Executors;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -99,8 +101,7 @@ public class FoldersActivity extends AppCompatActivity {
         Log.d("", "OnMediaFolderListUpdated(): " + event);
 
         adapter.refresh();
-        if (event == Events.OnMediaFolderListUpdated.FINISHED)
-            progress.setVisibility(View.GONE);
+        progress.setVisibility(View.GONE);
     }
 
     @Subscribe
@@ -122,14 +123,6 @@ public class FoldersActivity extends AppCompatActivity {
         adapter.refresh();
     }
 
-    @Subscribe
-    public void OnSharedPreferenceRead(Events.OnSharedPreferenceRead event) {
-        Log.d("", "OnSharedPreferenceRead()");
-        model.setMediaFilterMode(event.getModel().getMediaFilterMode());
-        mediaController.refreshFolderListAsync(model);
-        progress.setVisibility(View.VISIBLE);
-    }
-
     private void initData() {
         EventBusHelper.eventBus.register(this);
 
@@ -140,7 +133,13 @@ public class FoldersActivity extends AppCompatActivity {
 
         mediaController = new MediaController(this);
 
-        SharedPreferenceController.instance().readMediaMode(SharedPreferenceModel.KEY_MEDIA_MODE);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            MediaFilterMode mode = SharedPreferenceController.instance()
+                    .readMediaMode();
+            model.setMediaFilterMode(mode);
+            mediaController.refreshFolderListAsync(model);
+            progress.setVisibility(View.VISIBLE);
+        });
     }
 
     private void initUI() {
