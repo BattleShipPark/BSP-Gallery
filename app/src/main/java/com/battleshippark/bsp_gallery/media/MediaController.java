@@ -52,7 +52,7 @@ public class MediaController {
 
     /**
      * 디렉토리 목록을 갱신한다. 한 번에 전부 가져올 수 없고, 쿼리를 여러번 던져야 해서
-     * 쿼리를 던질때마다 FoldersModel을 갱신한다.
+     * 쿼리를 던질때마다 FoldersModel을 갱신하고 {@link com.battleshippark.bsp_gallery.Events.OnMediaFolderListUpdated}를 이벤트로 발생시킨다
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
     public void refreshFolderListAsync(FoldersActivityModel model) {

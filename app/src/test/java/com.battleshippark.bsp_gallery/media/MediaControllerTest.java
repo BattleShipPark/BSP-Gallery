@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import rx.android.schedulers.AndroidSchedulers;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 
@@ -117,11 +118,11 @@ public class MediaControllerTest {
 
 
         MediaController controller = new MediaController(null, eventBus);
-        controller.refreshFolderList(MediaFilterMode.ALL, folderController, cacheController, testSubscriber, Schedulers.io(), Schedulers.io());
+        controller.refreshFolderList(MediaFilterMode.ALL, folderController, cacheController,
+                testSubscriber, AndroidSchedulers.mainThread(), AndroidSchedulers.mainThread());
 
         /* */
 
-        testSubscriber.awaitTerminalEvent();
         testSubscriber.assertNoErrors();
         testSubscriber.assertReceivedOnNext(Arrays.asList(mediaFolderModels1, mediaFolderModels2, mediaFolderModels3, mediaFolderModels4, mediaFolderModels5));
     }
