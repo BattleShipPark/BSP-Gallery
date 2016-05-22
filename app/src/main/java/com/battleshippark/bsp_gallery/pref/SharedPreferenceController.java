@@ -25,7 +25,6 @@ public class SharedPreferenceController {
     private static SharedPreferenceController INSTANCE;
     private final Context context;
     private final SharedPreferenceModel model;
-    private final Map<String, Action1<String>> writingProcessMap = new HashMap<>();
 
     private SharedPreferenceController(Context context) {
         this.context = context;
@@ -43,14 +42,6 @@ public class SharedPreferenceController {
 
     public static SharedPreferenceController instance() {
         return INSTANCE;
-    }
-
-    @Subscribe
-    public void OnMediaModeUpdated(Events.OnMediaModeUpdated event) {
-        Log.d("", getClass().getSimpleName() + ".OnMediaModeUpdated()");
-
-        String key = SharedPreferenceModel.KEY_MEDIA_MODE;
-        writingProcessMap.get(key).call(key);
     }
 
     public MediaFilterMode readMediaMode() {
