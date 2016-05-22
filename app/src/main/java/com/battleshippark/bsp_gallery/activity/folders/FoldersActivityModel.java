@@ -35,7 +35,5 @@ public final class FoldersActivityModel {
 
     public void setMediaFilterMode(MediaFilterMode mode) {
         mediaFilterMode = mode;
-
-        eventBus.post(Events.OnMediaModeUpdated.EVENT);
     }
 }

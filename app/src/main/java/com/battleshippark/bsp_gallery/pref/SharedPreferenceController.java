@@ -62,10 +62,10 @@ public class SharedPreferenceController {
         return model.getMediaFilterMode();
     }
 
-    public void writeMediaMode(String key, FoldersActivityModel model) {
+    public void writeMediaMode(MediaFilterMode mode) {
         SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        p.edit().putString(key, model.getMediaFilterMode().name()).apply();
-        model.setMediaFilterMode(model.getMediaFilterMode());
+        p.edit().putString(SharedPreferenceModel.KEY_MEDIA_MODE, mode.name()).apply();
+        model.setMediaFilterMode(mode);
     }
 
     private void sendEvent() {

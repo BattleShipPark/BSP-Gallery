@@ -139,6 +139,8 @@ public class FoldersActivity extends AppCompatActivity {
             model.setMediaFilterMode(mode);
             mediaController.refreshFolderListAsync(model);
             progress.setVisibility(View.VISIBLE);
+
+            SharedPreferenceController.instance().writeMediaMode(mode);
         });
     }
 
