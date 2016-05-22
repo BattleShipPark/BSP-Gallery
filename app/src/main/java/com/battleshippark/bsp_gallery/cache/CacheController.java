@@ -22,9 +22,9 @@ public class CacheController {
     }
 
     public void writeCache(MediaFilterMode mediaFilterMode, List<MediaFolderModel> models) {
-        Realm realm = Realm.getInstance(context);
+        Realm realm = Realm.getDefaultInstance();
         realm.executeTransaction(_realm -> {
-            _realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name()).findAll().clear();
+            _realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name()).findAll().deleteAllFromRealm();
 
             FoldersCacheModel cacheModel = _realm.createObject(FoldersCacheModel.class);
             cacheModel.setMediaFilterMode(mediaFilterMode.name());
@@ -36,7 +36,7 @@ public class CacheController {
     }
 
     public List<MediaFolderModel> readCache(MediaFilterMode mediaFilterMode) {
-        Realm realm = Realm.getInstance(context);
+        Realm realm = Realm.getDefaultInstance();
 
         RealmQuery<FoldersCacheModel> query = realm.where(FoldersCacheModel.class).equalTo("mediaFilterMode", mediaFilterMode.name());
         FoldersCacheModel foldersCacheModel = query.findFirst();
@@ -54,8 +54,8 @@ public class CacheController {
     }
 
     public void clear() {
-        Realm r = Realm.getInstance(context);
-        r.executeTransaction(realm -> realm.clear(FoldersCacheModel.class));
+        Realm r = Realm.getDefaultInstance();
+        r.executeTransaction(realm -> realm.delete(FoldersCacheModel.class));
         r.close();
     }
 }

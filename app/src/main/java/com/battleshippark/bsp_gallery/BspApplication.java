@@ -6,6 +6,9 @@ import android.os.Looper;
 
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 
 /**
  */
@@ -21,7 +24,15 @@ public class BspApplication extends Application {
         super.onCreate();
 
         AnalyticsTrackers.initialize(this);
+        initRealm();
         SharedPreferenceController.create(this);
+    }
+
+    private void initRealm() {
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this)
+                .schemaVersion(RealmHelper.SCHEMA_VERSION)
+                .migration(RealmHelper.migration).build();
+        Realm.setDefaultConfiguration(realmConfig);
     }
 
     public static Handler getHandler() {
