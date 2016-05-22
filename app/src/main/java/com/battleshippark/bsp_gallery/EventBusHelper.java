@@ -5,5 +5,5 @@ import com.squareup.otto.Bus;
 /**
  */
 public class EventBusHelper {
-    public static final Bus eventBus = new Bus();
+    public static final Bus eventBus = new MainThreadBus();
 }
