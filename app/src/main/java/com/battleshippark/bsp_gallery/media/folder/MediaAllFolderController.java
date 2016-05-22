@@ -119,9 +119,7 @@ public class MediaAllFolderController extends MediaFolderController {
         Cursor c = null;
         try {
             if (mediaFolderModel.getCoverMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
-                MediaFolderModel model = mediaFolderModel.copy();
-                model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
-                return model;
+                return mediaFolderModel.copy();
             } else {
                 c = queryVideoMiniThumbnail(context.getContentResolver(), mediaFolderModel.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses);
 
