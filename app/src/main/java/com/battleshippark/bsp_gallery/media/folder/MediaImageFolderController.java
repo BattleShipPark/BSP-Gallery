@@ -57,7 +57,7 @@ public class MediaImageFolderController extends MediaFolderController {
 
         try (Cursor c = context.getContentResolver().query(uri, countClauses, selectionClause, selectionArgs, null)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
+                MediaFolderModel model = mediaFolderModel.copy();
                 model.setCount(CursorUtils.getInt(c, "count"));
                 return model;
             }
@@ -76,7 +76,7 @@ public class MediaImageFolderController extends MediaFolderController {
 
         try (Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
+                MediaFolderModel model = mediaFolderModel.copy();
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
                 model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
                 return model;
@@ -85,19 +85,8 @@ public class MediaImageFolderController extends MediaFolderController {
         throw new IOException();
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
-    protected MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) throws IOException {
-        String[] projectionClauses = new String[]{MediaStore.Images.Thumbnails.DATA,};
-
-        try (Cursor c = MediaStore.Images.Thumbnails.queryMiniThumbnail(context.getContentResolver(), mediaFolderModel.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses)) {
-            if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
-                model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
-                return model;
-            }
-        }
-
-        throw new IOException();
+    protected MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) {
+        return mediaFolderModel.copy();
     }
 }

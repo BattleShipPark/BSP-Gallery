@@ -103,7 +103,7 @@ public abstract class MediaFolderController {
 
         for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
             if (mediaFolderModel.getId() == MediaFolderModel.ALL_DIR_ID) {
-                result.add(MediaFolderModel.copy(mediaFolderModel));
+                result.add(mediaFolderModel.copy());
                 continue;
             }
 
@@ -139,5 +139,5 @@ public abstract class MediaFolderController {
         return callAndMergeWithAll(mediaFolderModels, this::queryMediaThumbPath);
     }
 
-    protected abstract MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) throws IOException;
+    protected abstract MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel);
 }

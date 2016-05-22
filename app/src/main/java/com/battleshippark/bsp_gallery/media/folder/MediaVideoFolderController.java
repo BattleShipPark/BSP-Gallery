@@ -58,7 +58,7 @@ public class MediaVideoFolderController extends MediaFolderController {
 
         try (Cursor c = context.getContentResolver().query(uri, countClauses, selectionClause, selectionArgs, null)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
+                MediaFolderModel model = mediaFolderModel.copy();
                 model.setCount(CursorUtils.getInt(c, "count"));
                 return model;
             }
@@ -77,7 +77,7 @@ public class MediaVideoFolderController extends MediaFolderController {
 
         try (Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
+                MediaFolderModel model = mediaFolderModel.copy();
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
                 model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
                 return model;
@@ -88,17 +88,18 @@ public class MediaVideoFolderController extends MediaFolderController {
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
-    protected MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) throws IOException {
+    protected MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel) {
         String[] projectionClauses = new String[]{MediaStore.Video.Thumbnails.DATA,};
 
         try (Cursor c = queryVideoMiniThumbnail(context.getContentResolver(), mediaFolderModel.getCoverMediaId(), MediaStore.Images.Thumbnails.MINI_KIND, projectionClauses)) {
             if (c != null && c.moveToFirst()) {
-                MediaFolderModel model = MediaFolderModel.copy(mediaFolderModel);
+                MediaFolderModel model = mediaFolderModel.copy();
                 model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[0]));
                 return model;
+            } else {
+                return mediaFolderModel.copy();
             }
         }
-        throw new IOException();
     }
 
     private Cursor queryVideoMiniThumbnail(ContentResolver cr, long origId, int kind, String[] projection) {

@@ -22,14 +22,14 @@ public class MediaFolderModel extends RealmObject {
     private int count;
     private int coverMediaType; /* MediaStore.File.FileColumns.MEDIA_TYPE_? */
 
-    public static MediaFolderModel copy(MediaFolderModel model) {
+    public MediaFolderModel copy() {
         MediaFolderModel result = new MediaFolderModel();
-        result.setId(model.getId());
-        result.setCoverMediaId(model.getCoverMediaId());
-        result.setCoverThumbPath(model.getCoverThumbPath());
-        result.setName(model.getName());
-        result.setCount(model.getCount());
-        result.setCoverMediaType(model.getCoverMediaType());
+        result.setId(this.getId());
+        result.setCoverMediaId(this.getCoverMediaId());
+        result.setCoverThumbPath(this.getCoverThumbPath());
+        result.setName(this.getName());
+        result.setCount(this.getCount());
+        result.setCoverMediaType(this.getCoverMediaType());
         return result;
     }
 

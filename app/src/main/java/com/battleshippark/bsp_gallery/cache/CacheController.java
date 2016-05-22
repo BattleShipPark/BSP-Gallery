@@ -45,7 +45,7 @@ public class CacheController {
         if (query.count() != 0) {
             //noinspection Convert2streamapi
             for (MediaFolderModel model : foldersCacheModel.getFolderModels())
-                results.add(MediaFolderModel.copy(model));
+                results.add(model.copy());
         }
 
         realm.close();
