@@ -58,8 +58,4 @@ public class SharedPreferenceController {
         p.edit().putString(SharedPreferenceModel.KEY_MEDIA_MODE, mode.name()).apply();
         model.setMediaFilterMode(mode);
     }
-
-    private void sendEvent() {
-        EventBusHelper.eventBus.post(new Events.OnSharedPreferenceRead(model));
-    }
 }

@@ -97,16 +97,8 @@ public class FoldersActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void OnMediaDirectoryListUpdated(Events.OnMediaFolderListUpdated event) {
+    public void OnMediaFolderListUpdated(Events.OnMediaFolderListUpdated event) {
         Log.d("", "OnMediaFolderListUpdated(): " + event);
-
-        adapter.refresh();
-        progress.setVisibility(View.GONE);
-    }
-
-    @Subscribe
-    public void OnMediaModeUpdated(Events.OnMediaModeUpdated event) {
-        Log.d("", getClass().getSimpleName() + ".OnMediaModeUpdated()");
 
         TextView tv = (TextView) toolbar.findViewById(R.id.media);
         switch (model.getMediaFilterMode()) {
@@ -120,7 +112,9 @@ public class FoldersActivity extends AppCompatActivity {
                 tv.setText(R.string.media_mode_video);
                 break;
         }
+
         adapter.refresh();
+        progress.setVisibility(View.GONE);
     }
 
     private void initData() {
