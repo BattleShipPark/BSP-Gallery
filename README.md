@@ -1,17 +1,18 @@
 [![Build Status](https://travis-ci.org/BattleShipPark/BSP-Gallery.svg?branch=master)](https://travis-ci.org/BattleShipPark/BSP-Gallery)
 # BSP-Gallery
 
-This is a personal project for coding practice implementing android gallery with several libraries that I can't use in the company.<br>
-I focused on using libraries, not gallery itself.
+This is a personal project for coding practice implementing android gallery with several libraries<br>
 
 Libraries that I used are:
-- recyclerview
 - butterknife
+- glide
 - google analytics
-- otto
-- picasso
-- rxandroid
 - lombok
+- otto
+- parceler
+- recyclerview
+- rxandroid
+- rxpermissions
 
 You can download here: https://play.google.com/store/apps/details?id=com.battleshippark.bsp_gallery
 
