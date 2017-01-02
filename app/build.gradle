@@ -125,6 +125,9 @@ dependencies {
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.1@aar'
     compile 'io.reactivex:rxandroid:1.2.0'
     compile 'io.reactivex:rxjava:1.1.5'
-    compile 'org.parceler:parceler:1.1.4'
-    compile 'org.projectlombok:lombok:1.16.6'
+    compile 'org.parceler:parceler-api:1.1.6'
+    apt 'org.parceler:parceler:1.1.6'
+
+    provided 'org.projectlombok:lombok:1.16.12'
+    apt 'org.projectlombok:lombok:1.16.12'
 }
