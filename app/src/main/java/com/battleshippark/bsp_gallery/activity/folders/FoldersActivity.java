@@ -1,5 +1,7 @@
 package com.battleshippark.bsp_gallery.activity.folders;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +22,7 @@ import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceModel;
 import com.squareup.otto.Subscribe;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.concurrent.Executors;
 
@@ -46,6 +49,7 @@ public class FoldersActivity extends AppCompatActivity {
     private FoldersAdapter adapter;
     private FoldersItemDecoration decoration;
     private FoldersActivityModel model;
+    private RxPermissions rxPermissions;
 
 
     @Override
@@ -127,15 +131,24 @@ public class FoldersActivity extends AppCompatActivity {
 
         mediaController = new MediaController(this);
 
-        Executors.newSingleThreadExecutor().execute(() -> {
-            MediaFilterMode mode = SharedPreferenceController.instance()
-                    .readMediaMode();
-            model.setMediaFilterMode(mode);
-            mediaController.refreshFolderListAsync(model);
-            progress.setVisibility(View.VISIBLE);
+        rxPermissions = new RxPermissions(this);
+        rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .subscribe(granted -> {
+                    if (granted) {
+                        Executors.newSingleThreadExecutor().execute(() -> {
+                            MediaFilterMode mode = SharedPreferenceController.instance()
+                                    .readMediaMode();
+                            model.setMediaFilterMode(mode);
+                            mediaController.refreshFolderListAsync(model);
+                            progress.post(() -> progress.setVisibility(View.VISIBLE));
 
-            SharedPreferenceController.instance().writeMediaMode(mode);
-        });
+                            SharedPreferenceController.instance().writeMediaMode(mode);
+                        });
+                    } else {
+                        new AlertDialog.Builder(FoldersActivity.this)
+                                .setMessage("You should grant READ_EXTERNAL_STORAGE").show();
+                    }
+                });
     }
 
     private void initUI() {
