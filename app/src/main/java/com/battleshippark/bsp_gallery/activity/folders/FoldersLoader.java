@@ -2,9 +2,10 @@ package com.battleshippark.bsp_gallery.activity.folders;
 
 import com.battleshippark.bsp_gallery.Loader;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
-import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  */
@@ -25,10 +26,7 @@ class FoldersLoader implements Loader {
     @Override
     public void execute(Subscriber subscriber) {
         MediaFilterMode mode = mediaModeRepository.load();
-//        model.setMediaFilterMode(mode);
-        mediaRepository.loadFolderList(mode);
-//        mediaController.refreshFolderListAsync(model);
-
-        SharedPreferenceController.instance().writeMediaFilterMode(mode);
+        mediaRepository.loadFolderList(mode).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber);
     }
 }

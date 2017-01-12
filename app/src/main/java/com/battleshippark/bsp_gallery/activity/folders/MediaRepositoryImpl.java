@@ -23,32 +23,35 @@ class MediaRepositoryImpl implements MediaRepository {
 
     @Override
     public Observable<List<MediaFolderModel>> loadFolderList(MediaFilterMode mode) {
-//        MediaFolderController folderController = MediaFolderController.create(context, model.getMediaFilterMode());
         MediaFolderController folderController = mediaFactory.createFolderController(mode);
         CacheController cacheController = cacheFactory.createCacheController();
 
-/*        Subscriber<List<MediaFolderModel>> subscriber = new Subscriber<List<MediaFolderModel>>() {
-            @Override
-            public void onCompleted() {
-                writeCache(model);
-            }
+        return Observable.create(
+                _subscriber -> {
+                    List<MediaFolderModel> mediaFolderModels = null;
 
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
+                    mediaFolderModels = cacheController.readCache(mode);
+                    _subscriber.onNext(mediaFolderModels);
 
-            @Override
-            public void onNext(List<MediaFolderModel> mediaFolderModels) {
-                model.setMediaFolderModelList(mediaFolderModels);
-                eventBus.post(Events.OnMediaFolderListUpdated.EVENT);
-            }
-        };
+                    mediaFolderModels = folderController.queryMediaFolderList(mediaFolderModels);
+                    _subscriber.onNext(mediaFolderModels);
 
-        CacheController cacheController = new CacheController(context);
+                    mediaFolderModels = folderController.addMediaFileCount(mediaFolderModels);
+                    _subscriber.onNext(mediaFolderModels);
 
-        refreshFolderList(model.getMediaFilterMode(), folderController, cacheController,
-                subscriber, Schedulers.io(), AndroidSchedulers.mainThread());*/
-        return null;
+                    mediaFolderModels = folderController.addMediaFileId(mediaFolderModels);
+                    _subscriber.onNext(mediaFolderModels);
+
+                    mediaFolderModels = folderController.addMediaThumbPath(mediaFolderModels);
+                    _subscriber.onNext(mediaFolderModels);
+
+                    mediaFolderModels = folderController.addAllDirectory(mediaFolderModels);
+                    _subscriber.onNext(mediaFolderModels);
+
+                    cacheController.writeCache(mode, mediaFolderModels);
+
+                    _subscriber.onCompleted();
+                }
+        );
     }
 }

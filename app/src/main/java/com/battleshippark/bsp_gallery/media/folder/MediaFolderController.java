@@ -140,4 +140,37 @@ public abstract class MediaFolderController {
     }
 
     protected abstract MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel);
+
+    public List<MediaFolderModel> addAllDirectory(List<MediaFolderModel> directories) {
+        MediaFolderModel allDir = new MediaFolderModel();
+
+        allDir.setId(MediaFolderModel.ALL_DIR_ID);
+        allDir.setName("All");
+
+        if (directories.get(0).getId() == MediaFolderModel.ALL_DIR_ID)
+            directories.remove(0);
+
+        int count = Observable.from(directories)
+                .map(MediaFolderModel::getCount)
+                .reduce((_sum, _count) -> _sum + _count)
+                .toBlocking()
+                .last();
+        allDir.setCount(count);
+
+        MediaFolderModel dir = Observable.from(directories)
+                .reduce((_dir1, _dir2) -> {
+                    if (_dir1.getCoverMediaId() >= _dir2.getCoverMediaId())
+                        return _dir1;
+                    else
+                        return _dir2;
+                })
+                .toBlocking()
+                .last();
+        allDir.setCoverMediaId(dir.getCoverMediaId());
+        allDir.setCoverThumbPath(dir.getCoverThumbPath());
+        allDir.setCoverMediaType(dir.getCoverMediaType());
+
+        directories.add(0, allDir);
+        return directories;
+    }
 }
