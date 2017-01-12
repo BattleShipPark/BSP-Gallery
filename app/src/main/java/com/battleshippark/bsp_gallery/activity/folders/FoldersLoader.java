@@ -29,6 +29,6 @@ class FoldersLoader implements Loader {
         mediaRepository.loadFolderList(mode);
 //        mediaController.refreshFolderListAsync(model);
 
-        SharedPreferenceController.instance().writeMediaMode(mode);
+        SharedPreferenceController.instance().writeMediaFilterMode(mode);
     }
 }

@@ -44,7 +44,7 @@ public class SharedPreferenceController {
         return INSTANCE;
     }
 
-    public MediaFilterMode readMediaMode() {
+    public MediaFilterMode readMediaFilterMode() {
         if (model.getMediaFilterMode() == null) {
             SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
             model.setMediaFilterMode(MediaFilterMode.valueOf(
@@ -53,7 +53,7 @@ public class SharedPreferenceController {
         return model.getMediaFilterMode();
     }
 
-    public void writeMediaMode(MediaFilterMode mode) {
+    public void writeMediaFilterMode(MediaFilterMode mode) {
         SharedPreferences p = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
         p.edit().putString(SharedPreferenceModel.KEY_MEDIA_MODE, mode.name()).apply();
         model.setMediaFilterMode(mode);

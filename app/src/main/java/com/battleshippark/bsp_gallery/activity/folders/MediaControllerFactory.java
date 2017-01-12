@@ -5,20 +5,15 @@ import android.content.Context;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
 
+import lombok.AllArgsConstructor;
+
 /**
  */
-class FolderLoaderFactory {
+@AllArgsConstructor
+class MediaControllerFactory {
     private Context context;
 
-    FolderLoaderFactory(Context context) {
-        this.context = context;
-    }
-
-    static FolderLoaderFactory create(Context context) {
-        return new FolderLoaderFactory(context);
-    }
-
-    MediaFolderController createLoader(MediaFilterMode mode) {
+    MediaFolderController createFolderController(MediaFilterMode mode) {
         return null;
     }
 }
