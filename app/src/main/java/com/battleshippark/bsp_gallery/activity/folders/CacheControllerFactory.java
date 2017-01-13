@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 class CacheControllerFactory {
     private Context context;
 
-    CacheController createCacheController() {
+    CacheController create() {
         return new CacheController(context);
     }
 }

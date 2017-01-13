@@ -14,18 +14,20 @@ class FoldersPresenter {
     private final Loader foldersLoader;
     private FoldersView foldersView;
 
-    private FoldersPresenter(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository, MediaRepository mediaRepository) {
+    private FoldersPresenter(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
+                             MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
         this.foldersView = foldersView;
-        foldersLoader = FoldersLoader.create(mediaFilterModeRepository, mediaRepository);
+        foldersLoader = FoldersLoader.create(mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
+    }
+
+    public static FoldersPresenter create(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
+                                          MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
+        return new FoldersPresenter(foldersView, mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
     }
 
     void load() {
         foldersLoader.execute(new FoldersSubscriber());
         foldersView.showProgress();
-    }
-
-    public static FoldersPresenter create(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository, MediaRepository mediaRepository) {
-        return new FoldersPresenter(foldersView, mediaFilterModeRepository, mediaRepository);
     }
 
     private class FoldersSubscriber extends Subscriber<List<MediaFolderModel>> {

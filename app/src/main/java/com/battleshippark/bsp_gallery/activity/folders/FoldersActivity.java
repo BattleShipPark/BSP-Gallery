@@ -128,7 +128,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         decoration = new FoldersItemDecoration(model);
 
         presenter = FoldersPresenter.create(this, new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance()),
-                MediaRepositoryImpl.create(new MediaControllerFactory(this), new CacheControllerFactory(this)));
+                new MediaControllerFactory(this), new CacheControllerFactory(this));
         mediaController = new MediaController(this);
 
         rxPermissions = new RxPermissions(this);

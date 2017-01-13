@@ -24,7 +24,7 @@ class MediaRepositoryImpl implements MediaRepository {
     @Override
     public Observable<List<MediaFolderModel>> loadFolderList(MediaFilterMode mode) {
         MediaFolderController folderController = mediaFactory.createFolderController(mode);
-        CacheController cacheController = cacheFactory.createCacheController();
+        CacheController cacheController = cacheFactory.create();
 
         return Observable.create(
                 _subscriber -> {
