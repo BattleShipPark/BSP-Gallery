@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.data.media;
+package com.battleshippark.bsp_gallery.data.mode;
 
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;

@@ -1,8 +1,8 @@
 package com.battleshippark.bsp_gallery.presentation.folders;
 
-import com.battleshippark.bsp_gallery.Loader;
+import com.battleshippark.bsp_gallery.domain.Loader;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
-import com.battleshippark.bsp_gallery.data.media.MediaFilterModeRepository;
+import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.folders.FoldersLoader;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -18,15 +18,10 @@ class FoldersPresenter {
     private final Loader foldersLoader;
     private FoldersView foldersView;
 
-    private FoldersPresenter(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
+    FoldersPresenter(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
                              MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
         this.foldersView = foldersView;
         foldersLoader = FoldersLoader.create(mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
-    }
-
-    public static FoldersPresenter create(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
-                                          MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
-        return new FoldersPresenter(foldersView, mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
     }
 
     void load() {

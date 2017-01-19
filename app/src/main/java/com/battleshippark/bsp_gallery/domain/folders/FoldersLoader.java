@@ -1,9 +1,9 @@
 package com.battleshippark.bsp_gallery.domain.folders;
 
-import com.battleshippark.bsp_gallery.Loader;
+import com.battleshippark.bsp_gallery.domain.Loader;
 import com.battleshippark.bsp_gallery.data.cache.CacheController;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
-import com.battleshippark.bsp_gallery.data.media.MediaFilterModeRepository;
+import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;

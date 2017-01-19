@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery;
+package com.battleshippark.bsp_gallery.domain;
 
 import rx.Subscriber;
 
