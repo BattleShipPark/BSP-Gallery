@@ -56,7 +56,7 @@ public class MediaController {
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
     public void refreshFolderListAsync(FoldersActivityModel model) {
-        MediaFolderController folderController = MediaFolderController.create(context, model.getMediaFilterMode());
+        MediaFolderController folderController = new MediaFolderController(model.getMediaFilterMode());
 
         Subscriber<List<MediaFolderModel>> subscriber = new Subscriber<List<MediaFolderModel>>() {
             @Override

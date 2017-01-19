@@ -2,7 +2,7 @@ package com.battleshippark.bsp_gallery.media.folder;
 
 import android.content.Context;
 
-import com.battleshippark.bsp_gallery.media.MediaFilterMode;
+import com.battleshippark.bsp_gallery.activity.folders.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
@@ -12,30 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
 import rx.Observable;
 import rx.Subscriber;
 
 /**
  */
+@AllArgsConstructor
 public abstract class MediaFolderController {
-    final Context context;
-
-    public MediaFolderController(Context context) {
-        this.context = context;
-    }
-
-    public static MediaFolderController create(Context context, MediaFilterMode mediaFilterMode) {
-        switch (mediaFilterMode) {
-            case ALL:
-                return new MediaAllFolderController(context);
-            case IMAGE:
-                return new MediaImageFolderController(context);
-            case VIDEO:
-                return new MediaVideoFolderController(context);
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
+    private final MediaFolderRepository mediaRepository;
 
     /**
      * 폴더 구조를 가져온다. mediaFolderModels 파라미터가 All 폴더를 가지고 있을 수 있고,
@@ -51,24 +36,9 @@ public abstract class MediaFolderController {
             }
         }
 
-        Observable.create((Observable.OnSubscribe<MediaFolderModel>) subscriber -> {
-            queryMediaFolderAndOnNext(subscriber);
-            subscriber.onCompleted();
-        }).subscribe(new Subscriber<MediaFolderModel>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(MediaFolderModel mediaFolderModel) {
-                if (!map.containsKey(mediaFolderModel.getId()))
-                    map.put(mediaFolderModel.getId(), mediaFolderModel);
-            }
+        mediaRepository.queryFolderList().subscribe(mediaFolderModel -> {
+            if (!map.containsKey(mediaFolderModel.getId()))
+                map.put(mediaFolderModel.getId(), mediaFolderModel);
         });
 
         List<MediaFolderModel> result = new ArrayList<>(map.values());

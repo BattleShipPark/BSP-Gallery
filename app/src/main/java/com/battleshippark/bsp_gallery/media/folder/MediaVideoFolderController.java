@@ -9,6 +9,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
+import com.battleshippark.bsp_gallery.activity.folders.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
@@ -19,9 +20,10 @@ import rx.Subscriber;
  */
 public class MediaVideoFolderController extends MediaFolderController {
     private Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+    private Context context;
 
-    public MediaVideoFolderController(Context context) {
-        super(context);
+    public MediaVideoFolderController(MediaFolderRepository repository) {
+        super(repository);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
