@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.presentation.folders;
+package com.battleshippark.bsp_gallery.data.media;
 
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
  */
 
 @AllArgsConstructor
-class MediaFilterModeRepositoryImpl implements MediaFilterModeRepository {
+public class MediaFilterModeRepositoryImpl implements MediaFilterModeRepository {
     private SharedPreferenceController pref;
 
     @Override

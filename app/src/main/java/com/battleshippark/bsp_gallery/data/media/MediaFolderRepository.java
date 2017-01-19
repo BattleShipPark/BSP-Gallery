@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.presentation.folders;
+package com.battleshippark.bsp_gallery.data.media;
 
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 

@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.presentation.folders;
+package com.battleshippark.bsp_gallery.data.media;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -8,17 +8,15 @@ import android.provider.MediaStore;
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
+import lombok.AllArgsConstructor;
 import rx.Observable;
 
 /**
  */
-class MediaImageFolderRepository implements MediaFolderRepository {
+@AllArgsConstructor
+public class MediaImageFolderRepository implements MediaFolderRepository {
     private final static Uri uri = MediaStore.Files.getContentUri("external");
     private Context context;
-
-    MediaImageFolderRepository(Context context) {
-        this.context = context;
-    }
 
     @Override
     public Observable<MediaFolderModel> queryFolderList() {

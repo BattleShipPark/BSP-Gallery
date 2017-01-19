@@ -1,32 +1,42 @@
-package com.battleshippark.bsp_gallery.presentation.folders;
+package com.battleshippark.bsp_gallery.domain.folders;
 
-import com.battleshippark.bsp_gallery.cache.CacheController;
+import com.battleshippark.bsp_gallery.Loader;
+import com.battleshippark.bsp_gallery.data.cache.CacheController;
+import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
+import com.battleshippark.bsp_gallery.data.media.MediaFilterModeRepository;
+import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
-import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
 
 import java.util.List;
 
 import lombok.AllArgsConstructor;
 import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  */
+
 @AllArgsConstructor
-class MediaRepositoryImpl implements MediaRepository {
+public class FoldersLoader implements Loader {
+    private MediaFilterModeRepository mediaFilterModeRepository;
     private MediaControllerFactory mediaFactory;
     private CacheControllerFactory cacheFactory;
 
-    static MediaRepositoryImpl create(MediaControllerFactory mediaFactory, CacheControllerFactory cacheFactory) {
-        return new MediaRepositoryImpl(mediaFactory, cacheFactory);
+    public static Loader create(MediaFilterModeRepository mediaFilterModeRepository,
+                                MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
+        return new FoldersLoader(mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
     }
 
     @Override
-    public Observable<List<MediaFolderModel>> loadFolderList(MediaFilterMode mode) {
+    public void execute(Subscriber subscriber) {
+        MediaFilterMode mode = mediaFilterModeRepository.load();
         MediaFolderController folderController = mediaFactory.createFolderController(mode);
         CacheController cacheController = cacheFactory.create();
 
-        return Observable.create(
+        Observable.create(
                 _subscriber -> {
                     List<MediaFolderModel> mediaFolderModels = null;
 
@@ -52,6 +62,6 @@ class MediaRepositoryImpl implements MediaRepository {
 
                     _subscriber.onCompleted();
                 }
-        );
+        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
     }
 }

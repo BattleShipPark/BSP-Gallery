@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.cache;
+package com.battleshippark.bsp_gallery.data.cache;
 
 import android.content.Context;
 

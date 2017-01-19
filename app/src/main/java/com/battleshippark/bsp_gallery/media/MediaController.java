@@ -12,9 +12,9 @@ import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
 import com.battleshippark.bsp_gallery.presentation.folders.FoldersActivityModel;
-import com.battleshippark.bsp_gallery.cache.CacheController;
+import com.battleshippark.bsp_gallery.data.cache.CacheController;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
-import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
+import com.battleshippark.bsp_gallery.domain.folders.MediaFolderController;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class MediaController {
      * 전체 쿼리 앞뒤로 캐시 작업이 있다
      */
     public void refreshFolderListAsync(FoldersActivityModel model) {
-        MediaFolderController folderController = new MediaFolderController(model.getMediaFilterMode());
+        MediaFolderController folderController = null; //new MediaFolderController(model.getMediaFilterMode());
 
         Subscriber<List<MediaFolderModel>> subscriber = new Subscriber<List<MediaFolderModel>>() {
             @Override

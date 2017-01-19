@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.media.folder;
+package com.battleshippark.bsp_gallery.domain.folders;
 
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -10,7 +10,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
-import com.battleshippark.bsp_gallery.presentation.folders.MediaFolderRepository;
+import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;

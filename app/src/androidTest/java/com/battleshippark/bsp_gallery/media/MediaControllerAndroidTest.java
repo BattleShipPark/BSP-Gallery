@@ -1,8 +1,8 @@
 package com.battleshippark.bsp_gallery.media;
 
 import com.battleshippark.bsp_gallery.Events;
-import com.battleshippark.bsp_gallery.cache.CacheController;
-import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
+import com.battleshippark.bsp_gallery.data.cache.CacheController;
+import com.battleshippark.bsp_gallery.domain.folders.MediaFolderController;
 import com.squareup.otto.Bus;
 
 import org.junit.Before;
