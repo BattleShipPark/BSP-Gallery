@@ -11,7 +11,7 @@ import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
+import com.battleshippark.bsp_gallery.presentation.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.cache.CacheController;
 import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.battleshippark.bsp_gallery.media.folder.MediaFolderController;
@@ -31,8 +31,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 /**
  */

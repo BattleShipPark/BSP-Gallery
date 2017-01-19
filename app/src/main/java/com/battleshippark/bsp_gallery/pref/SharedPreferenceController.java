@@ -3,20 +3,10 @@ package com.battleshippark.bsp_gallery.pref;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.MainThread;
-import android.util.Log;
 
 import com.battleshippark.bsp_gallery.EventBusHelper;
-import com.battleshippark.bsp_gallery.Events;
-import com.battleshippark.bsp_gallery.activity.folders.FoldersActivityModel;
+import com.battleshippark.bsp_gallery.presentation.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
-import com.squareup.otto.Subscribe;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import rx.Observable;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  */

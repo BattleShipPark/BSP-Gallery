@@ -9,7 +9,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 
 import com.battleshippark.bsp_gallery.CursorUtils;
-import com.battleshippark.bsp_gallery.activity.folders.MediaFolderRepository;
+import com.battleshippark.bsp_gallery.presentation.folders.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;

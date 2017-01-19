@@ -1,8 +1,6 @@
 package com.battleshippark.bsp_gallery.media.folder;
 
-import android.content.Context;
-
-import com.battleshippark.bsp_gallery.activity.folders.MediaFolderRepository;
+import com.battleshippark.bsp_gallery.presentation.folders.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
