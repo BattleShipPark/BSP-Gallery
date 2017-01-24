@@ -12,12 +12,11 @@ import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import rx.Observable;
-import rx.Subscriber;
 
 /**
  */
 @AllArgsConstructor
-public abstract class MediaFolderController {
+public class MediaFolderController {
     private final MediaFolderRepository mediaRepository;
 
     /**
@@ -26,7 +25,7 @@ public abstract class MediaFolderController {
      *
      * @return ID와 이름만 유효하다
      */
-    public List<MediaFolderModel> queryMediaFolderList(List<MediaFolderModel> mediaFolderModels) {
+    public List<MediaFolderModel> addList(List<MediaFolderModel> mediaFolderModels) {
         Map<Integer, MediaFolderModel> map = new HashMap<>();
         if (!mediaFolderModels.isEmpty()) {
             for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
@@ -34,7 +33,7 @@ public abstract class MediaFolderController {
             }
         }
 
-        mediaRepository.queryFolderList().subscribe(mediaFolderModel -> {
+        mediaRepository.queryList().subscribe(mediaFolderModel -> {
             if (!map.containsKey(mediaFolderModel.getId()))
                 map.put(mediaFolderModel.getId(), mediaFolderModel);
         });
@@ -50,8 +49,6 @@ public abstract class MediaFolderController {
 
     }
 
-    protected abstract void queryMediaFolderAndOnNext(Subscriber<? super MediaFolderModel> subscriber);
-
     interface IOExceptionFunc1<T1, R> {
         R call(T1 t1) throws IOException;
     }
@@ -59,8 +56,25 @@ public abstract class MediaFolderController {
     /**
      * 디렉토리에 파일 갯수를 추가한다
      */
-    public List<MediaFolderModel> addMediaFileCount(List<MediaFolderModel> mediaFolderModels) {
-        return callAndMergeWithAll(mediaFolderModels, this::queryMediaFileCount);
+    public List<MediaFolderModel> addFileCount(List<MediaFolderModel> mediaFolderModels) {
+        List<MediaFolderModel> result = new ArrayList<>();
+
+        for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
+            if (mediaFolderModel.getId() == MediaFolderModel.ALL_DIR_ID) {
+                result.add(mediaFolderModel.copy());
+                continue;
+            }
+
+            MediaFolderModel newMediaFolderModel = mediaFolderModel.copy();
+            try {
+                newMediaFolderModel.setCount(mediaRepository.queryFileCount(mediaFolderModel.getId()));
+                result.add(newMediaFolderModel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -89,25 +103,31 @@ public abstract class MediaFolderController {
         return result;
     }
 
-    protected abstract MediaFolderModel queryMediaFileCount(MediaFolderModel mediaFolderModel) throws IOException;
-
     /**
      * 디렉토리에 가장 최근 파일의 ID를 추가한다
      */
-    public List<MediaFolderModel> addMediaFileId(List<MediaFolderModel> mediaFolderModels) {
-        return callAndMergeWithAll(mediaFolderModels, this::queryMediaFileId);
+    public List<MediaFolderModel> addCoverFile(List<MediaFolderModel> mediaFolderModels) {
+        List<MediaFolderModel> result = new ArrayList<>();
+
+        for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
+            if (mediaFolderModel.getId() == MediaFolderModel.ALL_DIR_ID) {
+                result.add(mediaFolderModel.copy());
+                continue;
+            }
+
+            MediaFolderModel newMediaFolderModel = mediaFolderModel.copy();
+            try {
+                MediaFolderModel folderModel = mediaRepository.queryCoverFile(mediaFolderModel.getId());
+                newMediaFolderModel.setCoverMediaId(folderModel.getCoverMediaId());
+                newMediaFolderModel.setCoverMediaType(folderModel.getCoverMediaType());
+                result.add(newMediaFolderModel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return result;
     }
-
-    protected abstract MediaFolderModel queryMediaFileId(MediaFolderModel mediaFolderModel) throws IOException;
-
-    /**
-     * 디렉토리에 가장 최근 파일의 손톱 이미지 경로를 추가한다
-     */
-    public List<MediaFolderModel> addMediaThumbPath(List<MediaFolderModel> mediaFolderModels) {
-        return callAndMergeWithAll(mediaFolderModels, this::queryMediaThumbPath);
-    }
-
-    protected abstract MediaFolderModel queryMediaThumbPath(MediaFolderModel mediaFolderModel);
 
     public List<MediaFolderModel> addAllDirectory(List<MediaFolderModel> directories) {
         MediaFolderModel allDir = new MediaFolderModel();

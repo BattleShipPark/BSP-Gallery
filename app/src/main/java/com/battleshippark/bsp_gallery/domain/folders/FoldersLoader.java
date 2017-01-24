@@ -43,16 +43,13 @@ public class FoldersLoader implements Loader {
                     mediaFolderModels = cacheController.readCache(mode);
                     _subscriber.onNext(mediaFolderModels);
 
-                    mediaFolderModels = folderController.queryMediaFolderList(mediaFolderModels);
+                    mediaFolderModels = folderController.addList(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
 
-                    mediaFolderModels = folderController.addMediaFileCount(mediaFolderModels);
+                    mediaFolderModels = folderController.addFileCount(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
 
-                    mediaFolderModels = folderController.addMediaFileId(mediaFolderModels);
-                    _subscriber.onNext(mediaFolderModels);
-
-                    mediaFolderModels = folderController.addMediaThumbPath(mediaFolderModels);
+                    mediaFolderModels = folderController.addCoverFile(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
 
                     mediaFolderModels = folderController.addAllDirectory(mediaFolderModels);

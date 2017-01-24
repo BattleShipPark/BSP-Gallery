@@ -8,6 +8,8 @@ import android.provider.MediaStore;
 import com.battleshippark.bsp_gallery.CursorUtils;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
+import java.io.IOException;
+
 import lombok.AllArgsConstructor;
 import rx.Observable;
 
@@ -19,7 +21,7 @@ public class MediaVideoFolderRepository implements MediaFolderRepository {
     private Context context;
 
     @Override
-    public Observable<MediaFolderModel> queryFolderList() {
+    public Observable<MediaFolderModel> queryList() {
         return Observable.create(subscriber -> {
             String[] columns = new String[]{
                     MediaStore.Images.ImageColumns.BUCKET_ID,
@@ -55,5 +57,49 @@ public class MediaVideoFolderRepository implements MediaFolderRepository {
                 }
             }
         });
+    }
+
+    @Override
+    public int queryFileCount(int folderId) throws IOException {
+        String[] countClauses = new String[]{"count(*) AS count"};
+
+        String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
+        String[] selectionArgs = new String[]{String.valueOf(folderId)};
+
+        Cursor c = context.getContentResolver().query(uri, countClauses, selectionClause, selectionArgs, null);
+        try {
+            if (c != null && c.moveToFirst()) {
+                return CursorUtils.getInt(c, "count");
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        throw new IOException();
+    }
+
+    @Override
+    public MediaFolderModel queryCoverFile(int folderId) throws IOException {
+        String[] projectionClauses = new String[]{MediaStore.Video.Media._ID};
+        String orderClause = MediaStore.Video.Media._ID + " desc";
+
+        String selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
+        String[] selectionArgs = new String[]{String.valueOf(folderId)};
+
+        Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause);
+        try {
+            if (c != null && c.moveToFirst()) {
+                MediaFolderModel model = new MediaFolderModel();
+                model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
+                model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO);
+                return model;
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        throw new IOException();
     }
 }

@@ -96,13 +96,11 @@ public class MediaController {
 
                     mediaFolderModels = MediaController.this.readCache(cacheController, _subscriber, mediaFilterMode);
 
-                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::queryMediaFolderList);
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addList);
 
-                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaFileCount);
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addFileCount);
 
-                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaFileId);
-
-                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addMediaThumbPath);
+                    mediaFolderModels = getFoldersAndOnNext(mediaFolderModels, _subscriber, folderController::addCoverFile);
 
                     mediaFolderModels = MediaController.this.addAllDirectory(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
