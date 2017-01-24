@@ -132,11 +132,11 @@ public class FilesActivity extends AppCompatActivity {
         toolbarProgress.setVisibility(View.GONE);
     }
 
-    public static Intent createIntent(Context context, FoldersActivityModel foldersActivityModel, MediaFolderModel mediaFolderModel) {
+    public static Intent createIntent(Context context, MediaFilterMode filterMode, MediaFolderModel mediaFolderModel) {
         Intent i = new Intent(context, FilesActivity.class);
         i.putExtra(KEY_FOLDER_ID, mediaFolderModel.getId());
         i.putExtra(KEY_FOLDER_NAME, mediaFolderModel.getName());
-        i.putExtra(KEY_MEDIA_MODE, foldersActivityModel.getMediaFilterMode().name());
+        i.putExtra(KEY_MEDIA_MODE, filterMode.name());
 
         return i;
     }

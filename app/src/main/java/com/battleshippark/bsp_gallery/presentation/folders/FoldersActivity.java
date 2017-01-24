@@ -22,9 +22,12 @@ import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
+import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
 import com.squareup.otto.Subscribe;
 import com.tbruyelle.rxpermissions.RxPermissions;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -118,7 +121,8 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
                 break;
         }
 
-        adapter.refresh();
+        adapter.setFilterMode(model.getMediaFilterMode());
+        adapter.notifyDataSetChanged();
         progress.setVisibility(View.GONE);
     }
 
@@ -127,7 +131,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
 
         model = new FoldersActivityModel();
 
-        adapter = new FoldersAdapter(this, model);
+        adapter = new FoldersAdapter(this);
         decoration = new FoldersItemDecoration(model);
 
         presenter = new FoldersPresenter(this, new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance()),
@@ -180,5 +184,16 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
     @Override
     public void showProgress() {
         progress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progress.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void refreshList(List<MediaFolderModel> mediaFolderModels) {
+        adapter.setItems(mediaFolderModels);
+        adapter.notifyDataSetChanged();
     }
 }

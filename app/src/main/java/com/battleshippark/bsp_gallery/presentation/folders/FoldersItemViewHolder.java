@@ -9,10 +9,12 @@ import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.activity.files.FilesActivity;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -20,10 +22,7 @@ import butterknife.OnClick;
 
 /**
  */
-public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
-    private final Context context;
-    private final FoldersActivityModel foldersActivityModel;
-
+class FoldersItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.image)
     ImageView coverImageView;
 
@@ -36,22 +35,24 @@ public class FoldersItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.count)
     TextView countTextView;
 
+    private final Context context;
+    private final MediaFilterMode filterMode;
     private MediaFolderModel model;
 
-    public FoldersItemViewHolder(Context context, View view, FoldersActivityModel foldersActivityModel) {
+    FoldersItemViewHolder(Context context, View view, MediaFilterMode filterMode) {
         super(view);
         this.context = context;
-        this.foldersActivityModel = foldersActivityModel;
+        this.filterMode = filterMode;
 
         ButterKnife.bind(this, view);
     }
 
     @OnClick(R.id.root)
-    public void onClick() {
-        context.startActivity(FilesActivity.createIntent(context, foldersActivityModel, model));
+    void onClick() {
+        context.startActivity(FilesActivity.createIntent(context, filterMode, model));
     }
 
-    public void setModel(MediaFolderModel model) {
+    public void bind(MediaFolderModel model) {
         this.model = model;
 
         if (model.getCoverThumbPath() == null) {

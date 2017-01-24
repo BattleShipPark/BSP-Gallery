@@ -19,7 +19,7 @@ class FoldersPresenter {
     private FoldersView foldersView;
 
     FoldersPresenter(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
-                             MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
+                     MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
         this.foldersView = foldersView;
         foldersLoader = FoldersLoader.create(mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
     }
@@ -32,17 +32,17 @@ class FoldersPresenter {
     private class FoldersSubscriber extends Subscriber<List<MediaFolderModel>> {
         @Override
         public void onCompleted() {
-
+            foldersView.hideProgress();
         }
 
         @Override
         public void onError(Throwable e) {
-
+            foldersView.hideProgress();
         }
 
         @Override
         public void onNext(List<MediaFolderModel> mediaFolderModels) {
-
+            foldersView.refreshList(mediaFolderModels);
         }
     }
 }
