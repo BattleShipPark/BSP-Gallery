@@ -74,7 +74,7 @@ public class MediaController {
             }
         };
 
-        CacheController cacheController = new CacheController(context);
+        CacheController cacheController = new CacheController();
 
         refreshFolderList(model.getMediaFilterMode(), folderController, cacheController,
                 subscriber, Schedulers.io(), AndroidSchedulers.mainThread());
@@ -82,7 +82,7 @@ public class MediaController {
 
     private void writeCache(FoldersActivityModel model) {
         Executors.newSingleThreadExecutor().execute(() ->
-                new CacheController(context).writeCache(model.getMediaFilterMode(),
+                new CacheController().writeCache(model.getMediaFilterMode(),
                         model.getMediaFolderModelList()));
     }
 

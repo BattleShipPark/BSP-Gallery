@@ -1,16 +1,13 @@
 package com.battleshippark.bsp_gallery.data.cache;
 
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.battleshippark.bsp_gallery.BlankActivity;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -21,14 +18,11 @@ import java.util.List;
  */
 @RunWith(AndroidJUnit4.class)
 public class CacheControllerTest {
-    @Rule
-    public ActivityTestRule<BlankActivity> rule = new ActivityTestRule<>(BlankActivity.class);
-
     private CacheController controller;
 
     @Before
     public void setUp() {
-        controller = new CacheController(rule.getActivity());
+        controller = new CacheController();
         controller.clear();
     }
 
