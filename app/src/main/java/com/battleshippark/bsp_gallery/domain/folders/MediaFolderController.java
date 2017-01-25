@@ -1,21 +1,13 @@
 package com.battleshippark.bsp_gallery.domain.folders;
 
-import android.annotation.SuppressLint;
-import android.util.ArraySet;
-
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.BiFunction;
-import com.annimon.stream.function.Function;
 import com.annimon.stream.function.UnaryOperator;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,29 +28,26 @@ public class MediaFolderController {
      * @return ID와 이름만 유효하다
      */
     public List<MediaFolderModel> addList(List<MediaFolderModel> cachedModels) {
-        Set<Integer> idSet = Stream.of(cachedModels)
+        Set<Integer> cachedIdSet = Stream.of(cachedModels)
                 .map(MediaFolderModel::getId)
                 .collect(Collectors.toSet());
 
         Map<Integer, MediaFolderModel> cachedMap = Stream.of(cachedModels)
                 .collect(Collectors.toMap(MediaFolderModel::getId, UnaryOperator.Util.identity()));
 
-        @SuppressLint("UseSparseArrays") Map<Integer, MediaFolderModel> queriedMap = new HashMap<>();
-        mediaRepository.queryList().subscribe(mediaFolderModel -> {
-            queriedMap.put(mediaFolderModel.getId(), mediaFolderModel);
-            idSet.add(mediaFolderModel.getId());
-        }, Throwable::printStackTrace);
+        List<MediaFolderModel> queriedModels = new ArrayList<>();
+        mediaRepository.queryList().subscribe(queriedModels::add, Throwable::printStackTrace);
 
-        return Stream.of(idSet).filter(id -> queriedMap.containsKey(id) || cachedMap.containsKey(id))
-                .map(id -> {
-                    if (queriedMap.containsKey(id)) {
-                        return queriedMap.get(id);
-                    }
-                    if (cachedMap.containsKey(id)) {
-                        return cachedMap.get(id);
-                    }
-                    throw new IllegalArgumentException();
-                }).sorted((lhs, rhs) -> {
+        Set<Integer> queriedIdSet = Stream.of(queriedModels)
+                .map(MediaFolderModel::getId)
+                .collect(Collectors.toSet());
+
+        cachedIdSet.removeAll(queriedIdSet);
+
+        Stream.of(cachedIdSet).map(cachedMap::get).forEach(queriedModels::add);
+
+        return Stream.of(queriedModels)
+                .sorted((lhs, rhs) -> {
                     if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
                     if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
                     return lhs.getId() - rhs.getId();
