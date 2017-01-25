@@ -36,7 +36,7 @@ public class MediaAllFileController extends MediaFileController {
                 MediaStore.Files.FileColumns.DATA
         };
 
-        if (dirId == MediaFolderModel.ALL_DIR_ID) {
+        if (dirId == MediaFolderModel.ALL_FOLDER_ID) {
             selectionClause = String.format("%s = ? OR %s = ?",
                     MediaStore.Files.FileColumns.MEDIA_TYPE,
                     MediaStore.Files.FileColumns.MEDIA_TYPE
@@ -49,7 +49,7 @@ public class MediaAllFileController extends MediaFileController {
             );
         }
 
-        if (dirId == MediaFolderModel.ALL_DIR_ID) {
+        if (dirId == MediaFolderModel.ALL_FOLDER_ID) {
             selectionArgs = new String[]{
                     String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
                     String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),

@@ -146,4 +146,20 @@ public class MediaFolderControllerTest {
         assertThat(result.get(1).getCoverMediaId()).isEqualTo(20);
         assertThat(result.get(1).getCoverMediaType()).isEqualTo(30);
     }
+
+    @Test
+    public void addAllFolder() throws Exception {
+        MediaFolderController controller = new MediaFolderController(null);
+        List<MediaFolderModel> models = Arrays.asList(
+                new MediaFolderModel(0, 1, 2, "path0", "name0", 4),
+                new MediaFolderModel(1, 2, 3, "path1", "name1", 4),
+                new MediaFolderModel(2, 3, 4, "path2", "name2", 5));
+
+        List<MediaFolderModel> result = controller.addAllFolder(models);
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0).getId()).isEqualTo(0);
+        assertThat(result.get(0).getCount()).isEqualTo(9);
+        assertThat(result.get(0).getCoverMediaId()).isEqualTo(3);
+        assertThat(result.get(0).getCoverMediaType()).isEqualTo(4);
+    }
 }

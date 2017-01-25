@@ -34,11 +34,11 @@ public class MediaImageFileController extends MediaFileController {
                 MediaStore.Images.ImageColumns.DATA
         };
 
-        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+        if (dirId != MediaFolderModel.ALL_FOLDER_ID) {
             selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
         }
 
-        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+        if (dirId != MediaFolderModel.ALL_FOLDER_ID) {
             selectionArgs = new String[]{String.valueOf(dirId),};
         }
 
@@ -55,7 +55,7 @@ public class MediaImageFileController extends MediaFileController {
 
         String selectionClause = null;
         String[] selectionArgs = null;
-        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+        if (dirId != MediaFolderModel.ALL_FOLDER_ID) {
             selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
             selectionArgs = new String[]{String.valueOf(dirId)};
         }

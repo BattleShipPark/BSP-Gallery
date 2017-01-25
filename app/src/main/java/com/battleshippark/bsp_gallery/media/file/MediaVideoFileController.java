@@ -35,7 +35,7 @@ public class MediaVideoFileController extends MediaFileController {
                 MediaStore.Video.VideoColumns.DATA
         };
 
-        if (dirId != MediaFolderModel.ALL_DIR_ID) {
+        if (dirId != MediaFolderModel.ALL_FOLDER_ID) {
             selectionClause = String.format("%s = ?", MediaStore.Video.VideoColumns.BUCKET_ID);
             selectionArgs = new String[]{String.valueOf(dirId)};
         }

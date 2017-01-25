@@ -2,12 +2,14 @@ package com.battleshippark.bsp_gallery.domain.folders;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.UnaryOperator;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,8 +50,8 @@ public class MediaFolderController {
 
         return Stream.of(queriedModels)
                 .sorted((lhs, rhs) -> {
-                    if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
-                    if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
+                    if (lhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return -1;
+                    if (rhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return 1;
                     return lhs.getId() - rhs.getId();
                 }).collect(Collectors.toList());
     }
@@ -61,7 +63,7 @@ public class MediaFolderController {
         List<MediaFolderModel> result = new ArrayList<>();
 
         for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
-            if (mediaFolderModel.getId() == MediaFolderModel.ALL_DIR_ID) {
+            if (mediaFolderModel.getId() == MediaFolderModel.ALL_FOLDER_ID) {
                 result.add(mediaFolderModel.copy());
                 continue;
             }
@@ -85,7 +87,7 @@ public class MediaFolderController {
         List<MediaFolderModel> result = new ArrayList<>();
 
         for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
-            if (mediaFolderModel.getId() == MediaFolderModel.ALL_DIR_ID) {
+            if (mediaFolderModel.getId() == MediaFolderModel.ALL_FOLDER_ID) {
                 result.add(mediaFolderModel.copy());
                 continue;
             }
@@ -104,36 +106,28 @@ public class MediaFolderController {
         return result;
     }
 
-    public List<MediaFolderModel> addAllDirectory(List<MediaFolderModel> directories) {
-        MediaFolderModel allDir = new MediaFolderModel();
+    public List<MediaFolderModel> addAllFolder(List<MediaFolderModel> folders) {
+        List<MediaFolderModel> result = new ArrayList<>(folders);
+        if (result.get(0).getId() == MediaFolderModel.ALL_FOLDER_ID)
+            result.remove(0);
 
-        allDir.setId(MediaFolderModel.ALL_DIR_ID);
-        allDir.setName("All");
+        MediaFolderModel allFolder = new MediaFolderModel();
+        allFolder.setId(MediaFolderModel.ALL_FOLDER_ID);
+        allFolder.setName("All");
 
-        if (directories.get(0).getId() == MediaFolderModel.ALL_DIR_ID)
-            directories.remove(0);
+        int count = Stream.of(result)
+                .mapToInt(MediaFolderModel::getCount)
+                .sum();
+        allFolder.setCount(count);
 
-        int count = Observable.from(directories)
-                .map(MediaFolderModel::getCount)
-                .reduce((_sum, _count) -> _sum + _count)
-                .toBlocking()
-                .last();
-        allDir.setCount(count);
+        MediaFolderModel coverFolder = Stream.of(folders)
+                .max((_folder1, _folder2) -> (int) (_folder1.getCoverMediaId() - _folder2.getCoverMediaId())
+                ).get();
+        allFolder.setCoverMediaId(coverFolder.getCoverMediaId());
+        allFolder.setCoverThumbPath(coverFolder.getCoverThumbPath());
+        allFolder.setCoverMediaType(coverFolder.getCoverMediaType());
 
-        MediaFolderModel dir = Observable.from(directories)
-                .reduce((_dir1, _dir2) -> {
-                    if (_dir1.getCoverMediaId() >= _dir2.getCoverMediaId())
-                        return _dir1;
-                    else
-                        return _dir2;
-                })
-                .toBlocking()
-                .last();
-        allDir.setCoverMediaId(dir.getCoverMediaId());
-        allDir.setCoverThumbPath(dir.getCoverThumbPath());
-        allDir.setCoverMediaType(dir.getCoverMediaType());
-
-        directories.add(0, allDir);
-        return directories;
+        result.add(0, allFolder);
+        return result;
     }
 }

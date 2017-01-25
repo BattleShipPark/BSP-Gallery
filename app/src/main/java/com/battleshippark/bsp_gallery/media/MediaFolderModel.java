@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class MediaFolderModel extends RealmObject {
-    public static final int ALL_DIR_ID = 0;
+    public static final int ALL_FOLDER_ID = 0;
 
     private int id;
     private long coverMediaId;

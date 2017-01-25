@@ -236,8 +236,8 @@ public class MediaController {
         }
 
         Collections.sort(result, (lhs, rhs) -> {
-            if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
-            if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
+            if (lhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return 1;
+            if (rhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return -1;
             return lhs.getId() - rhs.getId();
         });
 
@@ -259,10 +259,10 @@ public class MediaController {
     List<MediaFolderModel> addAllDirectory(List<MediaFolderModel> directories) {
         MediaFolderModel allDir = new MediaFolderModel();
 
-        allDir.setId(MediaFolderModel.ALL_DIR_ID);
+        allDir.setId(MediaFolderModel.ALL_FOLDER_ID);
         allDir.setName("All");
 
-        if (directories.get(0).getId() == MediaFolderModel.ALL_DIR_ID)
+        if (directories.get(0).getId() == MediaFolderModel.ALL_FOLDER_ID)
             directories.remove(0);
 
         int count = Observable.from(directories)

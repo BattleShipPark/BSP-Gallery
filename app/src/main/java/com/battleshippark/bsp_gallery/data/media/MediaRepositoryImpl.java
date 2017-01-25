@@ -44,7 +44,7 @@ class MediaRepositoryImpl implements MediaRepository {
                     mediaFolderModels = folderController.addCoverFile(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
 
-                    mediaFolderModels = folderController.addAllDirectory(mediaFolderModels);
+                    mediaFolderModels = folderController.addAllFolder(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
 
                     cacheController.writeCache(mode, mediaFolderModels);
