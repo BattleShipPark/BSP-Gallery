@@ -2,20 +2,18 @@ package com.battleshippark.bsp_gallery.domain.folders;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.BiFunction;
+import com.annimon.stream.function.BinaryOperator;
 import com.annimon.stream.function.UnaryOperator;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
-import rx.Observable;
 
 /**
  */
@@ -108,21 +106,24 @@ public class MediaFolderController {
 
     public List<MediaFolderModel> addAllFolder(List<MediaFolderModel> folders) {
         List<MediaFolderModel> result = new ArrayList<>(folders);
-        if (result.get(0).getId() == MediaFolderModel.ALL_FOLDER_ID)
+        if (!result.isEmpty() && result.get(0).getId() == MediaFolderModel.ALL_FOLDER_ID)
             result.remove(0);
+        if (result.isEmpty()) {
+            return result;
+        }
 
         MediaFolderModel allFolder = new MediaFolderModel();
         allFolder.setId(MediaFolderModel.ALL_FOLDER_ID);
         allFolder.setName("All");
 
-        int count = Stream.of(result)
+        int totalCount = Stream.of(result)
                 .mapToInt(MediaFolderModel::getCount)
                 .sum();
-        allFolder.setCount(count);
+        allFolder.setCount(totalCount);
 
         MediaFolderModel coverFolder = Stream.of(folders)
-                .max((_folder1, _folder2) -> (int) (_folder1.getCoverMediaId() - _folder2.getCoverMediaId())
-                ).get();
+                .max((_folder1, _folder2) -> (int) (_folder1.getCoverMediaId() - _folder2.getCoverMediaId()))
+                .get();
         allFolder.setCoverMediaId(coverFolder.getCoverMediaId());
         allFolder.setCoverThumbPath(coverFolder.getCoverThumbPath());
         allFolder.setCoverMediaType(coverFolder.getCoverMediaType());

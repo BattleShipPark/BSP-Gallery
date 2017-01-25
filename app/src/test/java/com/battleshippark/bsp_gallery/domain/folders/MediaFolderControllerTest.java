@@ -76,6 +76,15 @@ public class MediaFolderControllerTest {
     }
 
     @Test
+    public void addFileCount_입력이비어있을때() throws Exception {
+        MediaFolderController controller = new MediaFolderController(null);
+        List<MediaFolderModel> models = Collections.emptyList();
+
+        List<MediaFolderModel> result = controller.addFileCount(models);
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     public void addFileCount() throws Exception {
         MediaFolderRepository repository = new MediaFolderRepository() {
             @Override
@@ -108,6 +117,15 @@ public class MediaFolderControllerTest {
         assertThat(result.get(0).getCount()).isEqualTo(3);
         assertThat(result.get(1).getId()).isEqualTo(1);
         assertThat(result.get(1).getCount()).isEqualTo(40);
+    }
+
+    @Test
+    public void addCoverFile_입력이비어있을때() throws Exception {
+        MediaFolderController controller = new MediaFolderController(null);
+        List<MediaFolderModel> models = Collections.emptyList();
+
+        List<MediaFolderModel> result = controller.addCoverFile(models);
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -145,6 +163,15 @@ public class MediaFolderControllerTest {
         assertThat(result.get(1).getId()).isEqualTo(1);
         assertThat(result.get(1).getCoverMediaId()).isEqualTo(20);
         assertThat(result.get(1).getCoverMediaType()).isEqualTo(30);
+    }
+
+    @Test
+    public void addAllFolder_입력이비어있을때() throws Exception {
+        MediaFolderController controller = new MediaFolderController(null);
+        List<MediaFolderModel> models = Collections.emptyList();
+
+        List<MediaFolderModel> result = controller.addAllFolder(models);
+        assertThat(result).isEmpty();
     }
 
     @Test
