@@ -2,7 +2,6 @@ package com.battleshippark.bsp_gallery.domain.folders;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.BinaryOperator;
 import com.annimon.stream.function.UnaryOperator;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;

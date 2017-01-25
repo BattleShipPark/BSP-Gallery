@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class MediaFolderControllerTest {
     @Test
-    public void addList_입력이비어있을때() throws Exception {
+    public void addList_InputIsEmpty() throws Exception {
         MediaFolderModel queriedModel = new MediaFolderModel(1, 2, 3, "path1", "name1", 4);
         MediaFolderRepository repository = new MediaFolderRepository() {
             @Override
@@ -44,7 +44,7 @@ public class MediaFolderControllerTest {
     }
 
     @Test
-    public void addList_입력과일부겹칠때() throws Exception {
+    public void addList_InputIsOverlaped() throws Exception {
         List<MediaFolderModel> queriedModels = Arrays.asList(
                 new MediaFolderModel(1, 2, 3, "path_1", "name_1", 4),
                 new MediaFolderModel(2, 3, 4, "path_2", "name_2", 5));
@@ -76,7 +76,7 @@ public class MediaFolderControllerTest {
     }
 
     @Test
-    public void addFileCount_입력이비어있을때() throws Exception {
+    public void addFileCount_InputIsEmpty() throws Exception {
         MediaFolderController controller = new MediaFolderController(null);
         List<MediaFolderModel> models = Collections.emptyList();
 
@@ -120,7 +120,7 @@ public class MediaFolderControllerTest {
     }
 
     @Test
-    public void addCoverFile_입력이비어있을때() throws Exception {
+    public void addCoverFile_InputIsEmpty() throws Exception {
         MediaFolderController controller = new MediaFolderController(null);
         List<MediaFolderModel> models = Collections.emptyList();
 
@@ -166,7 +166,7 @@ public class MediaFolderControllerTest {
     }
 
     @Test
-    public void addAllFolder_입력이비어있을때() throws Exception {
+    public void addAllFolder_InputIsEmpty() throws Exception {
         MediaFolderController controller = new MediaFolderController(null);
         List<MediaFolderModel> models = Collections.emptyList();
 
