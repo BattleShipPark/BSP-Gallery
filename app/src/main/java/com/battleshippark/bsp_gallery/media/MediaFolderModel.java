@@ -17,19 +17,19 @@ public class MediaFolderModel extends RealmObject {
 
     private int id;
     private long coverMediaId;
+    private int coverMediaType; /* MediaStore.File.FileColumns.MEDIA_TYPE_? */
     private String coverThumbPath;
     private String name;
     private int count;
-    private int coverMediaType; /* MediaStore.File.FileColumns.MEDIA_TYPE_? */
 
     public MediaFolderModel copy() {
         MediaFolderModel result = new MediaFolderModel();
         result.setId(this.getId());
         result.setCoverMediaId(this.getCoverMediaId());
+        result.setCoverMediaType(this.getCoverMediaType());
         result.setCoverThumbPath(this.getCoverThumbPath());
         result.setName(this.getName());
         result.setCount(this.getCount());
-        result.setCoverMediaType(this.getCoverMediaType());
         return result;
     }
 
@@ -39,6 +39,10 @@ public class MediaFolderModel extends RealmObject {
 
     public long getCoverMediaId() {
         return coverMediaId;
+    }
+
+    public int getCoverMediaType() {
+        return coverMediaType;
     }
 
     public String getCoverThumbPath() {
@@ -53,16 +57,16 @@ public class MediaFolderModel extends RealmObject {
         return count;
     }
 
-    public int getCoverMediaType() {
-        return coverMediaType;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
 
     public void setCoverMediaId(long coverMediaId) {
         this.coverMediaId = coverMediaId;
+    }
+
+    public void setCoverMediaType(int coverMediaType) {
+        this.coverMediaType = coverMediaType;
     }
 
     public void setCoverThumbPath(String coverThumbPath) {
@@ -75,9 +79,5 @@ public class MediaFolderModel extends RealmObject {
 
     public void setCount(int count) {
         this.count = count;
-    }
-
-    public void setCoverMediaType(int coverMediaType) {
-        this.coverMediaType = coverMediaType;
     }
 }

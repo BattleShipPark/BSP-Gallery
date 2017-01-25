@@ -54,10 +54,6 @@ public class MediaFolderController {
                 }).collect(Collectors.toList());
     }
 
-    interface IOExceptionFunc1<T1, R> {
-        R call(T1 t1) throws IOException;
-    }
-
     /**
      * 디렉토리에 파일 갯수를 추가한다
      */
@@ -76,32 +72,6 @@ public class MediaFolderController {
                 result.add(newMediaFolderModel);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * mediaFolderModels에 대해 func 파라미터를 호출해서 필요한 정보를 갱신한다 . All 폴더는 유지한다
-     */
-    List<MediaFolderModel> callAndMergeWithAll(List<MediaFolderModel> mediaFolderModels, IOExceptionFunc1<MediaFolderModel, MediaFolderModel> func) {
-        List<MediaFolderModel> result = new ArrayList<>();
-
-        for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
-            if (mediaFolderModel.getId() == MediaFolderModel.ALL_DIR_ID) {
-                result.add(mediaFolderModel.copy());
-                continue;
-            }
-
-            MediaFolderModel newMediaFolderModel = null;
-            try {
-                newMediaFolderModel = func.call(mediaFolderModel);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (newMediaFolderModel != null) {
-                result.add(newMediaFolderModel);
             }
         }
 
