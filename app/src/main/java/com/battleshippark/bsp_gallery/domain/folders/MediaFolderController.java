@@ -1,5 +1,13 @@
 package com.battleshippark.bsp_gallery.domain.folders;
 
+import android.annotation.SuppressLint;
+import android.util.ArraySet;
+
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiFunction;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.UnaryOperator;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
@@ -7,8 +15,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import rx.Observable;
@@ -20,33 +30,39 @@ public class MediaFolderController {
     private final MediaFolderRepository mediaRepository;
 
     /**
-     * 폴더 구조를 가져온다. mediaFolderModels 파라미터가 All 폴더를 가지고 있을 수 있고,
+     * 폴더 구조를 가져온다. cachedModels 파라미터가 All 폴더를 가지고 있을 수 있고,
      * 기존 폴더 는 파일 갯수나 썸네일 등을 가지고 있으므로 기존에 없던 폴더만 선택적으로 추가한다
      *
      * @return ID와 이름만 유효하다
      */
-    public List<MediaFolderModel> addList(List<MediaFolderModel> mediaFolderModels) {
-        Map<Integer, MediaFolderModel> map = new HashMap<>();
-        if (!mediaFolderModels.isEmpty()) {
-            for (MediaFolderModel mediaFolderModel : mediaFolderModels) {
-                map.put(mediaFolderModel.getId(), mediaFolderModel);
-            }
-        }
+    public List<MediaFolderModel> addList(List<MediaFolderModel> cachedModels) {
+        Set<Integer> idSet = Stream.of(cachedModels)
+                .map(MediaFolderModel::getId)
+                .collect(Collectors.toSet());
 
+        Map<Integer, MediaFolderModel> cachedMap = Stream.of(cachedModels)
+                .collect(Collectors.toMap(MediaFolderModel::getId, UnaryOperator.Util.identity()));
+
+        @SuppressLint("UseSparseArrays") Map<Integer, MediaFolderModel> queriedMap = new HashMap<>();
         mediaRepository.queryList().subscribe(mediaFolderModel -> {
-            if (!map.containsKey(mediaFolderModel.getId()))
-                map.put(mediaFolderModel.getId(), mediaFolderModel);
-        });
+            queriedMap.put(mediaFolderModel.getId(), mediaFolderModel);
+            idSet.add(mediaFolderModel.getId());
+        }, Throwable::printStackTrace);
 
-        List<MediaFolderModel> result = new ArrayList<>(map.values());
-        Collections.sort(result, (lhs, rhs) -> {
-            if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
-            if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
-            return lhs.getId() - rhs.getId();
-        });
-
-        return result;
-
+        return Stream.of(idSet).filter(id -> queriedMap.containsKey(id) || cachedMap.containsKey(id))
+                .map(id -> {
+                    if (queriedMap.containsKey(id)) {
+                        return queriedMap.get(id);
+                    }
+                    if (cachedMap.containsKey(id)) {
+                        return cachedMap.get(id);
+                    }
+                    throw new IllegalArgumentException();
+                }).sorted((lhs, rhs) -> {
+                    if (lhs.getId() == MediaFolderModel.ALL_DIR_ID) return -1;
+                    if (rhs.getId() == MediaFolderModel.ALL_DIR_ID) return 1;
+                    return lhs.getId() - rhs.getId();
+                }).collect(Collectors.toList());
     }
 
     interface IOExceptionFunc1<T1, R> {
