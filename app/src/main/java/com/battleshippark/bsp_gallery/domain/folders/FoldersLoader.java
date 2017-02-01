@@ -1,9 +1,9 @@
 package com.battleshippark.bsp_gallery.domain.folders;
 
-import com.battleshippark.bsp_gallery.domain.Loader;
 import com.battleshippark.bsp_gallery.data.cache.CacheController;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
+import com.battleshippark.bsp_gallery.domain.Loader;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -12,23 +12,19 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  */
 
 @AllArgsConstructor
 public class FoldersLoader implements Loader {
-    private MediaFilterModeRepository mediaFilterModeRepository;
-    private MediaControllerFactory mediaFactory;
-    private CacheControllerFactory cacheFactory;
-
-    public static Loader create(MediaFilterModeRepository mediaFilterModeRepository,
-                                MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
-        return new FoldersLoader(mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
-    }
+    private final MediaFilterModeRepository mediaFilterModeRepository;
+    private final MediaControllerFactory mediaFactory;
+    private final CacheControllerFactory cacheFactory;
+    private final Scheduler scheduler;
+    private final Scheduler postScheduler;
 
     @Override
     public void execute(Subscriber subscriber) {
@@ -59,6 +55,6 @@ public class FoldersLoader implements Loader {
 
                     _subscriber.onCompleted();
                 }
-        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
+        ).subscribeOn(scheduler).observeOn(postScheduler).subscribe(subscriber);
     }
 }

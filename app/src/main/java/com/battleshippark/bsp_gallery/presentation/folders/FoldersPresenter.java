@@ -12,6 +12,7 @@ import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import rx.Scheduler;
 import rx.Subscriber;
 
 /**
@@ -22,9 +23,11 @@ class FoldersPresenter {
     private final FoldersView foldersView;
 
     FoldersPresenter(FoldersView foldersView, MediaFilterModeRepository mediaFilterModeRepository,
-                     MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory) {
+                     MediaControllerFactory mediaControllerFactory, CacheControllerFactory cacheControllerFactory,
+                     Scheduler scheduler, Scheduler postScheduler) {
         this.foldersView = foldersView;
-        this.foldersLoader = FoldersLoader.create(mediaFilterModeRepository, mediaControllerFactory, cacheControllerFactory);
+        this.foldersLoader = new FoldersLoader(mediaFilterModeRepository, mediaControllerFactory,
+                cacheControllerFactory, scheduler, postScheduler);
     }
 
     void load() {

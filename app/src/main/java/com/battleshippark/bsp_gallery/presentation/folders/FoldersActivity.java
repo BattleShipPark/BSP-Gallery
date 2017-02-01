@@ -32,6 +32,9 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class FoldersActivity extends AppCompatActivity implements FoldersView {
     /* */
@@ -136,7 +139,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         decoration = new FoldersItemDecoration(model);
 
         presenter = new FoldersPresenter(this, new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance()),
-                new MediaControllerFactoryImpl(this), new CacheControllerFactory());
+                new MediaControllerFactoryImpl(this), new CacheControllerFactory(), Schedulers.io(), AndroidSchedulers.mainThread());
         mediaController = new MediaController(this);
 
         rxPermissions = new RxPermissions(this);
