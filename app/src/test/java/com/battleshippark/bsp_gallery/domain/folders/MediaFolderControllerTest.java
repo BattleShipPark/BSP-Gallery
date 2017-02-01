@@ -44,7 +44,7 @@ public class MediaFolderControllerTest {
     }
 
     @Test
-    public void addList_InputIsOverlaped() throws Exception {
+    public void addList_InputIsOverlapped() throws Exception {
         List<MediaFolderModel> queriedModels = Arrays.asList(
                 new MediaFolderModel(1, 2, 3, "path_1", "name_1", 4),
                 new MediaFolderModel(2, 3, 4, "path_2", "name_2", 5));

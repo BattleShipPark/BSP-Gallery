@@ -20,6 +20,7 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
+import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -135,7 +136,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         decoration = new FoldersItemDecoration(model);
 
         presenter = new FoldersPresenter(this, new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance()),
-                new MediaControllerFactory(this), new CacheControllerFactory());
+                new MediaControllerFactoryImpl(this), new CacheControllerFactory());
         mediaController = new MediaController(this);
 
         rxPermissions = new RxPermissions(this);
