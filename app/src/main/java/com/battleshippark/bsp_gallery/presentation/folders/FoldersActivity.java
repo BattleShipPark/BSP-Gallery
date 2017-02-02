@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,24 +14,20 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.EventBusHelper;
-import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
-import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
-import com.squareup.otto.Subscribe;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -57,7 +52,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
     private FoldersAdapter adapter;
     private FoldersItemDecoration decoration;
     private FoldersActivityModel model;
-    private RxPermissions rxPermissions;
+    private MediaFilterMode mediaFilterMode;
 
 
     @Override
@@ -108,28 +103,6 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         return super.onOptionsItemSelected(item);
     }
 
-    @Subscribe
-    public void OnMediaFolderListUpdated(Events.OnMediaFolderListUpdated event) {
-        Log.d("", "OnMediaFolderListUpdated(): " + event);
-
-        TextView tv = (TextView) toolbar.findViewById(R.id.media);
-        switch (model.getMediaFilterMode()) {
-            case ALL:
-                tv.setText(R.string.media_mode_all);
-                break;
-            case IMAGE:
-                tv.setText(R.string.media_mode_image);
-                break;
-            case VIDEO:
-                tv.setText(R.string.media_mode_video);
-                break;
-        }
-
-        adapter.setFilterMode(model.getMediaFilterMode());
-        adapter.notifyDataSetChanged();
-        progress.setVisibility(View.GONE);
-    }
-
     private void initData() {
         EventBusHelper.eventBus.register(this);
 
@@ -142,11 +115,11 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
                 new MediaControllerFactoryImpl(this), new CacheControllerFactory(), Schedulers.io(), AndroidSchedulers.mainThread());
         mediaController = new MediaController(this);
 
-        rxPermissions = new RxPermissions(this);
+        RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .subscribe(granted -> {
                     if (granted) {
-                        presenter.load();
+                        presenter.loadFilterMode();
                     } else {
                         new AlertDialog.Builder(FoldersActivity.this)
                                 .setMessage("You should grant READ_EXTERNAL_STORAGE").show();
@@ -193,6 +166,31 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
     @Override
     public void hideProgress() {
         progress.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void updateFilterMode(MediaFilterMode mediaFilterMode) {
+        TextView tv = (TextView) toolbar.findViewById(R.id.media);
+        switch (mediaFilterMode) {
+            case ALL:
+                tv.setText(R.string.media_mode_all);
+                break;
+            case IMAGE:
+                tv.setText(R.string.media_mode_image);
+                break;
+            case VIDEO:
+                tv.setText(R.string.media_mode_video);
+                break;
+        }
+
+        this.mediaFilterMode = mediaFilterMode;
+        adapter.setFilterMode(mediaFilterMode);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void refreshList() {
+        presenter.loadList(mediaFilterMode);
     }
 
     @Override

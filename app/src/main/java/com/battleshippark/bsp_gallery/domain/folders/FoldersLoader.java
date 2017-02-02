@@ -10,7 +10,6 @@ import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
@@ -18,25 +17,34 @@ import rx.Subscriber;
 /**
  */
 
-@AllArgsConstructor
-public class FoldersLoader implements Loader {
+public class FoldersLoader implements Loader<List<MediaFolderModel>> {
     private final MediaFilterModeRepository mediaFilterModeRepository;
     private final MediaControllerFactory mediaFactory;
     private final CacheControllerFactory cacheFactory;
     private final Scheduler scheduler;
     private final Scheduler postScheduler;
 
-    @Override
-    public void execute(Subscriber subscriber) {
-        MediaFilterMode mode = mediaFilterModeRepository.load();
-        MediaFolderController folderController = mediaFactory.createFolderController(mode);
-        CacheController cacheController = cacheFactory.create();
+    private MediaFilterMode filterMode;
 
+    public FoldersLoader(MediaFilterModeRepository mediaFilterModeRepository, MediaControllerFactory mediaFactory,
+                         CacheControllerFactory cacheFactory, Scheduler scheduler, Scheduler postScheduler) {
+        this.mediaFilterModeRepository = mediaFilterModeRepository;
+        this.mediaFactory = mediaFactory;
+        this.cacheFactory = cacheFactory;
+        this.scheduler = scheduler;
+        this.postScheduler = postScheduler;
+    }
+
+    @Override
+    public void execute(Subscriber<List<MediaFolderModel>> subscriber) {
         Observable.create(
-                _subscriber -> {
+                (Subscriber<? super List<MediaFolderModel>> _subscriber) -> {
+                    MediaFolderController folderController = mediaFactory.createFolderController(filterMode);
+                    CacheController cacheController = cacheFactory.create();
+
                     List<MediaFolderModel> mediaFolderModels = null;
 
-                    mediaFolderModels = cacheController.readCache(mode);
+                    mediaFolderModels = cacheController.readCache(filterMode);
                     _subscriber.onNext(mediaFolderModels);
 
                     mediaFolderModels = folderController.addList(mediaFolderModels);
@@ -51,10 +59,14 @@ public class FoldersLoader implements Loader {
                     mediaFolderModels = folderController.addAllFolder(mediaFolderModels);
                     _subscriber.onNext(mediaFolderModels);
 
-                    cacheController.writeCache(mode, mediaFolderModels);
+                    cacheController.writeCache(filterMode, mediaFolderModels);
 
                     _subscriber.onCompleted();
                 }
         ).subscribeOn(scheduler).observeOn(postScheduler).subscribe(subscriber);
+    }
+
+    public void setFilterMode(MediaFilterMode filterMode) {
+        this.filterMode = filterMode;
     }
 }

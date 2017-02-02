@@ -5,6 +5,7 @@ import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.folders.MediaFolderController;
+import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 
+import rx.internal.schedulers.ImmediateScheduler;
 import rx.schedulers.TestScheduler;
 
 import static org.mockito.Mockito.verify;
@@ -35,11 +37,11 @@ public class FoldersPresenterTest {
     MediaControllerFactory controllerFactory;
 
     @Test
-    public void load() throws IOException {
+    public void loadList() throws IOException {
         FoldersPresenter presenter = new FoldersPresenter(foldersView,
                 filterModeRepository,
                 controllerFactory,
-                new CacheControllerFactory(), new TestScheduler(), new TestScheduler());
+                new CacheControllerFactory(), ImmediateScheduler.INSTANCE, ImmediateScheduler.INSTANCE);
 
         when(filterModeRepository.load()).thenReturn(null);
         when(folderRepository.queryList()).thenReturn(null);
@@ -47,9 +49,25 @@ public class FoldersPresenterTest {
         when(folderRepository.queryCoverFile(0)).thenReturn(null);
         when(controllerFactory.createFolderController(null)).thenReturn(new MediaFolderController(folderRepository));
 
-        presenter.load(new FoldersPresenter.FoldersSubscriber(foldersView));
+        presenter.loadList(MediaFilterMode.ALL, new FoldersPresenter.FoldersSubscriber(foldersView));
 
 
         verify(foldersView).hideProgress();
+    }
+
+    @Test
+    public void loadFilterMode() throws IOException {
+        FoldersPresenter presenter = new FoldersPresenter(foldersView,
+                filterModeRepository,
+                controllerFactory,
+                new CacheControllerFactory(), ImmediateScheduler.INSTANCE, ImmediateScheduler.INSTANCE);
+
+        when(filterModeRepository.load()).thenReturn(MediaFilterMode.ALL);
+
+        presenter.loadFilterMode();
+
+        
+        verify(foldersView).updateFilterMode(MediaFilterMode.ALL);
+        verify(foldersView).refreshList();
     }
 }
