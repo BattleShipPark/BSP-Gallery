@@ -1,7 +1,5 @@
 package com.battleshippark.bsp_gallery.domain;
 
-import com.battleshippark.bsp_gallery.media.MediaFilterMode;
-
 import rx.Subscriber;
 
 /**

@@ -18,6 +18,8 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
+import com.battleshippark.bsp_gallery.domain.folders.FilterModeLoader;
+import com.battleshippark.bsp_gallery.domain.folders.FoldersLoader;
 import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -28,6 +30,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -111,8 +114,17 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         adapter = new FoldersAdapter(this);
         decoration = new FoldersItemDecoration(model);
 
-        presenter = new FoldersPresenter(this, new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance()),
-                new MediaControllerFactoryImpl(this), new CacheControllerFactory(), Schedulers.io(), AndroidSchedulers.mainThread());
+        MediaFilterModeRepositoryImpl mediaFilterModeRepository = new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance());
+        MediaControllerFactoryImpl mediaControllerFactory = new MediaControllerFactoryImpl(this);
+        CacheControllerFactory cacheControllerFactory = new CacheControllerFactory();
+        Scheduler scheduler = Schedulers.io();
+        Scheduler postScheduler = AndroidSchedulers.mainThread();
+
+        FilterModeLoader filerModeLoader = new FilterModeLoader(mediaFilterModeRepository, scheduler, postScheduler);
+        FoldersLoader foldersLoader = new FoldersLoader(mediaFilterModeRepository, mediaControllerFactory,
+                cacheControllerFactory, scheduler, postScheduler);
+
+        presenter = new FoldersPresenter(this, filerModeLoader, foldersLoader);
         mediaController = new MediaController(this);
 
         RxPermissions rxPermissions = new RxPermissions(this);
