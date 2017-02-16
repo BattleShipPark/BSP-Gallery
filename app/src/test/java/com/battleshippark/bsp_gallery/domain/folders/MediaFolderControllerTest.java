@@ -46,8 +46,8 @@ public class MediaFolderControllerTest {
     @Test
     public void addList_InputIsOverlapped() throws Exception {
         List<MediaFolderModel> queriedModels = Arrays.asList(
-                new MediaFolderModel(1, 2, 3, "path_1", "name_1", 4),
-                new MediaFolderModel(2, 3, 4, "path_2", "name_2", 5));
+                new MediaFolderModel(1, 0, 0, null, "name_1", 0),
+                new MediaFolderModel(2, 0, 0, null, null, 0));
 
         MediaFolderRepository repository = new MediaFolderRepository() {
             @Override
@@ -71,8 +71,14 @@ public class MediaFolderControllerTest {
                 new MediaFolderModel(1, 2, 3, "path0", "name1", 5));
 
         List<MediaFolderModel> result = controller.addList(cachedModels);
-        assertThat(result).isEqualTo(
-                Arrays.asList(cachedModels.get(0), queriedModels.get(0), queriedModels.get(1)));
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo(cachedModels.get(0));
+        assertThat(result.get(1).getCoverMediaId()).isEqualTo(2);
+        assertThat(result.get(1).getCoverMediaType()).isEqualTo(3);
+        assertThat(result.get(1).getCoverThumbPath()).isEqualTo("path0");
+        assertThat(result.get(1).getName()).isEqualTo("name_1");
+        assertThat(result.get(1).getCount()).isEqualTo(5);
+        assertThat(result.get(2)).isEqualTo(queriedModels.get(1));
     }
 
     @Test
@@ -157,12 +163,11 @@ public class MediaFolderControllerTest {
 
         List<MediaFolderModel> result = controller.addCoverFile(models);
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).getId()).isEqualTo(0);
-        assertThat(result.get(0).getCoverMediaId()).isEqualTo(1);
-        assertThat(result.get(0).getCoverMediaType()).isEqualTo(2);
+        assertThat(result.get(0)).isEqualTo(models.get(0));
         assertThat(result.get(1).getId()).isEqualTo(1);
         assertThat(result.get(1).getCoverMediaId()).isEqualTo(20);
         assertThat(result.get(1).getCoverMediaType()).isEqualTo(30);
+        assertThat(result.get(1).getCoverThumbPath()).isEqualTo("path1");
     }
 
     @Test
@@ -188,5 +193,6 @@ public class MediaFolderControllerTest {
         assertThat(result.get(0).getCount()).isEqualTo(9);
         assertThat(result.get(0).getCoverMediaId()).isEqualTo(3);
         assertThat(result.get(0).getCoverMediaType()).isEqualTo(4);
+        assertThat(result.get(0).getCoverThumbPath()).isEqualTo("path2");
     }
 }

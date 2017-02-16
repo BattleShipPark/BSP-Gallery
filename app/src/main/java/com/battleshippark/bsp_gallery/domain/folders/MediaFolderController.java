@@ -2,6 +2,7 @@ package com.battleshippark.bsp_gallery.domain.folders;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Predicate;
 import com.annimon.stream.function.UnaryOperator;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -22,30 +23,35 @@ public class MediaFolderController {
 
     /**
      * 폴더 구조를 가져온다. cachedModels 파라미터가 All 폴더를 가지고 있을 수 있고,
-     * 기존 폴더 는 파일 갯수나 썸네일 등을 가지고 있으므로 기존에 없던 폴더만 선택적으로 추가한다
+     * 기존 폴더의 파일 갯수나 썸네일 등은 유지하고, 새로 추가된 폴더는 추가한다
      *
      * @return ID와 이름만 유효하다
      */
     public List<MediaFolderModel> addList(List<MediaFolderModel> cachedModels) {
-        Set<Integer> cachedIdSet = Stream.of(cachedModels)
-                .map(MediaFolderModel::getId)
-                .collect(Collectors.toSet());
+        List<MediaFolderModel> newModels = new ArrayList<>(cachedModels);
 
-        Map<Integer, MediaFolderModel> cachedMap = Stream.of(cachedModels)
-                .collect(Collectors.toMap(MediaFolderModel::getId, UnaryOperator.Util.identity()));
+        Map<Integer, MediaFolderModel> cachedMap = Stream.of(newModels)
+                .collect(Collectors.toMap(MediaFolderModel::getId));
 
         List<MediaFolderModel> queriedModels = new ArrayList<>();
         mediaRepository.queryList().subscribe(queriedModels::add, Throwable::printStackTrace);
 
-        Set<Integer> queriedIdSet = Stream.of(queriedModels)
-                .map(MediaFolderModel::getId)
-                .collect(Collectors.toSet());
+        Map<Integer, MediaFolderModel> queriedMap = Stream.of(queriedModels)
+                .collect(Collectors.toMap(MediaFolderModel::getId));
 
-        cachedIdSet.removeAll(queriedIdSet);
+        // name 업데이트
+        Stream.of(queriedMap.entrySet())
+                .filter(entry -> cachedMap.containsKey(entry.getKey()))
+                .forEach(entry -> cachedMap.get(entry.getKey()).setName(entry.getValue().getName()));
 
-        Stream.of(cachedIdSet).map(cachedMap::get).forEach(queriedModels::add);
+        // 새로 추가된 폴더
+        newModels.addAll(
+                Stream.of(queriedMap.entrySet())
+                        .filter(entry -> !cachedMap.containsKey(entry.getKey()))
+                        .map(Map.Entry::getValue)
+                        .collect(Collectors.toList()));
 
-        return Stream.of(queriedModels)
+        return Stream.of(newModels)
                 .sorted((lhs, rhs) -> {
                     if (lhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return -1;
                     if (rhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return 1;
@@ -121,7 +127,7 @@ public class MediaFolderController {
                 .sum();
         allFolder.setCount(totalCount);
 
-        MediaFolderModel coverFolder = Stream.of(folders)
+        MediaFolderModel coverFolder = Stream.of(result)
                 .max((_folder1, _folder2) -> (int) (_folder1.getCoverMediaId() - _folder2.getCoverMediaId()))
                 .get();
         allFolder.setCoverMediaId(coverFolder.getCoverMediaId());
