@@ -71,6 +71,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
     @Override
     protected void onResume() {
         super.onResume();
+        presenter.loadList(mediaFilterMode);
     }
 
     @Override

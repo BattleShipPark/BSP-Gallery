@@ -94,6 +94,7 @@ public class MediaFolderController {
                 MediaFolderModel folderModel = mediaRepository.queryCoverFile(mediaFolderModel.getId());
                 newMediaFolderModel.setCoverMediaId(folderModel.getCoverMediaId());
                 newMediaFolderModel.setCoverMediaType(folderModel.getCoverMediaType());
+                newMediaFolderModel.setCoverThumbPath(folderModel.getCoverThumbPath());
                 result.add(newMediaFolderModel);
             } catch (IOException e) {
                 e.printStackTrace();

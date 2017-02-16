@@ -90,7 +90,9 @@ public class MediaAllFolderRepository implements MediaFolderRepository {
 
     @Override
     public MediaFolderModel queryCoverFile(int folderId) throws IOException {
-        String[] projectionClauses = new String[]{MediaStore.Images.Media._ID, MediaStore.Files.FileColumns.MEDIA_TYPE};
+        String[] projectionClauses = new String[]{MediaStore.Images.Media._ID,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.DATA};
         String orderClause = MediaStore.Images.Media._ID + " desc";
 
         String selectionClause = String.format("%s = ? AND (%s = ? OR %s = ?)",
@@ -110,6 +112,7 @@ public class MediaAllFolderRepository implements MediaFolderRepository {
                 MediaFolderModel model = new MediaFolderModel();
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
                 model.setCoverMediaType(CursorUtils.getInt(c, projectionClauses[1]));
+                model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[2]));
                 return model;
             }
         } finally {
