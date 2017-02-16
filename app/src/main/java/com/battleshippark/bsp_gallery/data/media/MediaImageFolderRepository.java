@@ -27,14 +27,11 @@ public class MediaImageFolderRepository implements MediaFolderRepository {
                     MediaStore.Images.ImageColumns.BUCKET_ID,
                     MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
             };
-            String selectionClause = String.format("%s = ? OR %s = ?",
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+            String selectionClause = String.format("%s = ?",
                     MediaStore.Files.FileColumns.MEDIA_TYPE
             );
             String[] selectionArgs = new String[]{
                     String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
-                    String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
-
             };
 
             Uri distinctUri = uri.buildUpon().appendQueryParameter("distinct", "true").build();
@@ -63,8 +60,13 @@ public class MediaImageFolderRepository implements MediaFolderRepository {
     public int queryFileCount(int folderId) throws IOException {
         String[] countClauses = new String[]{"count(*) AS count"};
 
-        String selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
-        String[] selectionArgs = new String[]{String.valueOf(folderId)};
+        String selectionClause = String.format("%s = ? AND %s = ?",
+                MediaStore.Images.ImageColumns.BUCKET_ID,
+                MediaStore.Files.FileColumns.MEDIA_TYPE);
+        String[] selectionArgs = new String[]{
+                String.valueOf(folderId),
+                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+        };
 
         Cursor c = context.getContentResolver().query(uri, countClauses, selectionClause, selectionArgs, null);
         try {
@@ -81,18 +83,27 @@ public class MediaImageFolderRepository implements MediaFolderRepository {
 
     @Override
     public MediaFolderModel queryCoverFile(int folderId) throws IOException {
-        String[] projectionClauses = new String[]{MediaStore.Images.Media._ID};
+        String[] projectionClauses = new String[]{MediaStore.Images.Media._ID,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.DATA};
         String orderClause = MediaStore.Images.Media._ID + " desc";
 
-        String selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
-        String[] selectionArgs = new String[]{String.valueOf(folderId)};
+        String selectionClause = String.format("%s = ? AND %s = ?",
+                MediaStore.Images.ImageColumns.BUCKET_ID,
+                MediaStore.Files.FileColumns.MEDIA_TYPE
+        );
+        String[] selectionArgs = new String[]{
+                String.valueOf(folderId),
+                String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+        };
 
         Cursor c = context.getContentResolver().query(uri, projectionClauses, selectionClause, selectionArgs, orderClause);
         try {
             if (c != null && c.moveToFirst()) {
                 MediaFolderModel model = new MediaFolderModel();
                 model.setCoverMediaId(CursorUtils.getInt(c, projectionClauses[0]));
-                model.setCoverMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
+                model.setCoverMediaType(CursorUtils.getInt(c, projectionClauses[1]));
+                model.setCoverThumbPath(CursorUtils.getString(c, projectionClauses[2]));
                 return model;
             }
         } finally {

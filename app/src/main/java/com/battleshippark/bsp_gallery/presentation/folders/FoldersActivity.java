@@ -20,7 +20,6 @@ import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
 import com.battleshippark.bsp_gallery.domain.folders.FilterModeLoader;
 import com.battleshippark.bsp_gallery.domain.folders.FoldersLoader;
-import com.battleshippark.bsp_gallery.media.MediaController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.battleshippark.bsp_gallery.pref.SharedPreferenceController;
@@ -35,9 +34,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class FoldersActivity extends AppCompatActivity implements FoldersView {
-    /* */
-
-    /* View */
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -47,14 +43,10 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
     @Bind(R.id.listview)
     RecyclerView listview;
 
-    /* Controller */
     private FoldersPresenter presenter;
-    private MediaController mediaController;
 
-    /* */
     private FoldersAdapter adapter;
     private FoldersItemDecoration decoration;
-    private FoldersActivityModel model;
     private MediaFilterMode mediaFilterMode;
 
 
@@ -110,10 +102,8 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
     private void initData() {
         EventBusHelper.eventBus.register(this);
 
-        model = new FoldersActivityModel();
-
         adapter = new FoldersAdapter(this);
-        decoration = new FoldersItemDecoration(model);
+        decoration = new FoldersItemDecoration();
 
         MediaFilterModeRepositoryImpl mediaFilterModeRepository = new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance());
         MediaControllerFactoryImpl mediaControllerFactory = new MediaControllerFactoryImpl(this);
@@ -126,7 +116,6 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
                 cacheControllerFactory, scheduler, postScheduler);
 
         presenter = new FoldersPresenter(this, filerModeLoader, foldersLoader);
-        mediaController = new MediaController(this);
 
         RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -153,19 +142,22 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         PopupMenu popupMenu = new PopupMenu(this, anchor);
         popupMenu.inflate(R.menu.menu_main_media_popup);
         popupMenu.setOnMenuItemClickListener(item -> {
+            MediaFilterMode mode = null;
             switch (item.getItemId()) {
                 case R.id.action_media_all:
-                    model.setMediaFilterMode(MediaFilterMode.ALL);
+                    mode = MediaFilterMode.ALL;
                     break;
                 case R.id.action_media_image:
-                    model.setMediaFilterMode(MediaFilterMode.IMAGE);
+                    mode = MediaFilterMode.IMAGE;
                     break;
                 case R.id.action_media_video:
-                    model.setMediaFilterMode(MediaFilterMode.VIDEO);
+                    mode = MediaFilterMode.VIDEO;
                     break;
             }
 
-            mediaController.refreshFolderListAsync(model);
+            if (mode != mediaFilterMode) {
+                presenter.changeFilterMode(mode);
+            }
             return true;
         });
         popupMenu.show();
@@ -197,8 +189,6 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         }
 
         this.mediaFilterMode = mediaFilterMode;
-        adapter.setFilterMode(mediaFilterMode);
-        adapter.notifyDataSetChanged();
     }
 
     @Override

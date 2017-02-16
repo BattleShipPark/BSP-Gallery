@@ -8,13 +8,10 @@ import android.view.View;
 
 /**
  */
-public class FoldersItemDecoration extends RecyclerView.ItemDecoration {
-    private final FoldersActivityModel foldersActivityModel;
+class FoldersItemDecoration extends RecyclerView.ItemDecoration {
     private Paint paint;
 
-    public FoldersItemDecoration(FoldersActivityModel foldersActivityModel) {
-        this.foldersActivityModel = foldersActivityModel;
-
+    FoldersItemDecoration() {
         paint = new Paint();
         paint.setColor(Color.rgb(0x80, 0x80, 0x80));
         paint.setStrokeWidth(1);

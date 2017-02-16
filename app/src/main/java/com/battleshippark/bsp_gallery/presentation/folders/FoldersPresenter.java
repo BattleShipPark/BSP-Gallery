@@ -30,6 +30,10 @@ class FoldersPresenter {
         foldersView.showProgress();
     }
 
+    void changeFilterMode(MediaFilterMode mediaFilterMode) {
+        filterModeChanger.execute(new FilterModeSubscriber(foldersView));
+    }
+
     void loadList(MediaFilterMode mediaFilterMode) {
         loadList(mediaFilterMode, new FoldersSubscriber(foldersView));
     }
@@ -47,7 +51,6 @@ class FoldersPresenter {
 
         @Override
         public void onCompleted() {
-            foldersView.refreshList();
         }
 
         @Override
@@ -58,6 +61,7 @@ class FoldersPresenter {
         @Override
         public void onNext(MediaFilterMode mediaFilterMode) {
             foldersView.updateFilterMode(mediaFilterMode);
+            foldersView.refreshList();
         }
     }
 
