@@ -3,6 +3,7 @@ package com.battleshippark.bsp_gallery.presentation.files;
 import android.support.annotation.VisibleForTesting;
 
 import com.battleshippark.bsp_gallery.domain.UseCase;
+import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
@@ -17,27 +18,15 @@ import rx.Subscriber;
 @AllArgsConstructor
 class FilesPresenter {
     private final FilesView filesView;
-    private final UseCase<Void, MediaFilterMode> filerModeLoader;
-    private final UseCase<MediaFilterMode, MediaFilterMode> filterModeSaver;
-    private final UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader;
+    private final UseCase<Integer, List<MediaFileModel>> filesLoader;
 
-    void loadFilterMode() {
-        filesView.showProgress();
-        filerModeLoader.execute(null, new FilterModeSubscriber(filesView));
-    }
-
-    void changeFilterMode(MediaFilterMode mediaFilterMode) {
-        filesView.showProgress();
-        filterModeSaver.execute(mediaFilterMode, new FilterModeSubscriber(filesView));
-    }
-
-    void loadList(MediaFilterMode mediaFilterMode) {
-        foldersLoader.execute(mediaFilterMode, new FoldersSubscriber(filesView));
+    void loadList(MediaFilterMode mediaFilterMode, int folderId) {
+        filesLoader.execute(mediaFilterMode, new FoldersSubscriber(filesView));
     }
 
     @VisibleForTesting
     void loadList(MediaFilterMode mediaFilterMode, Subscriber subscriber) {
-        foldersLoader.execute(mediaFilterMode, subscriber);
+        filesLoader.execute(mediaFilterMode, subscriber);
     }
 
     @AllArgsConstructor
