@@ -22,10 +22,12 @@ class FoldersPresenter {
     private final UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader;
 
     void loadFilterMode() {
+        foldersView.showProgress();
         filerModeLoader.execute(null, new FilterModeSubscriber(foldersView));
     }
 
     void changeFilterMode(MediaFilterMode mediaFilterMode) {
+        foldersView.showProgress();
         filterModeSaver.execute(mediaFilterMode, new FilterModeSubscriber(foldersView));
     }
 

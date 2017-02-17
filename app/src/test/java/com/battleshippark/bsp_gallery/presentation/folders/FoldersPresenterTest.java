@@ -44,25 +44,24 @@ public class FoldersPresenterTest {
     @Mock
     MediaControllerFactory mediaControllerFactory;
 
-    Scheduler scheduler = ImmediateScheduler.INSTANCE, postScheduler = ImmediateScheduler.INSTANCE;
+    private Scheduler scheduler = ImmediateScheduler.INSTANCE, postScheduler = ImmediateScheduler.INSTANCE;
 
     @Test
     public void loadList() throws IOException {
         UseCase<Void, MediaFilterMode> filerModeLoader = new FilterModeLoader(mediaFilterModeRepository, scheduler, postScheduler);
         UseCase<MediaFilterMode, MediaFilterMode> filterModeSaver = new FilterModeSaver(mediaFilterModeRepository, scheduler, postScheduler);
-        UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader = new FoldersLoader(mediaControllerFactory,
-                new CacheControllerFactory(), scheduler, postScheduler);
+        UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader = new FoldersLoader(null, null, null, null) {
+            @Override
+            public void execute(MediaFilterMode filterMode, Subscriber<List<MediaFolderModel>> subscriber) {
+                subscriber.onNext(null);
+                subscriber.onCompleted();
+            }
+        };
         FoldersPresenter presenter = new FoldersPresenter(foldersView, filerModeLoader, filterModeSaver, foldersLoader);
-
-        when(mediaFilterModeRepository.load()).thenReturn(null);
-        when(folderRepository.queryList()).thenReturn(null);
-        when(folderRepository.queryFileCount(0)).thenReturn(0);
-        when(folderRepository.queryCoverFile(0)).thenReturn(null);
-        when(mediaControllerFactory.createFolderController(null)).thenReturn(new MediaFolderController(folderRepository));
-
         presenter.loadList(MediaFilterMode.ALL, new FoldersPresenter.FoldersSubscriber(foldersView));
 
 
+        verify(foldersView).refreshList(null);
         verify(foldersView).hideProgress();
     }
 
@@ -100,6 +99,7 @@ public class FoldersPresenterTest {
         presenter.loadFilterMode();
 
 
+        verify(foldersView).showProgress();
         verify(foldersView).updateFilterMode(MediaFilterMode.ALL);
         verify(foldersView).refreshList();
     }

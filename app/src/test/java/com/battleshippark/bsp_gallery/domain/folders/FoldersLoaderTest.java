@@ -47,9 +47,6 @@ public class FoldersLoaderTest {
         UseCase<MediaFilterMode, List<MediaFolderModel>> loader = new FoldersLoader(mediaControllerFactory,
                 cacheControllerFactory, ImmediateScheduler.INSTANCE, ImmediateScheduler.INSTANCE);
 
-        when(folderRepository.queryList()).thenReturn(null);
-        when(folderRepository.queryFileCount(anyInt())).thenReturn(0);
-        when(folderRepository.queryCoverFile(anyInt())).thenReturn(null);
         when(folderController.addList(any())).thenReturn(Collections.emptyList());
         when(folderController.addFileCount(any())).thenReturn(Collections.emptyList());
         when(folderController.addCoverFile(any())).thenReturn(Collections.emptyList());
