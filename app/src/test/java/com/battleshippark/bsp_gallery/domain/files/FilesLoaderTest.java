@@ -34,8 +34,6 @@ public class FilesLoaderTest {
     @Mock
     MediaControllerFactory mediaControllerFactory;
 
-    MediaFilesController filesController;
-
     @Test
     public void execute() throws Exception {
         MediaFileModel mediaFileModel1 = new MediaFileModel(1, "name1", 2, "path1", "thumb1");
@@ -45,7 +43,7 @@ public class FilesLoaderTest {
                 ImmediateScheduler.INSTANCE, ImmediateScheduler.INSTANCE,
                 MediaFilterMode.ALL, 1234);
 
-        filesController = new MediaFilesController(null) {
+        MediaFilesController filesController = new MediaFilesController(null) {
             @Override
             public void loadBufferedList(Consumer<List<MediaFileModel>> consumer) {
                 consumer.accept(Collections.singletonList(mediaFileModel1));

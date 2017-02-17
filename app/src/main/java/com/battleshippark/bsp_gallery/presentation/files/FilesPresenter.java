@@ -19,12 +19,12 @@ class FilesPresenter {
     private final FilesView filesView;
     private final UseCase<Void, List<MediaFileModel>> filesLoader;
 
-    void loadList(MediaFilterMode mediaFilterMode, int folderId) {
+    void loadList() {
         filesLoader.execute(null, new FilesSubscriber(filesView));
     }
 
     @VisibleForTesting
-    void loadList(MediaFilterMode mediaFilterMode, Subscriber subscriber) {
+    void loadList(Subscriber<List<MediaFileModel>> subscriber) {
         filesLoader.execute(null, subscriber);
     }
 
