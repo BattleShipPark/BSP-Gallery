@@ -18,7 +18,7 @@ import rx.Subscriber;
  */
 
 @AllArgsConstructor
-class FilesLoader implements UseCase<Void, List<MediaFileModel>> {
+public class FilesLoader implements UseCase<Void, List<MediaFileModel>> {
     private final MediaControllerFactory mediaFactory;
     private final Scheduler scheduler;
     private final Scheduler postScheduler;
@@ -35,6 +35,7 @@ class FilesLoader implements UseCase<Void, List<MediaFileModel>> {
                         list.addAll(bufferedList);
                         _subscriber.onNext(list);
                     });
+                    _subscriber.onCompleted();
                 }
         ).subscribeOn(scheduler).observeOn(postScheduler).subscribe(subscriber);
     }

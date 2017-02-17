@@ -16,9 +16,16 @@ import rx.Observable;
 
 /**
  */
-public class MediaImageFileRepository extends AbstractMediaFileRepository {
+public class MediaImageFileRepository implements MediaFileRepository {
+    private final static Uri uri = MediaStore.Files.getContentUri("external");
+    private final Context context;
+    private final String[] columns;
+    private final String selectionClause;
+    private final String[] selectionArgs;
+    private final String sortClause;
+
     public MediaImageFileRepository(Context context, int folderId) {
-        super(context, folderId);
+        this.context = context;
 
         columns = new String[]{
                 MediaStore.Images.ImageColumns._ID,
@@ -28,16 +35,36 @@ public class MediaImageFileRepository extends AbstractMediaFileRepository {
 
         if (folderId != MediaFolderModel.ALL_FOLDER_ID) {
             selectionClause = String.format("%s = ?", MediaStore.Images.ImageColumns.BUCKET_ID);
-        } else {
-            selectionClause = null;
-        }
-
-        if (folderId != MediaFolderModel.ALL_FOLDER_ID) {
             selectionArgs = new String[]{String.valueOf(folderId),};
         } else {
+            selectionClause = null;
             selectionArgs = null;
         }
 
         sortClause = MediaStore.Files.FileColumns._ID + " DESC";
+    }
+
+    @Override
+    public void queryBufferedList(Consumer<List<MediaFileModel>> consumer) {
+        Cursor c = context.getContentResolver().query(uri, columns, selectionClause, selectionArgs, sortClause);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                Observable.create((Observable.OnSubscribe<MediaFileModel>) _subscriber -> {
+                    do {
+                        MediaFileModel model = new MediaFileModel();
+                        model.setId(CursorUtils.getInt(c, columns[0]));
+                        model.setName(CursorUtils.getString(c, columns[1]));
+                        model.setMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE);
+                        model.setPath(CursorUtils.getString(c, columns[2]));
+
+                        _subscriber.onNext(model);
+                    } while (c.moveToNext());
+
+                    _subscriber.onCompleted();
+                }).buffer(BUFFER_COUNT)
+                        .subscribe(consumer::accept);
+            }
+            c.close();
+        }
     }
 }

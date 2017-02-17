@@ -1,5 +1,6 @@
 package com.battleshippark.bsp_gallery.presentation.files;
 
+import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
@@ -13,9 +14,7 @@ interface FilesView {
 
     void hideProgress();
 
-    void updateFilterMode(MediaFilterMode mediaFilterMode);
-
     void refreshList();
 
-    void refreshList(List<MediaFolderModel> mediaFolderModels);
+    void refreshList(List<MediaFileModel> mediaFileModels);
 }

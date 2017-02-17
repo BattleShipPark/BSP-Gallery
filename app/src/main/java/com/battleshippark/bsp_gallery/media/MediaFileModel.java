@@ -2,10 +2,14 @@ package com.battleshippark.bsp_gallery.media;
 
 import org.parceler.Parcel;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  */
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @org.parceler.Parcel(Parcel.Serialization.BEAN)
 public class MediaFileModel implements Cloneable {

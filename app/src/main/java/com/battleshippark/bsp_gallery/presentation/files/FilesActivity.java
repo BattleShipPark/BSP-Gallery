@@ -20,10 +20,15 @@ import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
+import com.battleshippark.bsp_gallery.domain.UseCase;
+import com.battleshippark.bsp_gallery.domain.files.FilesLoader;
 import com.battleshippark.bsp_gallery.media.MediaController;
+import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 import com.squareup.otto.Subscribe;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.BindInt;
@@ -33,7 +38,7 @@ import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class FilesActivity extends AppCompatActivity {
+public class FilesActivity extends AppCompatActivity implements FilesView {
     private static final String KEY_PARAM = "param";
 
     /* */
@@ -155,9 +160,10 @@ public class FilesActivity extends AppCompatActivity {
         Scheduler scheduler = Schedulers.io();
         Scheduler postScheduler = AndroidSchedulers.mainThread();
 
-//        Loader filesLoader = new FilesLoader(mediaControllerFactory, scheduler, postScheduler);
+        UseCase<Void, List<MediaFileModel>> filesLoader = new FilesLoader(mediaControllerFactory, scheduler, postScheduler,
+                model.getMediaFilterMode(), model.getFolderId());
 
-//        presenter = new FilesPresenter(this, filesLoader);
+        presenter = new FilesPresenter(this, filesLoader);
         mediaController = new MediaController(this);
     }
 
@@ -195,6 +201,27 @@ public class FilesActivity extends AppCompatActivity {
         listview.setAdapter(adapter);
         listview.setLayoutManager(new GridLayoutManager(this, FILES_COLUMN_COUNT));
 //        listview.addItemDecoration(decoration);
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+
+    @Override
+    public void refreshList() {
+
+    }
+
+    @Override
+    public void refreshList(List<MediaFileModel> mediaFileModels) {
+
     }
 
     @AllArgsConstructor
