@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
+import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
@@ -108,7 +109,7 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         adapter = new FoldersAdapter(this);
         decoration = new FoldersItemDecoration();
 
-        MediaFilterModeRepositoryImpl mediaFilterModeRepository = new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance());
+        MediaFilterModeRepository mediaFilterModeRepository = new MediaFilterModeRepositoryImpl(SharedPreferenceController.instance());
         MediaControllerFactory mediaControllerFactory = new MediaControllerFactoryImpl(this);
         CacheControllerFactory cacheControllerFactory = new CacheControllerFactory();
         Scheduler scheduler = Schedulers.io();
