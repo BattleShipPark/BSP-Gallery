@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.files;
+package com.battleshippark.bsp_gallery.presentation.files;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.domain.Loader;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
 import com.battleshippark.bsp_gallery.media.MediaController;
@@ -80,7 +79,7 @@ public class FilesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.loadList(model);
+//        presenter.loadList(model);
 //        mediaController.refreshFileListWithThumbAsync(this, model);
     }
 
@@ -156,9 +155,9 @@ public class FilesActivity extends AppCompatActivity {
         Scheduler scheduler = Schedulers.io();
         Scheduler postScheduler = AndroidSchedulers.mainThread();
 
-        Loader filesLoader = new FilesLoader(mediaControllerFactory, scheduler, postScheduler);
+//        Loader filesLoader = new FilesLoader(mediaControllerFactory, scheduler, postScheduler);
 
-        presenter = new FilesPresenter(this, filesLoader);
+//        presenter = new FilesPresenter(this, filesLoader);
         mediaController = new MediaController(this);
     }
 

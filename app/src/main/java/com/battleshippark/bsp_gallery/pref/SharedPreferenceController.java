@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.MainThread;
 
 import com.battleshippark.bsp_gallery.EventBusHelper;
-import com.battleshippark.bsp_gallery.presentation.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 
 /**

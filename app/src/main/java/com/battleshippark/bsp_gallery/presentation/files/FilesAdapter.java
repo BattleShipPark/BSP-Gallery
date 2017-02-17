@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.files;
+package com.battleshippark.bsp_gallery.presentation.files;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

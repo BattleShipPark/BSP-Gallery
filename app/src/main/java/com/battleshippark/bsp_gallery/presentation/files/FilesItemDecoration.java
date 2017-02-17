@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.files;
+package com.battleshippark.bsp_gallery.presentation.files;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

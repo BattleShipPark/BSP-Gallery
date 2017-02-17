@@ -8,13 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.activity.files.FilesActivity;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
+import com.battleshippark.bsp_gallery.presentation.files.FilesActivity;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

@@ -24,10 +24,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.files.FilesActivity"
+            android:name=".presentation.files.FilesActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".activity.file.FileActivity"
+            android:name=".presentation.file.FileActivity"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme" />
         <activity

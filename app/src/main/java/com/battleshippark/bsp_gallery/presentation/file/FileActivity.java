@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.file;
+package com.battleshippark.bsp_gallery.presentation.file;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -15,9 +15,8 @@ import android.view.View;
 import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
 import com.battleshippark.bsp_gallery.media.MediaController;
-import com.squareup.otto.Bus;
+import com.battleshippark.bsp_gallery.presentation.files.FilesActivityModel;
 import com.squareup.otto.Subscribe;
 
 import org.parceler.Parcels;

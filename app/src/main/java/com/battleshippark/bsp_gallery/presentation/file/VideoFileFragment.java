@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.file;
+package com.battleshippark.bsp_gallery.presentation.file;
 
 import android.content.Intent;
 import android.net.Uri;

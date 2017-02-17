@@ -4,9 +4,6 @@ import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
 import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 
-import java.util.Map;
-import java.util.Set;
-
 import lombok.AllArgsConstructor;
 import rx.Observable;
 import rx.Scheduler;

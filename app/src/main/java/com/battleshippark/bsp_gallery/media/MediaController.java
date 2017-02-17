@@ -9,12 +9,12 @@ import android.support.annotation.VisibleForTesting;
 import com.battleshippark.bsp_gallery.BspApplication;
 import com.battleshippark.bsp_gallery.EventBusHelper;
 import com.battleshippark.bsp_gallery.Events;
-import com.battleshippark.bsp_gallery.activity.file.FileActivityModel;
-import com.battleshippark.bsp_gallery.activity.files.FilesActivityModel;
-import com.battleshippark.bsp_gallery.presentation.folders.FoldersActivityModel;
 import com.battleshippark.bsp_gallery.data.cache.CacheController;
-import com.battleshippark.bsp_gallery.media.file.MediaFileController;
 import com.battleshippark.bsp_gallery.domain.folders.MediaFolderController;
+import com.battleshippark.bsp_gallery.media.file.MediaFileController;
+import com.battleshippark.bsp_gallery.presentation.file.FileActivityModel;
+import com.battleshippark.bsp_gallery.presentation.files.FilesActivityModel;
+import com.battleshippark.bsp_gallery.presentation.folders.FoldersActivityModel;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;

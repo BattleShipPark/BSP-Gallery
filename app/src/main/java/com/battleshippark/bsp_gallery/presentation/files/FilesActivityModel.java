@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.file;
+package com.battleshippark.bsp_gallery.presentation.files;
 
 import android.support.annotation.VisibleForTesting;
 
@@ -16,21 +16,20 @@ import lombok.Data;
  */
 @Data
 @org.parceler.Parcel(org.parceler.Parcel.Serialization.BEAN)
-public final class FileActivityModel {
+public final class FilesActivityModel {
     @org.parceler.Transient
     private final Bus eventBus;
-    private int position;
     private int folderId;
     private String folderName;
     private List<MediaFileModel> mediaFileModelList;
     private MediaFilterMode mediaFilterMode;
 
-    public FileActivityModel() {
+    public FilesActivityModel() {
         this(EventBusHelper.eventBus);
     }
 
     @VisibleForTesting
-    FileActivityModel(Bus eventBus) {
+    FilesActivityModel(Bus eventBus) {
         this.eventBus = eventBus;
     }
 

@@ -1,4 +1,4 @@
-package com.battleshippark.bsp_gallery.activity.files;
+package com.battleshippark.bsp_gallery.presentation.files;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.battleshippark.bsp_gallery.R;
-import com.battleshippark.bsp_gallery.activity.file.FileActivity;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
+import com.battleshippark.bsp_gallery.presentation.file.FileActivity;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
