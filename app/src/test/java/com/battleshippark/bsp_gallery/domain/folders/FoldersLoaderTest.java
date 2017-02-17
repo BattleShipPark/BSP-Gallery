@@ -3,10 +3,8 @@ package com.battleshippark.bsp_gallery.domain.folders;
 import com.battleshippark.bsp_gallery.data.cache.CacheController;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
-import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
-import com.battleshippark.bsp_gallery.domain.Loader;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
-import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
+import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
@@ -18,11 +16,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
 
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.internal.schedulers.ImmediateScheduler;
 import rx.observers.TestSubscriber;
-import rx.schedulers.TestScheduler;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -32,9 +27,6 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FoldersLoaderTest {
-    @Mock
-    MediaFilterModeRepository filterModeRepository;
-
     @Mock
     MediaFolderRepository folderRepository;
 
@@ -52,10 +44,9 @@ public class FoldersLoaderTest {
 
     @Test
     public void execute() throws Exception {
-        Loader loader = new FoldersLoader(filterModeRepository, mediaControllerFactory,
+        UseCase<MediaFilterMode, List<MediaFolderModel>> loader = new FoldersLoader(mediaControllerFactory,
                 cacheControllerFactory, ImmediateScheduler.INSTANCE, ImmediateScheduler.INSTANCE);
 
-        when(filterModeRepository.load()).thenReturn(null);
         when(folderRepository.queryList()).thenReturn(null);
         when(folderRepository.queryFileCount(anyInt())).thenReturn(0);
         when(folderRepository.queryCoverFile(anyInt())).thenReturn(null);
@@ -68,7 +59,7 @@ public class FoldersLoaderTest {
         when(cacheControllerFactory.create()).thenReturn(cacheController);
 
         TestSubscriber subscriber = new TestSubscriber();
-        loader.execute(subscriber);
+        loader.execute(MediaFilterMode.ALL, subscriber);
 
         subscriber.assertCompleted();
     }

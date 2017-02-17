@@ -3,9 +3,10 @@ package com.battleshippark.bsp_gallery.presentation.folders;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.media.MediaFolderRepository;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
-import com.battleshippark.bsp_gallery.domain.Loader;
+import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.folders.FilterModeLoader;
+import com.battleshippark.bsp_gallery.domain.folders.FilterModeSaver;
 import com.battleshippark.bsp_gallery.domain.folders.FoldersLoader;
 import com.battleshippark.bsp_gallery.domain.folders.MediaFolderController;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
@@ -47,10 +48,11 @@ public class FoldersPresenterTest {
 
     @Test
     public void loadList() throws IOException {
-        FilterModeLoader filerModeLoader = new FilterModeLoader(mediaFilterModeRepository, scheduler, postScheduler);
-        FoldersLoader foldersLoader = new FoldersLoader(mediaFilterModeRepository, mediaControllerFactory,
+        UseCase<Void, MediaFilterMode> filerModeLoader = new FilterModeLoader(mediaFilterModeRepository, scheduler, postScheduler);
+        UseCase<MediaFilterMode, MediaFilterMode> filterModeSaver = new FilterModeSaver(mediaFilterModeRepository, scheduler, postScheduler);
+        UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader = new FoldersLoader(mediaControllerFactory,
                 new CacheControllerFactory(), scheduler, postScheduler);
-        FoldersPresenter presenter = new FoldersPresenter(foldersView, filerModeLoader, foldersLoader);
+        FoldersPresenter presenter = new FoldersPresenter(foldersView, filerModeLoader, filterModeSaver, foldersLoader);
 
         when(mediaFilterModeRepository.load()).thenReturn(null);
         when(folderRepository.queryList()).thenReturn(null);
@@ -67,14 +69,14 @@ public class FoldersPresenterTest {
     @Test
     public void loadList_withMode() throws IOException {
         List<MediaFolderModel> folderModelList = Collections.singletonList(new MediaFolderModel(1, 2, 3, "a", "b", 4));
-        Loader<List<MediaFolderModel>> foldersLoader = new FoldersLoader(null, null, null, null, null) {
+        UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader = new FoldersLoader(null, null, null, null) {
             @Override
-            public void execute(Subscriber<List<MediaFolderModel>> subscriber) {
+            public void execute(MediaFilterMode filterMode, Subscriber<List<MediaFolderModel>> subscriber) {
                 subscriber.onNext(folderModelList);
                 subscriber.onCompleted();
             }
         };
-        FoldersPresenter presenter = new FoldersPresenter(foldersView, null, foldersLoader);
+        FoldersPresenter presenter = new FoldersPresenter(foldersView, null, null, foldersLoader);
 
         presenter.loadList(MediaFilterMode.ALL, new FoldersPresenter.FoldersSubscriber(foldersView));
 
@@ -85,12 +87,15 @@ public class FoldersPresenterTest {
 
     @Test
     public void loadFilterMode() throws IOException {
-        Loader<MediaFilterMode> filerModeLoader = subscriber -> {
-            subscriber.onNext(MediaFilterMode.ALL);
-            subscriber.onCompleted();
+        UseCase<Void, MediaFilterMode> filerModeLoader = new FilterModeLoader(null, null, null) {
+            @Override
+            public void execute(Void aVoid, Subscriber<MediaFilterMode> subscriber) {
+                subscriber.onNext(MediaFilterMode.ALL);
+                subscriber.onCompleted();
+            }
         };
 
-        FoldersPresenter presenter = new FoldersPresenter(foldersView, filerModeLoader, null);
+        FoldersPresenter presenter = new FoldersPresenter(foldersView, filerModeLoader, null, null);
 
         presenter.loadFilterMode();
 

@@ -1,7 +1,7 @@
 package com.battleshippark.bsp_gallery.domain.folders;
 
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
-import com.battleshippark.bsp_gallery.domain.Loader;
+import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 
 import org.junit.Test;
@@ -26,13 +26,13 @@ public class FilterModeLoaderTest {
 
     @Test
     public void execute() throws Exception {
-        Loader<MediaFilterMode> loader = new FilterModeLoader(filterModeRepository,
+        UseCase<Void, MediaFilterMode> loader = new FilterModeLoader(filterModeRepository,
                 ImmediateScheduler.INSTANCE, ImmediateScheduler.INSTANCE);
 
         when(filterModeRepository.load()).thenReturn(MediaFilterMode.ALL);
 
         TestSubscriber<MediaFilterMode> subscriber = new TestSubscriber<>();
-        loader.execute(subscriber);
+        loader.execute(null, subscriber);
 
         List<MediaFilterMode> list = subscriber.getOnNextEvents();
         assertThat(list).hasSize(1);

@@ -2,8 +2,7 @@ package com.battleshippark.bsp_gallery.presentation.folders;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.battleshippark.bsp_gallery.domain.Loader;
-import com.battleshippark.bsp_gallery.domain.folders.FoldersLoader;
+import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
@@ -18,30 +17,25 @@ import rx.Subscriber;
 @AllArgsConstructor
 class FoldersPresenter {
     private final FoldersView foldersView;
-    private final Loader<MediaFilterMode> filerModeLoader;
-    private final Loader<List<MediaFolderModel>> foldersLoader;
+    private final UseCase<Void, MediaFilterMode> filerModeLoader;
+    private final UseCase<MediaFilterMode, MediaFilterMode> filterModeSaver;
+    private final UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader;
 
     void loadFilterMode() {
-        filerModeLoader.execute(new FilterModeSubscriber(foldersView));
-    }
-
-    void loadFilterMode(FilterModeSubscriber subscriber) {
-        filerModeLoader.execute(subscriber);
-        foldersView.showProgress();
+        filerModeLoader.execute(null, new FilterModeSubscriber(foldersView));
     }
 
     void changeFilterMode(MediaFilterMode mediaFilterMode) {
-        filterModeChanger.execute(new FilterModeSubscriber(foldersView));
+        filterModeSaver.execute(mediaFilterMode, new FilterModeSubscriber(foldersView));
     }
 
     void loadList(MediaFilterMode mediaFilterMode) {
-        loadList(mediaFilterMode, new FoldersSubscriber(foldersView));
+        foldersLoader.execute(mediaFilterMode, new FoldersSubscriber(foldersView));
     }
 
     @VisibleForTesting
-    void loadList(MediaFilterMode mediaFilterMode, FoldersSubscriber subscriber) {
-        ((FoldersLoader) foldersLoader).setFilterMode(mediaFilterMode);
-        foldersLoader.execute(subscriber);
+    void loadList(MediaFilterMode mediaFilterMode, Subscriber subscriber) {
+        foldersLoader.execute(mediaFilterMode, subscriber);
     }
 
     @AllArgsConstructor

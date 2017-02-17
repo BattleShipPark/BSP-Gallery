@@ -1,8 +1,11 @@
 package com.battleshippark.bsp_gallery.domain.folders;
 
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepository;
-import com.battleshippark.bsp_gallery.domain.Loader;
+import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
+
+import java.util.Map;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import rx.Observable;
@@ -13,17 +16,17 @@ import rx.Subscriber;
  */
 
 @AllArgsConstructor
-public class FilterModeChanger implements Loader<MediaFilterMode> {
+public class FilterModeSaver implements UseCase<MediaFilterMode, MediaFilterMode> {
     private final MediaFilterModeRepository mediaFilterModeRepository;
     private final Scheduler scheduler;
     private final Scheduler postScheduler;
 
     @Override
-    public void execute(Subscriber<MediaFilterMode> subscriber) {
+    public void execute(MediaFilterMode filterMode, Subscriber<MediaFilterMode> subscriber) {
         Observable.create(
                 (Subscriber<? super MediaFilterMode> _subscriber) -> {
-                    MediaFilterMode mode = mediaFilterModeRepository.load();
-                    _subscriber.onNext(mode);
+                    mediaFilterModeRepository.save(filterMode);
+                    _subscriber.onNext(filterMode);
                     _subscriber.onCompleted();
                 }
         ).subscribeOn(scheduler).observeOn(postScheduler).subscribe(subscriber);

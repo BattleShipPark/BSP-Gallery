@@ -18,7 +18,9 @@ import com.battleshippark.bsp_gallery.R;
 import com.battleshippark.bsp_gallery.data.cache.CacheControllerFactory;
 import com.battleshippark.bsp_gallery.data.mode.MediaFilterModeRepositoryImpl;
 import com.battleshippark.bsp_gallery.domain.MediaControllerFactoryImpl;
+import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.domain.folders.FilterModeLoader;
+import com.battleshippark.bsp_gallery.domain.folders.FilterModeSaver;
 import com.battleshippark.bsp_gallery.domain.folders.FoldersLoader;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 import com.battleshippark.bsp_gallery.media.MediaFolderModel;
@@ -111,11 +113,12 @@ public class FoldersActivity extends AppCompatActivity implements FoldersView {
         Scheduler scheduler = Schedulers.io();
         Scheduler postScheduler = AndroidSchedulers.mainThread();
 
-        FilterModeLoader filerModeLoader = new FilterModeLoader(mediaFilterModeRepository, scheduler, postScheduler);
-        FoldersLoader foldersLoader = new FoldersLoader(mediaFilterModeRepository, mediaControllerFactory,
+        UseCase<Void, MediaFilterMode> filerModeLoader = new FilterModeLoader(mediaFilterModeRepository, scheduler, postScheduler);
+        UseCase<MediaFilterMode, MediaFilterMode> filerModeSaver = new FilterModeSaver(mediaFilterModeRepository, scheduler, postScheduler);
+        UseCase<MediaFilterMode, List<MediaFolderModel>> foldersLoader = new FoldersLoader(mediaControllerFactory,
                 cacheControllerFactory, scheduler, postScheduler);
 
-        presenter = new FoldersPresenter(this, filerModeLoader, foldersLoader);
+        presenter = new FoldersPresenter(this, filerModeLoader, filerModeSaver, foldersLoader);
 
         RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
