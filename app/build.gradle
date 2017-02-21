@@ -7,7 +7,7 @@ android {
     //noinspection GroovyAssignabilityCheck
     signingConfigs {
         release {
-            storeFile file("..\\battleshippark.keystore")
+            storeFile file("..\\..\\battleshippark.keystore")
             storePassword System.getProperty("store_pwd")
             keyAlias System.getProperty("key_alias")
             keyPassword System.getProperty("key_pwd")
