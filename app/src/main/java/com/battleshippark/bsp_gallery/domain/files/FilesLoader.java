@@ -4,7 +4,6 @@ import com.battleshippark.bsp_gallery.domain.MediaControllerFactory;
 import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
 import com.battleshippark.bsp_gallery.media.MediaFilterMode;
-import com.battleshippark.bsp_gallery.media.MediaFolderModel;
 
 import java.util.ArrayList;
 import java.util.List;

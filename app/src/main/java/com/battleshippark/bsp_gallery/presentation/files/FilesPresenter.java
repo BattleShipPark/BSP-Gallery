@@ -4,7 +4,6 @@ import android.support.annotation.VisibleForTesting;
 
 import com.battleshippark.bsp_gallery.domain.UseCase;
 import com.battleshippark.bsp_gallery.media.MediaFileModel;
-import com.battleshippark.bsp_gallery.media.MediaFilterMode;
 
 import java.util.List;
 

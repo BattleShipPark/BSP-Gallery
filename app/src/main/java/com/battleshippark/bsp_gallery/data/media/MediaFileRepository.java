@@ -5,8 +5,6 @@ import com.battleshippark.bsp_gallery.media.MediaFileModel;
 
 import java.util.List;
 
-import rx.Observable;
-
 /**
  */
 public interface MediaFileRepository {
