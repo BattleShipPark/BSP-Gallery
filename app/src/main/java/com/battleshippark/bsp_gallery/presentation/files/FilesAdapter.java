@@ -28,8 +28,7 @@ public class FilesAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(context, R.layout.listitem_files, null);
-        RecyclerView.ViewHolder vh = new FilesItemViewHolder(context, view, model);
-        return vh;
+        return new FilesItemViewHolder(context, view, model);
     }
 
     @Override

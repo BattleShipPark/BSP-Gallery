@@ -26,8 +26,7 @@ class FoldersAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(context, R.layout.listitem_folders, null);
-        RecyclerView.ViewHolder vh = new FoldersItemViewHolder(context, view, filterMode);
-        return vh;
+        return new FoldersItemViewHolder(context, view, filterMode);
     }
 
     @Override

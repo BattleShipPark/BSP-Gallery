@@ -231,9 +231,7 @@ public class MediaController {
         }
 
         List<MediaFolderModel> result = new ArrayList<>();
-        for (MediaFolderModel mediaFolderModel : map.values()) {
-            result.add(mediaFolderModel);
-        }
+        result.addAll(map.values());
 
         Collections.sort(result, (lhs, rhs) -> {
             if (lhs.getId() == MediaFolderModel.ALL_FOLDER_ID) return 1;
